@@ -1,0 +1,41 @@
+name: Publish Snapshot
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**/*.md'
+
+permissions:
+  contents: read
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "snapshot-upload"
+  cancel-in-progress: false
+
+jobs:
+  publish-snapshot:
+    runs-on: ubuntu-latest
+    if: github.repository == 'square/metro-extensions'
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup-action
+        with:
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Publish snapshot
+        run: |
+          ./gradlew clean publish -PRELEASE_SIGNING_ENABLED=true --no-build-cache --stacktrace --show-version --no-configuration-cache
+          ./gradlew -p gradle-plugin clean publish -PRELEASE_SIGNING_ENABLED=true --no-build-cache --stacktrace --show-version --no-configuration-cache
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SECRET_PASSPHRASE }}
