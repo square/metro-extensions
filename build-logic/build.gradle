@@ -1,0 +1,27 @@
+plugins {
+  id 'java-gradle-plugin'
+  alias libs.plugins.kotlin.jvm
+  alias libs.plugins.ktfmt
+}
+
+gradlePlugin {
+  plugins {
+    libPlugin {
+      id = "com.squareup.lib"
+      implementationClass = "com.squareup.buildlogic.LibPlugin"
+    }
+  }
+}
+
+ktfmt {
+  googleStyle()
+}
+
+dependencies {
+  implementation libs.kotlin.gradle.plugin
+  implementation libs.ktfmt.gradle.plugin
+}
+
+tasks.register('release') {
+  dependsOn('assemble', 'test', 'ktfmtCheck')
+}

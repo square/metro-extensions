@@ -1,0 +1,1 @@
+/classMustImplementScoped.kt:(158,201): error: com.test.Service contributes a multibinding for the interface mortar.Scoped to the dependency graph, but doesn't implement mortar.Scoped. Did you forget to add the super type?

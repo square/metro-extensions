@@ -1,0 +1,11 @@
+plugins {
+  id 'com.squareup.lib'
+  id 'com.squareup.metro.extensions'
+  alias libs.plugins.metro
+}
+
+dependencies {
+  implementation project(':integration-tests:lib')
+  implementation project(':stubs')
+  testImplementation libs.kotlin.test
+}

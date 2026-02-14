@@ -1,0 +1,9 @@
+plugins {
+  id 'com.squareup.lib'
+  id 'com.squareup.metro.extensions'
+  alias libs.plugins.metro
+}
+
+dependencies {
+  implementation project(':stubs')
+}

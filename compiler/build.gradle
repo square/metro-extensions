@@ -1,0 +1,125 @@
+plugins {
+  id 'com.squareup.lib'
+  alias libs.plugins.autoservice
+  alias libs.plugins.binary.compat.validator
+  alias libs.plugins.maven.publish
+}
+
+kotlin {
+  explicitApi()
+}
+
+configurations {
+  annotationsRuntimeClasspath {
+    transitive = false
+  }
+  metroRuntimeClasspath {
+    transitive = false
+  }
+}
+
+dependencies {
+  compileOnly libs.kotlin.compiler.embeddable
+  compileOnly libs.metro.compiler
+
+  annotationsRuntimeClasspath project(':stubs')
+  metroRuntimeClasspath libs.metro.runtime
+
+  // Use non-embeddable kotlin-compiler for tests - includes IntelliJ platform classes needed
+  // by test framework
+  testImplementation libs.kotlin.compiler
+  testImplementation libs.kotlin.test.junit5
+  testImplementation libs.kotlin.compiler.internal.test.framework
+
+  // Metro compiler for running Metro tests
+  testImplementation libs.metro.compiler
+
+  // Dependencies required to run the internal test framework
+  testRuntimeOnly libs.kotlin.reflect
+  testRuntimeOnly libs.kotlin.test
+  testRuntimeOnly libs.kotlin.script.runtime
+  testRuntimeOnly libs.kotlin.annotations.jvm
+}
+
+//noinspection UnnecessaryQualifiedReference
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+  compilerOptions {
+    freeCompilerArgs.add('-Xcontext-parameters')
+    optIn.addAll([
+      'org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi',
+      'org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI',
+    ])
+  }
+}
+
+// Capture configurations as FileCollections for configuration cache compatibility
+def annotationsClasspathFiles = configurations.annotationsRuntimeClasspath
+def metroRuntimeClasspathFiles = configurations.metroRuntimeClasspath
+def testClasspathFiles = configurations.testRuntimeClasspath
+
+tasks.withType(Test).configureEach { testTask ->
+  // Use jvmArgumentProviders for configuration cache compatible system properties
+  testTask.jvmArgumentProviders.add(
+    new CommandLineArgumentProvider() {
+      @InputFiles
+      @PathSensitive(PathSensitivity.RELATIVE)
+      FileCollection annotationsClasspath = annotationsClasspathFiles
+
+      @InputFiles
+      @PathSensitive(PathSensitivity.RELATIVE)
+      FileCollection metroRuntimeClasspath = metroRuntimeClasspathFiles
+
+      @InputFiles
+      @PathSensitive(PathSensitivity.RELATIVE)
+      FileCollection testClasspath = testClasspathFiles
+
+      @Override
+      Iterable<String> asArguments() {
+        def args = []
+        args.add("-DannotationsRuntime.classpath=${annotationsClasspath.asPath}")
+        args.add("-DmetroRuntime.classpath=${metroRuntimeClasspath.asPath}")
+
+        def setLib = { String propName, String jarName ->
+          def path = testClasspath.files.find { it.name ==~ /$jarName-\d.*\.jar/ }?.absolutePath
+          if (path != null) {
+            args.add("-D${propName}=${path}")
+          }
+        }
+        setLib('org.jetbrains.kotlin.test.kotlin-stdlib', 'kotlin-stdlib')
+        setLib('org.jetbrains.kotlin.test.kotlin-stdlib-jdk8', 'kotlin-stdlib-jdk8')
+        setLib('org.jetbrains.kotlin.test.kotlin-reflect', 'kotlin-reflect')
+        setLib('org.jetbrains.kotlin.test.kotlin-test', 'kotlin-test')
+        setLib('org.jetbrains.kotlin.test.kotlin-script-runtime', 'kotlin-script-runtime')
+        setLib('org.jetbrains.kotlin.test.kotlin-annotations-jvm', 'kotlin-annotations-jvm')
+
+        return args
+      }
+    }
+  )
+
+  useJUnitPlatform()
+  workingDir = rootDir
+
+  // Properties required to run the internal test framework.
+  systemProperty('idea.ignore.disabled.plugins', 'true')
+  systemProperty('idea.home.path', rootDir)
+}
+
+tasks.register('generateTests', JavaExec) {
+  inputs
+    .dir(layout.projectDirectory.dir('src/test/resources'))
+    .withPropertyName('testData')
+    .withPathSensitivity(PathSensitivity.RELATIVE)
+
+  outputs
+    .dir(layout.projectDirectory.dir('src/test/java'))
+    .withPropertyName('generatedTests')
+
+  classpath = sourceSets.test.runtimeClasspath
+  mainClass = 'com.squareup.metro.extensions.GenerateTestsKt'
+  workingDir = rootDir
+
+  minHeapSize = '128m'
+  maxHeapSize = '1g'
+  jvmArgs('-Xss1m')
+}

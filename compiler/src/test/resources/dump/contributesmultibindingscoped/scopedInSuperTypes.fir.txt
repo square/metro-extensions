@@ -1,0 +1,41 @@
+FILE: scopedInSuperTypes.kt
+    package com.test
+
+    public abstract interface BaseInterface : R|mortar/Scoped| {
+    }
+    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/dagger/ContributesMultibindingScoped|(scope = <getClass>(Q|kotlin/Unit|)) public final class Service : R|com/test/BaseInterface| {
+        public constructor(): R|com/test/Service| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|com/squareup/dagger/ForScope|(value = <getClass>(Q|kotlin/Unit|)) public abstract fun bindsService(service: R|com/test/Service|): R|mortar/Scoped|
+
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/Service.MultibindingScopedContribution| {
+            }
+
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public abstract class BindsMirror : R|kotlin/Any| {
+                private constructor(): R|com/test/Service.MultibindingScopedContribution.BindsMirror| {
+                    super<R|kotlin/Any|>()
+                }
+
+                private constructor(): R|com/test/Service.MultibindingScopedContribution.BindsMirror| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+        }
+
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|dev/zacsweers/metro/internal/Factory<com/test/Service>| {
+            public final fun create(): R|dev/zacsweers/metro/internal/Factory<com/test/Service>|
+
+            public final fun newInstance(): R|com/test/Service|
+
+            private constructor(): R|com/test/Service.MetroFactory| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+    }

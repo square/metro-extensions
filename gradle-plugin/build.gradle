@@ -1,0 +1,50 @@
+plugins {
+  alias libs.plugins.kotlin.jvm
+  alias libs.plugins.binary.compat.validator
+  alias libs.plugins.buildconfig
+  alias libs.plugins.ktfmt
+  alias libs.plugins.maven.publish
+  id 'java-gradle-plugin'
+}
+
+kotlin {
+  explicitApi()
+}
+
+ktfmt {
+  googleStyle()
+}
+
+buildConfig {
+  packageName('com.squareup.metro.extensions')
+  useKotlinOutput {
+    topLevelConstants = true
+    internalVisibility = true
+  }
+  buildConfigField(String, 'VERSION', provider { VERSION_NAME })
+  buildConfigField(String, 'GROUP', provider { GROUP })
+}
+
+gradlePlugin {
+  plugins {
+    metroExtensions {
+      id = 'com.squareup.metro.extensions'
+      implementationClass = 'com.squareup.metro.extensions.SquareMetroExtensionsPlugin'
+    }
+  }
+}
+
+mavenPublishing {
+  coordinates(GROUP, 'gradle-plugin', VERSION_NAME)
+  pom {
+    name = 'Metro Extensions Gradle Plugin'
+  }
+}
+
+dependencies {
+  compileOnly libs.kotlin.gradle.plugin
+}
+
+tasks.register('release') {
+  dependsOn('assemble', 'test', 'ktfmtCheck', 'apiCheck')
+}
