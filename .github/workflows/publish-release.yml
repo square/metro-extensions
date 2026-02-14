@@ -1,0 +1,65 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: read
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "release-upload"
+  cancel-in-progress: false
+
+jobs:
+  publish-release:
+    # Needed for creating the release: https://github.com/softprops/action-gh-release?tab=readme-ov-file#permissions
+    permissions:
+      contents: write
+
+    runs-on: ubuntu-latest
+    if: github.repository == 'square/metro-extensions'
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./.github/actions/setup-action
+        with:
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Publish release
+        run: |
+          ./gradlew clean publishAndReleaseToMavenCentral -PRELEASE_SIGNING_ENABLED=true --no-build-cache --stacktrace --show-version --no-configuration-cache
+          ./gradlew -p gradle-plugin clean publishAndReleaseToMavenCentral -PRELEASE_SIGNING_ENABLED=true --no-build-cache --stacktrace --show-version --no-configuration-cache
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_PORTAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PORTAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ARTIFACT_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Extract release notes
+        id: release_notes
+        uses: ffurrer2/extract-release-notes@v2
+
+      - name: Check if pre-release
+        id: prerelease
+        run: |
+          version=$(grep VERSION_NAME gradle.properties | cut -d'=' -f2)
+          if [[ $version == *"-beta"* ]]; then
+            echo "isPrerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "isPrerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.release_notes.outputs.release_notes }}
+          prerelease: ${{ steps.prerelease.outputs.isPrerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
