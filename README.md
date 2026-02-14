@@ -1,36 +1,56 @@
-# square-metro-extensions README
+# Metro Extensions
 
-Congrats, project leads! You got a new project to grow!
+A Kotlin compiler plugin that extends [Metro](https://github.com/ZacSweers/metro). It uses Metro's
+extension API to generate additional DI declarations at compile time, bridging Square-internal
+annotations with Metro's DI graph.
 
-This stub is meant to help you form a strong community around your work. It's yours to adapt, and may 
-diverge from this initial structure. Just keep the files seeded in this repo, and the rest is yours to evolve! 
+> **Note:** This project is specific to Square's codebase and is not intended for external use. It
+> serves as a reference for how to write compiler plugins that extend Metro. All APIs used — both
+> Metro's extension API and Kotlin's compiler plugin API — are highly experimental and will break
+> between versions. If you want to extend Metro for your own project, see the
+> [Generating Metro Code](https://zacsweers.github.io/metro/latest/generating-metro-code/)
+> documentation.
 
-## Introduction
+## What it does
 
-Orient users to the project here. This is a good place to start with an assumption
-that the user knows very little - so start with the Big Picture and show how this
-project fits into it.
+Square's codebase uses annotations like `@ContributesMultibindingScoped` to declare scoped
+multibindings in dependency graphs. This compiler plugin recognizes those annotations and generates
+the Metro-compatible declarations needed to wire them into a `@DependencyGraph` automatically — no
+manual boilerplate required.
 
-Then maybe a dive into what this project does.
+### Supported annotations
 
-Diagrams and other visuals are helpful here. Perhaps code snippets showing usage.
+#### `@ContributesMultibindingScoped(scope: KClass<*>)`
 
-Project leads should complete, alongside this `README`:
+Contributes a class as a scoped multibinding into a Metro dependency graph. The annotated class must
+implement `mortar.Scoped`. At compile time, the plugin generates a `@ContributesMultibinding`
+provider scoped with `@SingleIn` for the given scope, so the class is automatically included in
+`Set<Scoped>` within the target graph.
 
-* [CODEOWNERS](./CODEOWNERS) - set project lead(s)
-* [CONTRIBUTING.md](./CONTRIBUTING.md) - Fill out how to: install prereqs, build, test, run, access CI, chat, discuss, file issues
-* [Bug-report.md](.github/ISSUE_TEMPLATE/bug-report.md) - Fill out `Assignees` add codeowners @names
-* [config.yml](.github/ISSUE_TEMPLATE/config.yml) - remove "(/add your discord channel..)" and replace the url with your Discord channel if applicable
+## Usage
 
-The other files in this template repo may be used as-is:
+Apply the Gradle plugin to your project:
 
-* [GOVERNANCE.md](./GOVERNANCE.md)
-* [LICENSE](./LICENSE)
+```groovy
+plugins {
+  id 'com.squareup.metro.extensions'
+}
+```
 
-## Project Resources
+## License
 
-| Resource                                   | Description                                                                    |
-| ------------------------------------------ | ------------------------------------------------------------------------------ |
-| [CODEOWNERS](./CODEOWNERS)                 | Outlines the project lead(s)                                                   |
-| [GOVERNANCE.md](./GOVERNANCE.md)           | Project governance                                                             |
-| [LICENSE](./LICENSE)                       | Apache License, Version 2.0                                                    |
+```
+Copyright 2026 Square, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```

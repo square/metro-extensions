@@ -1,0 +1,33 @@
+[versions]
+autoservice = "0.1.3"
+binary-compat-validator = "0.18.1"
+buildconfig = "6.0.7"
+kotlin = "2.3.10"
+ktfmt = "0.25.0"
+maven-publish = "0.36.0"
+metro = "0.10.4"
+
+[libraries]
+javax-inject = { module = "javax.inject:javax.inject", version = "1" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
+ktfmt-gradle-plugin = { module = "com.ncorti.ktfmt.gradle:plugin", version.ref = "ktfmt" }
+kotlin-annotations-jvm = { module = "org.jetbrains.kotlin:kotlin-annotations-jvm", version.ref = "kotlin" }
+kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin" }
+kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+kotlin-compiler-internal-test-framework = { module = "org.jetbrains.kotlin:kotlin-compiler-internal-test-framework", version.ref = "kotlin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-script-runtime = { module = "org.jetbrains.kotlin:kotlin-script-runtime", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+metro-compiler = { module = "dev.zacsweers.metro:compiler", version.ref = "metro" }
+metro-runtime = { module = "dev.zacsweers.metro:runtime", version.ref = "metro" }
+
+[plugins]
+autoservice = { id = "com.fueledbycaffeine.autoservice", version.ref = "autoservice" }
+binary-compat-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compat-validator" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+metro = { id = "dev.zacsweers.metro", version.ref = "metro" }

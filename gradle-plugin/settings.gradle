@@ -1,0 +1,21 @@
+pluginManagement {
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+
+  versionCatalogs {
+    libs {
+      from files('../gradle/libs.versions.toml')
+    }
+  }
+}
+
+rootProject.name = 'gradle-plugin'

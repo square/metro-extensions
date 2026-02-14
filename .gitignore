@@ -1,0 +1,28 @@
+# Gradle
+.gradle
+/.gradle/
+build/
+!/scripts/**/build
+local.properties
+/reports/
+
+# IntelliJ IDEA
+.idea/*
+!.idea/ktfmt.xml
+*.iml
+*.ipl
+*.ipr
+*.iws
+.shelf/
+
+# kotlin
+.kotlin
+
+# claude
+.claude/settings.local.json
+
+# iOS
+**/xcuserdata/
+
+# Steve Jobs
+.DS_Store

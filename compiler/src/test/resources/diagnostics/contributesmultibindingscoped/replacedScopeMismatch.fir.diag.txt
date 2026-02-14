@@ -1,0 +1,1 @@
+/replacedScopeMismatch.kt:(242,304): error: com.test.Service2 is replacing / excluding com.test.Service1, but it uses a different scope: kotlin.Unit and not kotlin.Int. You can only replace / exclude contributions with the same scope.

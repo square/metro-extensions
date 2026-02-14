@@ -1,0 +1,28 @@
+pluginManagement {
+  includeBuild('build-logic')
+  includeBuild('gradle-plugin')
+
+  repositories {
+    mavenCentral()
+    gradlePluginPortal()
+  }
+}
+
+includeBuild('gradle-plugin') {
+  dependencySubstitution {
+    substitute module("$GROUP:gradle-plugin") using project(':')
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+  }
+}
+
+rootProject.name = 'metro-extensions'
+
+include ':compiler'
+include ':integration-tests:app'
+include ':integration-tests:lib'
+include ':stubs'
