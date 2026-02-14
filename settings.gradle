@@ -1,6 +1,9 @@
 pluginManagement {
   includeBuild('build-logic')
   includeBuild('gradle-plugin')
+  if (settings.hasProperty('useLocalMetro')) {
+    includeBuild(settings.hasProperty('localMetroPath') ? localMetroPath : '../metro')
+  }
 
   repositories {
     mavenCentral()
@@ -11,6 +14,16 @@ pluginManagement {
 includeBuild('gradle-plugin') {
   dependencySubstitution {
     substitute module("$GROUP:gradle-plugin") using project(':')
+  }
+}
+
+if (settings.hasProperty('useLocalMetro')) {
+  def metroPath = settings.hasProperty('localMetroPath') ? localMetroPath : '../metro'
+  includeBuild(metroPath) {
+    dependencySubstitution {
+      substitute module('dev.zacsweers.metro:compiler') using project(':compiler')
+      substitute module('dev.zacsweers.metro:runtime') using project(':runtime')
+    }
   }
 }
 

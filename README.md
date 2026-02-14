@@ -40,6 +40,25 @@ plugins {
 }
 ```
 
+## Development
+
+To build and test against a local checkout of Metro (expected at `../metro`), pass the
+`-PuseLocalMetro` flag:
+
+```bash
+./gradlew :compiler:test -PuseLocalMetro
+```
+
+This includes the Metro project as a Gradle included build and substitutes the
+`dev.zacsweers.metro:compiler`, `dev.zacsweers.metro:runtime`, and `dev.zacsweers.metro` plugin
+dependencies with the local source. Without the flag, published Maven artifacts are used.
+
+To use a different path for the Metro checkout, pass `-PlocalMetroPath=<path>`:
+
+```bash
+./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=/path/to/metro
+```
+
 ## License
 
 ```
