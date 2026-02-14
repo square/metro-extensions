@@ -21,5 +21,5 @@
 
 - Initial release.
 
-[Unreleased]: https://github.com/amzn/app-platform/compare/0.0.1...HEAD
-[0.0.1]: https://github.com/amzn/app-platform/compare/0.0.1
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.1...HEAD
+[0.0.1]: https://github.com/square/metro-extensions/compare/0.0.1
