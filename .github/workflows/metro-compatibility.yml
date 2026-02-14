@@ -1,0 +1,48 @@
+name: Metro Compatibility
+
+on:
+  # Daily at 8:00 UTC. Needed because there's no trigger when the main branch in Metro changes.
+  schedule:
+    - cron: '0 8 * * *'
+
+  # Allow manual trigger.
+  workflow_dispatch:
+
+  # Verify for PRs as well.
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  metro-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout Metro
+        uses: actions/checkout@v4
+        with:
+          repository: ZacSweers/metro
+          path: metro
+
+      - name: Setup
+        uses: ./.github/actions/setup-action
+        with:
+          gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          java-version: '24'
+
+      - name: Compiler tests
+        run: ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version
+
+      - name: Integration tests
+        run: ./gradlew -p integration-tests test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: metro-compat-test-results
+          path: ./**/build/reports/
