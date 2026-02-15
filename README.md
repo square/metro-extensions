@@ -1,5 +1,8 @@
 # Metro Extensions
 
+[![CI](https://github.com/square/metro-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/square/metro-extensions/actions/workflows/ci.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/com.squareup.metro.extensions/compiler)](https://central.sonatype.com/artifact/com.squareup.metro.extensions/compiler)
+
 A Kotlin compiler plugin that extends [Metro](https://github.com/ZacSweers/metro). It uses Metro's
 extension API to generate additional DI declarations at compile time, bridging Square-internal
 annotations with Metro's DI graph.
