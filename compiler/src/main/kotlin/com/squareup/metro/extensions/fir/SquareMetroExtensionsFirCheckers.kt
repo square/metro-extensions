@@ -1,5 +1,6 @@
 package com.squareup.metro.extensions.fir
 
+import com.squareup.metro.extensions.robot.ContributesRobotChecker
 import com.squareup.metro.extensions.scoped.ContributesMultibindingScopedChecker
 import com.squareup.metro.extensions.scoped.ContributesMultibindingScopedReplacesChecker
 import org.jetbrains.kotlin.fir.FirSession
@@ -12,6 +13,10 @@ internal class SquareMetroExtensionsFirCheckers(session: FirSession) :
   override val declarationCheckers: DeclarationCheckers =
     object : DeclarationCheckers() {
       override val classCheckers: Set<FirClassChecker> =
-        setOf(ContributesMultibindingScopedChecker, ContributesMultibindingScopedReplacesChecker)
+        setOf(
+          ContributesMultibindingScopedChecker,
+          ContributesMultibindingScopedReplacesChecker,
+          ContributesRobotChecker,
+        )
     }
 }

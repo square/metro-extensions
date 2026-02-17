@@ -60,4 +60,44 @@ public class BoxTestGenerated extends AbstractBoxTest {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/singleCompilation.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/box/contributesrobot")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesrobot {
+    @Test
+    public void testAllFilesPresentInContributesrobot() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("componentAddedToGraph.kt")
+    public void testComponentAddedToGraph() {
+      runTest("compiler/src/test/resources/box/contributesrobot/componentAddedToGraph.kt");
+    }
+
+    @Test
+    @TestMetadata("composeScreenRobot.kt")
+    public void testComposeScreenRobot() {
+      runTest("compiler/src/test/resources/box/contributesrobot/composeScreenRobot.kt");
+    }
+
+    @Test
+    @TestMetadata("innerClassRobot.kt")
+    public void testInnerClassRobot() {
+      runTest("compiler/src/test/resources/box/contributesrobot/innerClassRobot.kt");
+    }
+
+    @Test
+    @TestMetadata("multiCompilation.kt")
+    public void testMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesrobot/multiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("screenRobot.kt")
+    public void testScreenRobot() {
+      runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
+    }
+  }
 }

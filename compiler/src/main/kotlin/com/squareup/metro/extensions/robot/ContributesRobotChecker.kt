@@ -1,4 +1,4 @@
-package com.squareup.metro.extensions.scoped
+package com.squareup.metro.extensions.robot
 
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.SquareMetroExtensionsDiagnostics
@@ -15,10 +15,11 @@ import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.types.coneType
 
 /**
- * FIR checker that validates classes annotated with `@ContributesMultibindingScoped` implement the
- * `mortar.Scoped` interface.
+ * FIR checker that validates classes annotated with `@ContributesRobot` extend
+ * `com.squareup.instrumentation.robots.ScreenRobot` or
+ * `com.squareup.instrumentation.robots.compose.ComposeScreenRobot`.
  */
-internal object ContributesMultibindingScopedChecker : FirClassChecker(MppCheckerKind.Common) {
+internal object ContributesRobotChecker : FirClassChecker(MppCheckerKind.Common) {
 
   context(context: CheckerContext, reporter: DiagnosticReporter)
   override fun check(declaration: FirClass) {
@@ -27,24 +28,23 @@ internal object ContributesMultibindingScopedChecker : FirClassChecker(MppChecke
 
     val annotation =
       declaration.annotations.firstOrNull { ann ->
-        ann.toAnnotationClassId(session) ==
-          ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID
+        ann.toAnnotationClassId(session) == ContributesRobotIds.CONTRIBUTES_ROBOT_CLASS_ID
       } ?: return
 
-    val implementsScoped =
+    val extendsRobot =
       declaration.superTypeRefs.any { superTypeRef ->
         val coneType = superTypeRef.coneType.fullyExpandedType()
-        hasTransitiveSupertype(coneType, session, listOf(ClassIds.SCOPED))
+        hasTransitiveSupertype(coneType, session, ClassIds.ROBOT_FQ_NAMES)
       }
 
-    if (!implementsScoped) {
+    if (!extendsRobot) {
       val fqName = declaration.classId.asSingleFqName()
       reporter.reportOn(
         annotation.source,
-        SquareMetroExtensionsDiagnostics.CONTRIBUTES_MULTIBINDING_SCOPED_ERROR,
-        "$fqName contributes a multibinding for the interface mortar.Scoped " +
-          "to the dependency graph, but doesn't implement mortar.Scoped. " +
-          "Did you forget to add the super type?",
+        SquareMetroExtensionsDiagnostics.CONTRIBUTES_ROBOT_ERROR,
+        "$fqName contributes a robot to the Metro graph, but doesn't extend " +
+          "${ClassIds.SCREEN_ROBOT.asSingleFqName()}, or " +
+          "${ClassIds.COMPOSE_SCREEN_ROBOT.asSingleFqName()}.",
       )
     }
   }

@@ -42,4 +42,20 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
       runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/replacedScopeMismatch.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/diagnostics/contributesrobot")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesrobot {
+    @Test
+    public void testAllFilesPresentInContributesrobot() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("classMustExtendScreenRobot.kt")
+    public void testClassMustExtendScreenRobot() {
+      runTest("compiler/src/test/resources/diagnostics/contributesrobot/classMustExtendScreenRobot.kt");
+    }
+  }
 }

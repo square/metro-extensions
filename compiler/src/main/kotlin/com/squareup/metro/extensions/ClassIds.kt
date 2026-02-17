@@ -29,6 +29,17 @@ internal object ClassIds {
   // to qualify Set<Scoped> multibindings, so the @Binds function must use the same annotation.
   val FOR_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("ForScope"))
 
+  val SCREEN_ROBOT =
+    ClassId(FqName("com.squareup.instrumentation.robots"), Name.identifier("ScreenRobot"))
+
+  val COMPOSE_SCREEN_ROBOT =
+    ClassId(
+      FqName("com.squareup.instrumentation.robots.compose"),
+      Name.identifier("ComposeScreenRobot"),
+    )
+
+  val ROBOT_FQ_NAMES = listOf(SCREEN_ROBOT, COMPOSE_SCREEN_ROBOT)
+
   /** Annotations that have a `replaces` parameter (index 2, except @ContributesTo at index 1). */
   val ANNOTATIONS_WITH_REPLACES =
     setOf(CONTRIBUTES_TO, CONTRIBUTES_BINDING, CONTRIBUTES_INTO_SET, CONTRIBUTES_INTO_MAP)
