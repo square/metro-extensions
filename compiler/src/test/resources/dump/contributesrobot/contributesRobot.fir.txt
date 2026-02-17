@@ -1,0 +1,28 @@
+FILE: contributesRobot.kt
+    package com.test
+
+    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/anvil/extension/ContributesRobot|(scope = <getClass>(Q|kotlin/Unit|)) public final class AbcRobot : R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>| {
+        public constructor(): R|com/test/AbcRobot| {
+            super<R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>|>()
+        }
+
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface RobotContribution : R|kotlin/Any| {
+            public abstract fun getAbcRobot(): R|com/test/AbcRobot|
+
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/AbcRobot.RobotContribution| {
+            }
+
+        }
+
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|dev/zacsweers/metro/internal/Factory<com/test/AbcRobot>| {
+            public final fun create(): R|dev/zacsweers/metro/internal/Factory<com/test/AbcRobot>|
+
+            public final fun newInstance(): R|com/test/AbcRobot|
+
+            private constructor(): R|com/test/AbcRobot.MetroFactory| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+    }

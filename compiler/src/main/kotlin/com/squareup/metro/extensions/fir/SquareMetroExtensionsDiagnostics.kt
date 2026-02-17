@@ -13,6 +13,9 @@ internal object SquareMetroExtensionsDiagnostics : KtDiagnosticsContainer() {
   val CONTRIBUTES_MULTIBINDING_SCOPED_ERROR by
     error1<KtElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
 
+  val CONTRIBUTES_ROBOT_ERROR by
+    error1<KtElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
+
   override fun getRendererFactory(): BaseDiagnosticRendererFactory {
     return SquareMetroExtensionsErrorMessages
   }
@@ -27,6 +30,7 @@ private object SquareMetroExtensionsErrorMessages : BaseDiagnosticRendererFactor
           "{0}",
           CommonRenderers.STRING,
         )
+        put(SquareMetroExtensionsDiagnostics.CONTRIBUTES_ROBOT_ERROR, "{0}", CommonRenderers.STRING)
       }
     }
 }

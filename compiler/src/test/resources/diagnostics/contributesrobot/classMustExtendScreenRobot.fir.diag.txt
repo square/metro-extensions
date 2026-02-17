@@ -1,0 +1,1 @@
+/classMustExtendScreenRobot.kt:(133,163): error: com.test.Abc contributes a robot to the Metro graph, but doesn't extend com.squareup.instrumentation.robots.ScreenRobot, or com.squareup.instrumentation.robots.compose.ComposeScreenRobot.

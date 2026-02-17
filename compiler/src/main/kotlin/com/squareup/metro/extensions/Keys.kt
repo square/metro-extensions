@@ -6,4 +6,8 @@ internal object Keys {
   data object ContributesMultibindingScopedGeneratorKey : GeneratedDeclarationKey() {
     override fun toString(): String = "ContributesMultibindingScopedGenerator"
   }
+
+  data object ContributesRobotGeneratorKey : GeneratedDeclarationKey() {
+    override fun toString(): String = "ContributesRobotGenerator"
+  }
 }

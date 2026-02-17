@@ -42,4 +42,20 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
       runTest("compiler/src/test/resources/dump/contributesmultibindingscoped/scopedInSuperTypes.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/dump/contributesrobot")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesrobot {
+    @Test
+    public void testAllFilesPresentInContributesrobot() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("contributesRobot.kt")
+    public void testContributesRobot() {
+      runTest("compiler/src/test/resources/dump/contributesrobot/contributesRobot.kt");
+    }
+  }
 }

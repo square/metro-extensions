@@ -4,6 +4,9 @@ import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGeneratorKey
+import com.squareup.metro.extensions.fir.buildAnnotationWithScope
+import com.squareup.metro.extensions.fir.extractScopeArgument
+import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -18,13 +21,10 @@ import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.origin
-import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
-import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
-import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
@@ -97,7 +97,13 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     classSymbol: FirClassSymbol<*>,
     context: NestedClassGenerationContext,
   ): Set<Name> {
-    if (hasAnnotation(classSymbol)) {
+    if (
+      hasAnnotation(
+        classSymbol,
+        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
+        session,
+      )
+    ) {
       return setOf(ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME)
     }
     return emptySet()
@@ -109,8 +115,20 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
     if (name != ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME) return null
-    if (!hasAnnotation(owner)) return null
-    val scopeArg = extractScopeArgument(owner) ?: return null
+    if (
+      !hasAnnotation(
+        owner,
+        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
+        session,
+      )
+    )
+      return null
+    val scopeArg =
+      extractScopeArgument(
+        owner,
+        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
+        session,
+      ) ?: return null
 
     val nestedClassId = owner.classId.createNestedClassId(name)
     val classSymbol = FirRegularClassSymbol(nestedClassId)
@@ -142,31 +160,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     }
 
     return klass.symbol
-  }
-
-  private fun hasAnnotation(classSymbol: FirClassSymbol<*>): Boolean {
-    // Use resolvedCompilerAnnotationsWithClassIds instead of resolvedAnnotationClassIds
-    // because the latter forces lazy resolution to TYPES phase, which can fail when
-    // getNestedClassifiersNames is called during the earlier SUPERTYPES phase.
-    return classSymbol.resolvedCompilerAnnotationsWithClassIds.any {
-      it.toAnnotationClassIdSafe(session) ==
-        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID
-    }
-  }
-
-  private fun findAnnotation(classSymbol: FirClassSymbol<*>): FirAnnotation? {
-    return classSymbol.resolvedAnnotationsWithArguments.firstOrNull { annotation ->
-      annotation.toAnnotationClassIdSafe(session) ==
-        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID
-    }
-  }
-
-  private fun extractScopeArgument(classSymbol: FirClassSymbol<*>): FirExpression? {
-    val annotation = findAnnotation(classSymbol) ?: return null
-    // At SUPERTYPES stage, argumentMapping is not yet populated (happens at ANNOTATION_ARGUMENTS).
-    // Use the raw argumentList from the FirAnnotationCall instead.
-    val annotationCall = annotation as? FirAnnotationCall ?: return null
-    return annotationCall.argumentList.arguments.firstOrNull()
   }
 
   private fun buildBindsFunction(
@@ -300,23 +293,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
       }
       containingDeclarationSymbol = containingSymbol
       annotationResolvePhase = FirAnnotationResolvePhase.Types
-    }
-  }
-
-  private fun buildAnnotationWithScope(
-    classId: ClassId,
-    argName: Name,
-    scopeArg: FirExpression,
-  ): FirAnnotation {
-    return buildAnnotation {
-      annotationTypeRef =
-        ConeClassLikeTypeImpl(
-            ConeClassLikeLookupTagImpl(classId),
-            emptyArray(),
-            isMarkedNullable = false,
-          )
-          .toFirResolvedTypeRef()
-      argumentMapping = buildAnnotationArgumentMapping { mapping[argName] = scopeArg }
     }
   }
 
