@@ -73,5 +73,11 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     public void testContributesService() {
       runTest("compiler/src/test/resources/dump/contributesservice/contributesService.kt");
     }
+
+    @Test
+    @TestMetadata("replacedService.kt")
+    public void testReplacedService() {
+      runTest("compiler/src/test/resources/dump/contributesservice/replacedService.kt");
+    }
   }
 }
