@@ -3,6 +3,7 @@ package com.squareup.metro.extensions.scoped
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.SquareMetroExtensionsDiagnostics
+import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirSession
@@ -15,19 +16,10 @@ import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
-import org.jetbrains.kotlin.fir.expressions.FirCall
-import org.jetbrains.kotlin.fir.expressions.FirExpression
-import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
 import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
-import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
-import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
-import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
-import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 
 /**
  * FIR checker that validates scope consistency when a class replaces or excludes a class annotated
@@ -50,13 +42,15 @@ internal object ContributesMultibindingScopedReplacesChecker :
 
       when (annotationClassId) {
         in ClassIds.ANNOTATIONS_WITH_REPLACES -> {
-          val replacedClassIds = extractReplacedClassIds(annotation, session)
+          val replacedClassIds =
+            extractClassIdsFromArrayArg(annotation, ArgNames.REPLACES, session)
           if (replacedClassIds.isEmpty()) continue
           val annotationScope = extractScopeFromAnnotation(annotation, session) ?: continue
           checkReplacedClasses(declaration, annotation, annotationScope, replacedClassIds, session)
         }
         ClassIds.DEPENDENCY_GRAPH -> {
-          val excludedClassIds = extractExcludedClassIds(annotation, session)
+          val excludedClassIds =
+            extractClassIdsFromArrayArg(annotation, ArgNames.EXCLUDES, session)
           if (excludedClassIds.isEmpty()) continue
           val annotationScope = extractScopeFromAnnotation(annotation, session) ?: continue
           checkReplacedClasses(declaration, annotation, annotationScope, excludedClassIds, session)
@@ -125,92 +119,26 @@ internal object ContributesMultibindingScopedReplacesChecker :
     return resolveClassIdFromExpression(scopeArg ?: return null, session)
   }
 
-  /**
-   * Extracts ClassIds from the `replaces` array argument of a Metro annotation.
-   *
-   * Handles both named (`replaces = [...]`) and positional arguments. The `replaces` parameter is
-   * at index 2 for `@ContributesBinding`/`@ContributesIntoSet`/`@ContributesIntoMap` and index 1
-   * for `@ContributesTo`.
-   */
-  private fun extractReplacedClassIds(
-    annotation: FirAnnotation,
-    session: FirSession,
-  ): List<ClassId> {
-    return extractClassIdsFromArrayArg(annotation, ArgNames.REPLACES, session)
-  }
-
-  /**
-   * Extracts ClassIds from the `excludes` array argument of `@DependencyGraph`. The `excludes`
-   * parameter is at index 2.
-   */
-  private fun extractExcludedClassIds(
-    annotation: FirAnnotation,
-    session: FirSession,
-  ): List<ClassId> {
-    return extractClassIdsFromArrayArg(annotation, ArgNames.EXCLUDES, session)
-  }
-
-  private fun extractClassIdsFromArrayArg(
-    annotation: FirAnnotation,
-    argName: Name,
-    session: FirSession,
-  ): List<ClassId> {
-    // Try argument mapping first (resolved annotations)
-    annotation.argumentMapping.mapping[argName]?.let { expr ->
-      return extractClassIdsFromArrayExpression(expr, session)
-    }
-
-    // Fall back to FirAnnotationCall argument list
-    val annotationCall = annotation as? FirAnnotationCall ?: return emptyList()
-    for (arg in annotationCall.argumentList.arguments) {
-      if (arg is FirNamedArgumentExpression && arg.name == argName) {
-        return extractClassIdsFromArrayExpression(arg.expression, session)
-      }
-    }
-    return emptyList()
-  }
-
-  private fun extractClassIdsFromArrayExpression(
-    expr: FirExpression,
-    session: FirSession,
-  ): List<ClassId> {
-    val arrayElements =
-      when (expr) {
-        is FirCall -> expr.argumentList.arguments
-        else -> return emptyList()
-      }
-    return arrayElements.mapNotNull { element ->
-      if (element is FirGetClassCall) {
-        resolveClassIdFromGetClassCall(element, session)
-      } else {
-        null
-      }
-    }
-  }
-
-  private fun resolveClassIdFromExpression(expr: FirExpression, session: FirSession): ClassId? {
+  private fun resolveClassIdFromExpression(expr: org.jetbrains.kotlin.fir.expressions.FirExpression, session: FirSession): ClassId? {
     return when (expr) {
-      is FirGetClassCall -> resolveClassIdFromGetClassCall(expr, session)
-      else -> null
-    }
-  }
-
-  private fun resolveClassIdFromGetClassCall(
-    getClassCall: FirGetClassCall,
-    session: FirSession,
-  ): ClassId? {
-    val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
-    return when (innerArg) {
-      is FirResolvedQualifier -> innerArg.classId
-      is FirPropertyAccessExpression -> {
-        val ref = innerArg.calleeReference
-        if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {
-          (ref.resolvedSymbol as FirClassLikeSymbol<*>).classId
-        } else {
-          val name = ref.name
-          session.symbolProvider
-            .getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))
-            ?.classId
+      is org.jetbrains.kotlin.fir.expressions.FirGetClassCall -> {
+        val innerArg = expr.argumentList.arguments.firstOrNull() ?: return null
+        when (innerArg) {
+          is org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier -> innerArg.classId
+          is org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression -> {
+            val ref = innerArg.calleeReference
+            if (ref is org.jetbrains.kotlin.fir.references.FirResolvedNamedReference &&
+              ref.resolvedSymbol is org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>
+            ) {
+              (ref.resolvedSymbol as org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>).classId
+            } else {
+              val name = ref.name
+              session.symbolProvider
+                .getClassLikeSymbolByClassId(ClassId(org.jetbrains.kotlin.name.FqName("kotlin"), name))
+                ?.classId
+            }
+          }
+          else -> null
         }
       }
       else -> null
