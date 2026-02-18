@@ -29,6 +29,10 @@ Run Gradle with `--quiet` to reduce noise. Failures are reported to the console 
 - **Metro** (https://github.com/ZacSweers/metro) — The DI framework we extend. Study `compiler/src/.../api/fir/` for the extension API and `compiler/API.md` for documentation.
 - **Kotlin Compiler Plugin Template** (https://github.com/Kotlin/compiler-plugin-template) — Canonical three-module structure from JetBrains. Our project follows this layout.
 
+## Key Documentation
+
+- **[docs/use-cases.md](docs/use-cases.md)** — Detailed specs for each custom annotation: what it targets, what code gets generated, and usage examples. Consult this when implementing or modifying annotation support.
+
 ## Module Structure
 
 ```

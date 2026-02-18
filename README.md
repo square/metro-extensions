@@ -16,10 +16,8 @@ annotations with Metro's DI graph.
 
 ## What it does
 
-Square's codebase uses annotations like `@ContributesMultibindingScoped` to declare scoped
-multibindings in dependency graphs. This compiler plugin recognizes those annotations and generates
-the Metro-compatible declarations needed to wire them into a `@DependencyGraph` automatically — no
-manual boilerplate required.
+For detailed descriptions of all annotations including generated output examples, see
+[docs/use-cases.md](docs/use-cases.md).
 
 ### Supported annotations
 
