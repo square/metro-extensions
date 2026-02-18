@@ -108,10 +108,23 @@ tasks.withType(Test).configureEach { testTask ->
 
   useJUnitPlatform()
   workingDir = rootDir
+  maxHeapSize = '2g'
 
   // Properties required to run the internal test framework.
   systemProperty('idea.ignore.disabled.plugins', 'true')
   systemProperty('idea.home.path', rootDir)
+
+  // Pass -PupdateTestData to overwrite expected test output files (e.g. .fir.txt) with actuals.
+  if (project.hasProperty('updateTestData')) {
+    systemProperty('kotlin.test.update.test.data', 'true')
+  }
+
+  // Detect preview Kotlin builds (e.g., 2.3.20-RC, 2.4.0-Beta1). Dump test golden files are
+  // version-sensitive and only match stable releases.
+  def kotlinVersion = libs.versions.kotlin.get()
+  if (kotlinVersion =~ /.*-[A-Za-z].*/) {
+    systemProperty('squareMetroExtensions.previewKotlinBuild', 'true')
+  }
 }
 
 tasks.register('generateTests', JavaExec) {

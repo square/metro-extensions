@@ -8,7 +8,6 @@ maven-publish = "0.36.0"
 metro = "0.10.4"
 
 [libraries]
-javax-inject = { module = "javax.inject:javax.inject", version = "1" }
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
 ktfmt-gradle-plugin = { module = "com.ncorti.ktfmt.gradle:plugin", version.ref = "ktfmt" }
 kotlin-annotations-jvm = { module = "org.jetbrains.kotlin:kotlin-annotations-jvm", version.ref = "kotlin" }

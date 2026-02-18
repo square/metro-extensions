@@ -58,4 +58,32 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
       runTest("compiler/src/test/resources/diagnostics/contributesrobot/classMustExtendScreenRobot.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/diagnostics/contributesservice")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesservice {
+    @Test
+    public void testAllFilesPresentInContributesservice() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("classMustBeInterface.kt")
+    public void testClassMustBeInterface() {
+      runTest("compiler/src/test/resources/diagnostics/contributesservice/classMustBeInterface.kt");
+    }
+
+    @Test
+    @TestMetadata("qualifierRequired.kt")
+    public void testQualifierRequired() {
+      runTest("compiler/src/test/resources/diagnostics/contributesservice/qualifierRequired.kt");
+    }
+
+    @Test
+    @TestMetadata("tooManyQualifiers.kt")
+    public void testTooManyQualifiers() {
+      runTest("compiler/src/test/resources/diagnostics/contributesservice/tooManyQualifiers.kt");
+    }
+  }
 }
