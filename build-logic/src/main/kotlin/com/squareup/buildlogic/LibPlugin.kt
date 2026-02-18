@@ -4,6 +4,7 @@ import com.ncorti.ktfmt.gradle.KtfmtExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -63,6 +64,7 @@ class LibPlugin : Plugin<Project> {
           it.showCauses = true
           it.showStackTraces = true
           it.showStandardStreams = true
+          it.exceptionFormat = TestExceptionFormat.FULL
         }
       }
 

@@ -35,6 +35,14 @@ Contributes a UI test robot class to a Metro dependency graph. The annotated cla
 `@ContributesTo` interface with an accessor function (`get{ClassName}()`), so the robot is
 automatically available on the `@DependencyGraph` without manually writing a component interface.
 
+#### `@ContributesService(scope: KClass<*>, replaces: Array<KClass<*>> = [])`
+
+Contributes a Retrofit service binding to a Metro dependency graph. The annotated interface must have
+exactly one `@Qualifier` annotation (e.g., `@RetrofitAuthenticated`) which determines which
+`ServiceCreator` is injected. At compile time, the plugin generates a `@Provides` function that
+calls `serviceCreator.create(Service::class.java)`, with a `@FakeMode` safety check to catch
+missing fake services in debug builds.
+
 ## Usage
 
 Apply the Gradle plugin to your project:
@@ -62,6 +70,12 @@ To use a different path for the Metro checkout, pass `-PlocalMetroPath=<path>`:
 
 ```bash
 ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=/path/to/metro
+```
+
+To update expected test output files (`.fir.txt` golden files) after changing generated code:
+
+```bash
+./gradlew :compiler:test -PuseLocalMetro -PupdateTestData
 ```
 
 To test with a different Kotlin version than the one defined in the version catalog, pass
