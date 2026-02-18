@@ -30,6 +30,13 @@ implement `mortar.Scoped`. At compile time, the plugin generates a `@Contributes
 provider scoped with `@SingleIn` for the given scope, so the class is automatically included in
 `Set<Scoped>` within the target graph.
 
+#### `@ContributesRobot(scope: KClass<*>)`
+
+Contributes a UI test robot class to a Metro dependency graph. The annotated class must extend
+`ScreenRobot` or `ComposeScreenRobot`. At compile time, the plugin generates a nested
+`@ContributesTo` interface with an accessor function (`get{ClassName}()`), so the robot is
+automatically available on the `@DependencyGraph` without manually writing a component interface.
+
 ## Usage
 
 Apply the Gradle plugin to your project:

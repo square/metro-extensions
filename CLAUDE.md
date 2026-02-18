@@ -19,6 +19,7 @@ Run Gradle with `--quiet` to reduce noise. Failures are reported to the console 
 - Do not run Gradle with unnecessary flags (`--info`, `--no-daemon`, etc.).
 - Always run Gradle from the repo root using `./gradlew` — never `cd` into a module directory.
 - Do not read `.gradle/caches` or similar directories — prefer reading sources.
+- Do not decompile `.jar` files from the Gradle cache to research Kotlin compiler APIs. Instead, look at the [Metro](https://github.com/ZacSweers/metro) source first, or the [Kotlin compiler source](https://github.com/JetBrains/kotlin/tree/master/compiler).
 - Always run `apiCheck` (or `apiDump` to update) when changing public APIs.
 - FIR is for analysis/validation, IR is for code generation — don't mix concerns.
 - Use existing test infrastructure patterns rather than creating new test types.
@@ -227,6 +228,39 @@ The `integration-tests` modules exercise the full compiler plugin with Metro. Th
 - **Visibility**: `internal` for compiler internals, `public` for SPI-loaded classes
 - **Gradle DSL**: Groovy (not Kotlin DSL)
 - **Version catalog sorting**: alphabetical within each section
+
+## FIR Compiler Plugin Limitations
+
+### FirSupertypeGenerationExtension not called for deeply nested generated classes
+
+The Kotlin compiler does NOT invoke `FirSupertypeGenerationExtension` callbacks (`needTransformSupertypes`, `computeAdditionalSupertypes`, `computeAdditionalSupertypesForGeneratedNestedClass`) for generated classes that are nested inside other generated classes.
+
+**Example:** When our extension generates `ProvidesContribution` (nested inside source-declared `Trigger`), and Metro generates `ProvideTriggerMetroFactory` inside `ProvidesContribution`, the factory is 2 levels deep in generation. The supertype extension is never called for it.
+
+**Impact:** Metro's `ProvidesFactorySupertypeGenerator` can't add `Factory<T>` as a supertype, causing Metro's IR to fail with `No function invoke`. Fixed in Metro by eagerly setting `Factory<T>` in `ProvidesFactoryFirGenerator.generateNestedClassLikeDeclaration` when the return type is already a `FirResolvedTypeRef`.
+
+### `declarations +=` vs `getCallableNamesForClass`/`generateFunctions`
+
+- `declarations +=` makes functions visible via `declarationSymbols` (used by Metro's `ProvidesFactoryFirGenerator`) but NOT in the class scope.
+- `getCallableNamesForClass`/`generateFunctions` registers functions in the scope but NOT in `declarationSymbols`.
+- Cannot use both: sharing the same `FirNamedFunctionSymbol` causes `IrSimpleFunctionSymbolImpl is already bound` during FIR-to-IR.
+
+### Predicate-based provider across multiple MetroFirDeclarationGenerationExtension instances
+
+`predicateBasedProvider.getSymbolsByPredicate(predicate)` may return empty for one extension's predicate when multiple `MetroFirDeclarationGenerationExtension` instances share Metro's composite. Use `resolvedCompilerAnnotationsWithClassIds` as a fallback.
+
+### Resolution timing during FIR generation phases
+
+- `resolvedAnnotationsWithArguments` triggers lazy resolution — may fail during SUPERTYPES phase for annotations defined in the same compilation unit.
+- `resolvedCompilerAnnotationsWithClassIds` works during SUPERTYPES phase (doesn't resolve arguments).
+- `resolvedSuperTypeRefs` triggers lazy SUPERTYPES resolution — causes `ClassCastException` if called during the SUPERTYPES phase itself.
+- Raw `classSymbol.fir.superTypeRefs` (with `@OptIn(SymbolInternals::class)`) provides `FirUserTypeRef` instances without triggering resolution.
+
+### Workarounds that don't work
+
+- **Top-level generated class:** Metro's internal generators don't process top-level classes from standard `FirDeclarationGenerationExtension` — only from Metro's composite.
+- **Calling Metro internals:** `ProvidesFactorySupertypeGenerator`, `Keys`, etc. are all `internal`.
+- **Generating the factory ourselves:** Metro's IR identifies factories by `origin == Keys.ProviderFactoryClassDeclaration` — custom keys aren't recognized.
 
 ## Important Warnings
 
