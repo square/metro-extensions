@@ -1,0 +1,220 @@
+// FILE: comTestFakeMyServiceServiceContributionUnit.kt
+package metro.hints
+
+fun Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: comTestMyServiceServiceContributionUnit.kt
+package metro.hints
+
+fun Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: replacedService.kt
+package com.test
+
+@ContributesService(scope = Unit::class, replaces = [MyService::class])
+@Inject
+class FakeMyService : MyService {
+  @ContributesTo(scope = Unit::class, replaces = [ServiceContribution::class])
+  interface ServiceContribution {
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @MetroContribution(scope = Unit::class)
+    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
+    }
+
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
+    class ProvideMyServiceMetroFactory : Factory<MyService> {
+      private /* final field */ val instance: ServiceContribution = instance
+      private /* final field */ val realService: Provider<MyService> = realService
+      private /* final field */ val fakeService: Provider<FakeMyService> = fakeService
+      private /* final field */ val isFakeMode: Provider<Boolean> = isFakeMode
+      companion object Companion {
+        private constructor() /* primary */ {
+          super/*Any*/()
+          /* <init>() */
+
+        }
+
+        fun create(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(instance = instance, realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
+        }
+
+        fun provideMyService(instance: ServiceContribution, @RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+          return instance.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
+        }
+
+      }
+
+      private constructor(instance: ServiceContribution, realService: Provider<MyService>, fakeService: Provider<FakeMyService>, isFakeMode: Provider<Boolean>) /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      override operator fun invoke(): MyService {
+        return Companion.provideMyService(instance = <this>.#instance, realService = <this>.#realService.invoke(), fakeService = <this>.#fakeService.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
+      }
+
+      fun mirrorFunction(@RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+        return error(message = "Never called")
+      }
+
+    }
+
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideRealMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideRealMyService")
+    class ProvideRealMyServiceMetroFactory : Factory<MyService> {
+      private /* final field */ val instance: ServiceContribution = instance
+      private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
+      companion object Companion {
+        private constructor() /* primary */ {
+          super/*Any*/()
+          /* <init>() */
+
+        }
+
+        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
+          return ProvideRealMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
+        }
+
+        fun provideRealMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+          return instance.provideRealMyService(serviceCreator = serviceCreator)
+        }
+
+      }
+
+      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      override operator fun invoke(): MyService {
+        return Companion.provideRealMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
+      }
+
+      @SingleIn(value = Unit::class)
+      @RealService
+      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+        return error(message = "Never called")
+      }
+
+    }
+
+    @Provides
+    fun provideMyService(@RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+      return when {
+        isFakeMode -> fakeService
+        else -> realService
+      }
+    }
+
+    @Provides
+    @SingleIn(value = Unit::class)
+    @RealService
+    fun provideRealMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+    }
+
+  }
+
+  @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+  object MetroFactory : Factory<FakeMyService> {
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
+
+    }
+
+    fun create(): Factory<FakeMyService> {
+      return MetroFactory
+    }
+
+    fun newInstance(): FakeMyService {
+      return FakeMyService()
+    }
+
+    override operator fun invoke(): FakeMyService {
+      return MetroFactory.newInstance()
+    }
+
+    fun mirrorFunction(): FakeMyService {
+      return error(message = "Never called")
+    }
+
+  }
+
+  constructor() /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+}
+
+@ContributesService(scope = Unit::class)
+@RetrofitAuthenticated
+interface MyService {
+  @ContributesTo(scope = Unit::class)
+  interface ServiceContribution {
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @MetroContribution(scope = Unit::class)
+    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
+    }
+
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
+    class ProvideMyServiceMetroFactory : Factory<MyService> {
+      private /* final field */ val instance: ServiceContribution = instance
+      private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
+      private /* final field */ val isFakeMode: Provider<Boolean> = isFakeMode
+      companion object Companion {
+        private constructor() /* primary */ {
+          super/*Any*/()
+          /* <init>() */
+
+        }
+
+        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator, isFakeMode = isFakeMode)
+        }
+
+        fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+          return instance.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
+        }
+
+      }
+
+      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>, isFakeMode: Provider<Boolean>) /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      override operator fun invoke(): MyService {
+        return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
+      }
+
+      @SingleIn(value = Unit::class)
+      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+        return error(message = "Never called")
+      }
+
+    }
+
+    @Provides
+    @SingleIn(value = Unit::class)
+    fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+      when {
+        isFakeMode -> error(message = "No fake service provided for MyService.")
+      }
+      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+    }
+
+  }
+
+}

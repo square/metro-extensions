@@ -1,0 +1,1 @@
+/tooManyQualifiers.kt:(226,258): error: No more than one qualifier is allowed.

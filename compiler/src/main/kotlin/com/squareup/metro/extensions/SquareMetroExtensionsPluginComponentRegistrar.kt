@@ -1,6 +1,8 @@
 package com.squareup.metro.extensions
 
 import com.fueledbycaffeine.autoservice.AutoService
+import com.squareup.metro.extensions.service.ContributesServiceIrExtension
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
@@ -12,5 +14,6 @@ public class SquareMetroExtensionsPluginComponentRegistrar : CompilerPluginRegis
 
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
     FirExtensionRegistrarAdapter.registerExtension(SquareMetroExtensionsPluginRegistrar())
+    IrGenerationExtension.registerExtension(ContributesServiceIrExtension())
   }
 }
