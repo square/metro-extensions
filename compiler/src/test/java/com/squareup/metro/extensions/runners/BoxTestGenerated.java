@@ -100,4 +100,26 @@ public class BoxTestGenerated extends AbstractBoxTest {
       runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/box/contributesservice")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesservice {
+    @Test
+    public void testAllFilesPresentInContributesservice() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("multiCompilation.kt")
+    public void testMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/multiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("singleCompilation.kt")
+    public void testSingleCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/singleCompilation.kt");
+    }
+  }
 }

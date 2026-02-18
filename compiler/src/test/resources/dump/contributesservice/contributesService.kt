@@ -1,0 +1,8 @@
+package com.test
+
+import com.squareup.api.RetrofitAuthenticated
+import com.squareup.services.anvil.ContributesService
+
+@ContributesService(Unit::class)
+@RetrofitAuthenticated
+interface MyService

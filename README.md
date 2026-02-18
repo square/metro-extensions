@@ -35,6 +35,14 @@ Contributes a UI test robot class to a Metro dependency graph. The annotated cla
 `@ContributesTo` interface with an accessor function (`get{ClassName}()`), so the robot is
 automatically available on the `@DependencyGraph` without manually writing a component interface.
 
+#### `@ContributesService(scope: KClass<*>, replaces: Array<KClass<*>> = [])`
+
+Contributes a Retrofit service binding to a Metro dependency graph. The annotated interface must have
+exactly one `@Qualifier` annotation (e.g., `@RetrofitAuthenticated`) which determines which
+`ServiceCreator` is injected. At compile time, the plugin generates a `@Provides` function that
+calls `serviceCreator.create(Service::class.java)`, with a `@FakeMode` safety check to catch
+missing fake services in debug builds.
+
 ## Usage
 
 Apply the Gradle plugin to your project:
