@@ -124,4 +124,50 @@ public class BoxTestGenerated extends AbstractBoxTest {
       runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/box/contributesservice")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesservice {
+    @Test
+    public void testAllFilesPresentInContributesservice() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("multiCompilation.kt")
+    public void testMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/multiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedMultipleServices.kt")
+    public void testReplacedMultipleServices() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedMultipleServices.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedServiceOneCompilation.kt")
+    public void testReplacedServiceOneCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceOneCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedServiceThreeCompilations.kt")
+    public void testReplacedServiceThreeCompilations() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceThreeCompilations.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedServiceTwoCompilations.kt")
+    public void testReplacedServiceTwoCompilations() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceTwoCompilations.kt");
+    }
+
+    @Test
+    @TestMetadata("singleCompilation.kt")
+    public void testSingleCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/singleCompilation.kt");
+    }
+  }
 }

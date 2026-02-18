@@ -40,6 +40,22 @@ internal object ClassIds {
 
   val ROBOT_FQ_NAMES = listOf(SCREEN_ROBOT, COMPOSE_SCREEN_ROBOT)
 
+  val PROVIDES = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provides"))
+
+  val SINGLE_IN = ClassId(FqName("com.squareup.dagger"), Name.identifier("SingleIn"))
+
+  val SERVICE_CREATOR = ClassId(FqName("com.squareup.api"), Name.identifier("ServiceCreator"))
+
+  val REAL_SERVICE = ClassId(FqName("com.squareup.api"), Name.identifier("RealService"))
+
+  val FAKE_MODE = ClassId(FqName("com.squareup.development"), Name.identifier("FakeMode"))
+
+  val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
+
+  val METRO_QUALIFIER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Qualifier"))
+
+  val QUALIFIER_CLASS_IDS = setOf(JAVAX_QUALIFIER, METRO_QUALIFIER)
+
   /** Annotations that have a `replaces` parameter (index 2, except @ContributesTo at index 1). */
   val ANNOTATIONS_WITH_REPLACES =
     setOf(CONTRIBUTES_TO, CONTRIBUTES_BINDING, CONTRIBUTES_INTO_SET, CONTRIBUTES_INTO_MAP)

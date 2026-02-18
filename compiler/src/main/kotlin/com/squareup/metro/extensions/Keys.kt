@@ -10,4 +10,8 @@ internal object Keys {
   data object ContributesRobotGeneratorKey : GeneratedDeclarationKey() {
     override fun toString(): String = "ContributesRobotGenerator"
   }
+
+  data object ContributesServiceGeneratorKey : GeneratedDeclarationKey() {
+    override fun toString(): String = "ContributesServiceGenerator"
+  }
 }
