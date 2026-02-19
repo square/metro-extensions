@@ -10,4 +10,6 @@ dependencyResolutionManagement {
   }
 }
 
+apply from: '../gradle/versions.gradle'
+
 rootProject.name = 'build-logic'

@@ -33,6 +33,8 @@ dependencyResolutionManagement {
   }
 }
 
+apply from: 'gradle/versions.gradle'
+
 rootProject.name = 'metro-extensions'
 
 include ':compiler'

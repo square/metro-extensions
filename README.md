@@ -64,6 +64,13 @@ To use a different path for the Metro checkout, pass `-PlocalMetroPath=<path>`:
 ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=/path/to/metro
 ```
 
+To test with a different Kotlin version than the one defined in the version catalog, pass
+`-Pkotlin.version=<version>`:
+
+```bash
+./gradlew :compiler:test -Pkotlin.version=2.3.20-RC
+```
+
 ## License
 
 ```
