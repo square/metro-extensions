@@ -1,0 +1,28 @@
+name: 'Kotlin Versions'
+description: 'Reads the Kotlin version from libs.versions.toml and builds a matrix JSON array'
+
+inputs:
+  preview-versions:
+    description: "Comma-separated Kotlin preview versions to include, e.g. '2.3.20-RC, 2.4.0-Beta1'"
+    default: ''
+
+outputs:
+  matrix:
+    description: "JSON array of Kotlin versions for use with fromJSON() in a strategy matrix"
+    value: ${{ steps.versions.outputs.matrix }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: versions
+      shell: bash
+      run: |
+        base=$(grep '^kotlin = ' gradle/libs.versions.toml | sed 's/kotlin = "\(.*\)"/\1/')
+        matrix="[\"${base}\""
+        IFS=',' read -ra previews <<< "${{ inputs.preview-versions }}"
+        for v in "${previews[@]}"; do
+          v=$(echo "$v" | xargs)  # trim whitespace
+          [ -n "$v" ] && matrix+=", \"${v}\""
+        done
+        matrix+="]"
+        echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
