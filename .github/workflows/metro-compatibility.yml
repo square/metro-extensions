@@ -20,10 +20,10 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Checkout Metro
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ZacSweers/metro
           path: metro
@@ -41,7 +41,7 @@ jobs:
         run: ./gradlew -p integration-tests test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version
 
       - name: Upload Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: metro-compat-test-results
