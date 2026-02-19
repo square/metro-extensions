@@ -9,6 +9,15 @@ kotlin {
   explicitApi()
 }
 
+// Select version-specific source set for Kotlin compiler API compatibility
+def kotlinBaseVersion = libs.versions.kotlin.get().split('-')[0]
+def kotlinParts = kotlinBaseVersion.tokenize('.').collect { it as int }
+def isKotlin2320OrLater = kotlinParts[0] > 2 ||
+  (kotlinParts[0] == 2 && kotlinParts[1] > 3) ||
+  (kotlinParts[0] == 2 && kotlinParts[1] == 3 && kotlinParts[2] >= 20)
+// TODO: Remove this when upgrading to Kotlin 2.3.20.
+sourceSets.main.kotlin.srcDir(isKotlin2320OrLater ? 'src/main/kotlin-2.3.20' : 'src/main/kotlin-pre-2.3.20')
+
 configurations {
   annotationsRuntimeClasspath {
     transitive = false

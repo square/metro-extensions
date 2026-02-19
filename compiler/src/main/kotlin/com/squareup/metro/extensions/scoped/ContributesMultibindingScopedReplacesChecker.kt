@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
-import org.jetbrains.kotlin.fir.expressions.FirArrayLiteral
+import org.jetbrains.kotlin.fir.expressions.FirCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
 import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
@@ -176,8 +176,7 @@ internal object ContributesMultibindingScopedReplacesChecker :
   ): List<ClassId> {
     val arrayElements =
       when (expr) {
-        is FirArrayLiteral -> expr.argumentList.arguments
-        is FirAnnotationCall -> expr.argumentList.arguments // vararg
+        is FirCall -> expr.argumentList.arguments
         else -> return emptyList()
       }
     return arrayElements.mapNotNull { element ->

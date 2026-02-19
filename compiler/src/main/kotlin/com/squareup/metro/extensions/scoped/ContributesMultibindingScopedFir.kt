@@ -5,6 +5,7 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationWithScope
+import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -14,10 +15,9 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
-import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.origin
@@ -166,7 +166,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     classId: ClassId,
     outerOwner: FirClassSymbol<*>,
     scopeArg: FirExpression,
-  ): FirSimpleFunction {
+  ): FirDeclaration {
     val outerClassId = outerOwner.classId
     val functionName = "binds${outerClassId.shortClassName.identifier}"
     val callableId = CallableId(classId, Name.identifier(functionName))
@@ -189,7 +189,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
 
     val functionSymbol = FirNamedFunctionSymbol(callableId)
 
-    return buildSimpleFunction {
+    return buildFirFunction {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesMultibindingScopedGeneratorKey.origin
