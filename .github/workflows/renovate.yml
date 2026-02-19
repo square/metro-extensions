@@ -2,7 +2,7 @@ name: Renovate
 
 on:
   schedule:
-    # Run every hour
+    # Run twice daily
     - cron: '0 6,18 * * *'
   workflow_dispatch:
 
@@ -21,3 +21,4 @@ jobs:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           LOG_LEVEL: info
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
