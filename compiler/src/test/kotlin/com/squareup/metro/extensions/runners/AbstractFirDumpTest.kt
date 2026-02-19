@@ -4,6 +4,7 @@ import com.squareup.metro.extensions.services.configureMetroImports
 import com.squareup.metro.extensions.services.configurePlugin
 import org.jetbrains.kotlin.test.FirParser
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
+import org.jetbrains.kotlin.test.directives.CodegenTestDirectives
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives
 import org.jetbrains.kotlin.test.directives.TestPhaseDirectives
 import org.jetbrains.kotlin.test.runners.AbstractFirPhasedDiagnosticTest
@@ -33,6 +34,7 @@ open class AbstractFirDumpTest : AbstractFirPhasedDiagnosticTest(FirParser.Light
         +FirDiagnosticsDirectives.DISABLE_GENERATED_FIR_TAGS
 
         TestPhaseDirectives.RUN_PIPELINE_TILL.with(TestPhase.FRONTEND)
+        +CodegenTestDirectives.IGNORE_DEXING
       }
 
       configurePlugin()
