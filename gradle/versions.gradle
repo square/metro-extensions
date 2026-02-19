@@ -1,0 +1,12 @@
+// Shared version overrides applied from settings.gradle files.
+// Usage: apply from: 'gradle/versions.gradle' (or '../gradle/versions.gradle' from included builds)
+dependencyResolutionManagement {
+  versionCatalogs {
+    libs {
+      def kotlinVersion = providers.gradleProperty('kotlin.version')
+      if (kotlinVersion.present) {
+        version('kotlin', kotlinVersion.get())
+      }
+    }
+  }
+}
