@@ -4,6 +4,7 @@ import com.ncorti.ktfmt.gradle.KtfmtExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("unused")
@@ -28,6 +29,8 @@ class LibPlugin : Plugin<Project> {
 
   private fun Project.configureKotlin() {
     pluginManager.apply(Plugins.KOTLIN_JVM)
+
+    extensions.configure(KotlinJvmProjectExtension::class.java) { it.jvmToolchain(21) }
 
     dependencies.add("implementation", dependencies.platform(libs.findLibrary("kotlin-bom").get()))
 

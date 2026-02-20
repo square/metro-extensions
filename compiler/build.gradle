@@ -109,6 +109,12 @@ tasks.withType(Test).configureEach { testTask ->
   useJUnitPlatform()
   workingDir = rootDir
 
+  // FIR/IR dump output can differ between Metro releases and local builds, so skip dump tests
+  // when building against a local Metro checkout.
+  if (project.hasProperty('useLocalMetro')) {
+    exclude '**/FirDumpTestGenerated*'
+  }
+
   // Properties required to run the internal test framework.
   systemProperty('idea.ignore.disabled.plugins', 'true')
   systemProperty('idea.home.path', rootDir)
