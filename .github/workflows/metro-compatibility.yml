@@ -15,10 +15,28 @@ permissions:
   contents: read
 
 jobs:
+  configure-kotlin-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      kotlin-versions: ${{ steps.kotlin-versions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: kotlin-versions
+        uses: ./.github/actions/kotlin-versions
+        with:
+          # preview-versions: 2.3.20-RC, 2.4.0-Beta1
+          preview-versions: 2.3.20-RC
+
   metro-compatibility:
+    needs: configure-kotlin-versions
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin-version: ${{ fromJSON(needs.configure-kotlin-versions.outputs.kotlin-versions) }}
 
+    name: metro-compatibility (Kotlin ${{ matrix.kotlin-version }})
     steps:
       - uses: actions/checkout@v6
 
@@ -35,14 +53,14 @@ jobs:
           java-version: '24'
 
       - name: Compiler tests
-        run: ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version
+        run: ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version -Pkotlin.version=${{ matrix.kotlin-version }}
 
       - name: Integration tests
-        run: ./gradlew -p integration-tests test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version
+        run: ./gradlew -p integration-tests test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version -Pkotlin.version=${{ matrix.kotlin-version }}
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v6
         if: failure()
         with:
-          name: metro-compat-test-results
+          name: metro-compat-test-results-kotlin-${{ matrix.kotlin-version }}
           path: ./**/build/reports/

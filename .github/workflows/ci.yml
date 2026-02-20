@@ -14,10 +14,29 @@ permissions:
   contents: read
 
 jobs:
+  configure-kotlin-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      kotlin-versions: ${{ steps.kotlin-versions.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: kotlin-versions
+        uses: ./.github/actions/kotlin-versions
+          # preview-versions: 2.3.20-RC, 2.4.0-Beta1
+#        TODO: Enable again once a new Metro release is out.
+#        with:
+#          preview-versions: 2.3.20-RC
+
   test:
+    needs: configure-kotlin-versions
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        kotlin-version: ${{ fromJSON(needs.configure-kotlin-versions.outputs.kotlin-versions) }}
 
+    name: test (Kotlin ${{ matrix.kotlin-version }})
     steps:
       - uses: actions/checkout@v6
 
@@ -27,13 +46,13 @@ jobs:
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Test
-        run: ./gradlew test --stacktrace --show-version --continue
+        run: ./gradlew test --stacktrace --show-version --continue -Pkotlin.version=${{ matrix.kotlin-version }}
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v6
         if: ${{ failure() }}
         with:
-          name: test-results-${{ github.job }}
+          name: test-results-${{ github.job }}-kotlin-${{ matrix.kotlin-version }}
           path: ./**/build/reports/
 
   binary-compatibility-check:
