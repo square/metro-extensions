@@ -39,7 +39,6 @@ FIR + IR two-phase pattern: FIR generates declaration stubs (shapes without bodi
 External extensions run **before** Metro's native generators. Generated classes with `@Inject`/`@Provides` are automatically picked up. For IR, register `IrGenerationExtension` directly with the Kotlin compiler.
 
 ## FIR Compiler Plugin Limitations
-- **Nested generated classes:** Kotlin does NOT invoke `FirSupertypeGenerationExtension` for classes nested 2+ levels deep inside generated classes.
 - **`declarations +=` vs `generateFunctions`:** `declarations +=` is visible via `declarationSymbols` but not in scope; `generateFunctions` is visible in scope but not in `declarationSymbols`. Cannot use both (causes `IrSimpleFunctionSymbolImpl is already bound`).
 - **`predicateBasedProvider.getSymbolsByPredicate`** may return empty with multiple extensions sharing Metro's composite — use `resolvedCompilerAnnotationsWithClassIds` as fallback.
 - **Resolution timing:** `resolvedAnnotationsWithArguments` may fail during SUPERTYPES phase; use `resolvedCompilerAnnotationsWithClassIds` (safe). For supertypes, use raw `classSymbol.fir.superTypeRefs` with `@OptIn(SymbolInternals::class)`.
