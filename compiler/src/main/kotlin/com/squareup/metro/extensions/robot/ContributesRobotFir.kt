@@ -7,6 +7,7 @@ import com.squareup.metro.extensions.Keys.ContributesRobotGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationWithScope
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
+import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.fir.declarations.origin
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
+import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
@@ -163,6 +165,26 @@ public class ContributesRobotFir(session: FirSession) :
     }
 
     return listOf(functionSymbol)
+  }
+
+  override fun getContributionHints(): List<ContributionHint> {
+    return session.predicateBasedProvider
+      .getSymbolsByPredicate(ContributesRobotIds.PREDICATE)
+      .filterIsInstance<FirRegularClassSymbol>()
+      .mapNotNull { classSymbol ->
+        val scopeClassId =
+          extractScopeClassId(
+            classSymbol,
+            ContributesRobotIds.CONTRIBUTES_ROBOT_CLASS_ID,
+            session,
+          ) ?: return@mapNotNull null
+        val nestedInterfaceClassId =
+          classSymbol.classId.createNestedClassId(ContributesRobotIds.NESTED_INTERFACE_NAME)
+        ContributionHint(
+          contributingClassId = nestedInterfaceClassId,
+          scope = scopeClassId,
+        )
+      }
   }
 
   private fun isGeneratedContributionInterface(classSymbol: FirClassSymbol<*>): Boolean {
