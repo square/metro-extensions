@@ -53,6 +53,11 @@ dependencies {
 //noinspection UnnecessaryQualifiedReference
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
   compilerOptions {
+    // TODO: undo when we no longer need to generate hints ourselves.
+    // Disable -Werror set by LibPlugin — the compiler module uses @file:Suppress("INVISIBLE_MEMBER")
+    // to access Metro internals, which produces an unavoidable compiler warning.
+    allWarningsAsErrors = false
+
     freeCompilerArgs.add('-Xcontext-parameters')
     optIn.addAll([
       'org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi',
