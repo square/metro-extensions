@@ -1,6 +1,6 @@
 # Custom Annotation Use Cases
 
-This document describes the custom annotations needed for the android-register, what each one generates, and example usages. These use cases are
+This document describes the custom annotations, what each one generates, and example usages. These use cases are
 implementation-agnostic -- they can be fulfilled by KSP processors, a compiler plugin
 feature, or any other code generation mechanism.
 
