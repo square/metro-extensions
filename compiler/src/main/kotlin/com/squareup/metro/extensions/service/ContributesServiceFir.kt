@@ -62,33 +62,10 @@ import org.jetbrains.kotlin.name.Name
  * Generates a nested `ServiceContribution` interface for classes annotated with
  * `@ContributesService`.
  *
- * For a **real service** (no `replaces`):
- * ```
- * @ContributesTo(SomeScope::class)
- * interface ServiceContribution {
- *   @Provides @SingleIn(SomeScope::class)
- *   fun provideMyService(
- *     @SomeQualifier serviceCreator: ServiceCreator,
- *     @FakeMode isFakeMode: Boolean,
- *   ): MyService
- * }
- * ```
- *
- * For a **fake service** (`replaces = [MyService::class]`):
- * ```
- * @ContributesTo(SomeScope::class)
- * interface ServiceContribution {
- *   @Provides @SingleIn(SomeScope::class) @RealService
- *   fun provideMyService(@SomeQualifier serviceCreator: ServiceCreator): MyService
- *
- *   @Provides
- *   fun provideFakeOrRealMyService(
- *     @RealService realService: Provider<MyService>,
- *     fakeService: Provider<FakeMyService>,
- *     @FakeMode isFakeMode: Boolean,
- *   ): MyService
- * }
- * ```
+ * See `docs/use-cases.md` for the full specification. The generated output differs slightly from
+ * the KSP processor: instead of a real/fake switcher with `@RealService` + `Provider<>`, fake
+ * services use a simple binding that always delegates to the fake. The `@FakeMode` runtime check
+ * only applies to real services (to catch missing fake implementations in debug builds).
  *
  * Functions are added directly to the class's declarations list (rather than through
  * `getCallableNamesForClass`/`generateFunctions`) so Metro can see them when deciding what nested
@@ -190,19 +167,7 @@ public class ContributesServiceFir(session: FirSession) :
     return klass.symbol
   }
 
-  /**
-   * Extract `replaces` ClassIds from the `@ContributesService` annotation.
-   *
-   * Uses the raw [FirAnnotationCall.argumentList] because during FIR generation, the annotation's
-   * [argumentMapping][org.jetbrains.kotlin.fir.expressions.FirAnnotation.argumentMapping] may not
-   * yet be populated.
-   */
-  /**
-   * Extract `replaces` ClassIds from the `@ContributesService` annotation.
-   *
-   * During FIR generation, `argumentMapping` is not yet populated, so we scan the raw
-   * `argumentList` for the named `replaces` argument.
-   */
+  /** Extract `replaces` ClassIds from the `@ContributesService` annotation. */
   private fun extractReplacesClassIds(owner: FirClassSymbol<*>): List<ClassId> {
     val annotation =
       findAnnotation(owner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)
@@ -296,14 +261,9 @@ public class ContributesServiceFir(session: FirSession) :
   /**
    * Build the `@Provides` function for a fake service (has `replaces`).
    *
-   * Generates a simple binding that delegates to the fake service:
-   * ```
-   * @Provides
-   * fun provideMyServiceFromFake(fake: FakeMyService): MyService = fake
-   * ```
-   *
-   * The fake class has `@Inject`, so Metro can construct it. The MetroContributionExtension handles
-   * replacing the real service's contribution, so only this binding exists in the graph.
+   * The fake class has `@Inject`, so Metro can construct it. The `@ContributesTo(replaces=...)`
+   * annotation on the generated `ServiceContribution` interface handles replacing the real
+   * service's contribution.
    */
   private fun buildFakeServiceFunctions(
     nestedClassId: ClassId,

@@ -31,22 +31,17 @@ import org.jetbrains.kotlin.name.Name
  * IR extension that generates method bodies for `@Provides` functions created by
  * [ContributesServiceFir].
  *
- * Handles three function patterns:
+ * Handles two function patterns:
  *
- * 1. **Real service with check** (has `serviceCreator` + `isFakeMode`):
+ * 1. **Real service** (has `serviceCreator` + `isFakeMode`):
  *    ```
  *    if (isFakeMode) error("No fake service provided for MyService.")
  *    return serviceCreator.create(MyService::class.java)
  *    ```
  *
- * 2. **Real service under @RealService** (has `serviceCreator`, no `isFakeMode`):
+ * 2. **Fake service binding** (has `fakeService`):
  *    ```
- *    return serviceCreator.create(MyService::class.java)
- *    ```
- *
- * 3. **Switcher** (has `realService` + `fakeService` + `isFakeMode`):
- *    ```
- *    return if (isFakeMode) fakeService() else realService()
+ *    return fakeService
  *    ```
  */
 @Suppress("DEPRECATION")
@@ -88,7 +83,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     when {
       hasFakeService && !hasServiceCreator -> generateFakeBindingBody(declaration)
       hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
-      hasServiceCreator -> generateRealServiceBody(declaration)
     }
 
     return super.visitSimpleFunction(declaration)
@@ -145,67 +139,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
           }
         +irIfThen(pluginContext.irBuiltIns.unitType, irGet(isFakeModeParam), errorCall)
 
-        val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
-        val classRef =
-          IrClassReferenceImpl(
-            UNDEFINED_OFFSET,
-            UNDEFINED_OFFSET,
-            kClassType,
-            serviceClassSymbol,
-            serviceClassSymbol.defaultType,
-          )
-
-        val javaClassExpr =
-          irCall(javaGetter).apply { arguments[0] = classRef }
-
-        val createCall =
-          irCall(createFun.symbol).apply {
-            arguments[0] = irGet(serviceCreatorParam)
-            typeArguments[0] = serviceType
-            arguments[1] = javaClassExpr
-          }
-
-        +irReturn(createCall)
-      }
-  }
-
-  /**
-   * Real service provider under @RealService (for fake service's contribution):
-   * ```
-   * return serviceCreator.create(ReplacedService::class.java)
-   * ```
-   */
-  private fun generateRealServiceBody(declaration: IrSimpleFunction) {
-    val serviceType = declaration.returnType
-    val serviceClassSymbol =
-      (serviceType as? IrSimpleType)?.classOrNull ?: return
-
-    val allParams = declaration.parameters
-    val serviceCreatorParam = allParams.first { it.name.asString() == "serviceCreator" }
-
-    val serviceCreatorClassSymbol =
-      pluginContext.referenceClass(ClassIds.SERVICE_CREATOR) ?: return
-    val createFun =
-      serviceCreatorClassSymbol.owner.declarations
-        .filterIsInstance<IrSimpleFunction>()
-        .singleOrNull { it.name.asString() == "create" } ?: return
-
-    val javaPropertySymbol =
-      pluginContext
-        .referenceProperties(CallableId(FqName("kotlin.jvm"), Name.identifier("java")))
-        .firstOrNull() ?: return
-    val javaGetter = javaPropertySymbol.owner.getter?.symbol ?: return
-
-    val irBuilder =
-      DeclarationIrBuilder(
-        pluginContext,
-        declaration.symbol,
-        declaration.startOffset,
-        declaration.endOffset,
-      )
-
-    declaration.body =
-      irBuilder.irBlockBody {
         val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
         val classRef =
           IrClassReferenceImpl(
