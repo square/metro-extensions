@@ -1,5 +1,6 @@
 package com.squareup.api
 
-import javax.inject.Qualifier
+import dev.zacsweers.metro.Qualifier
 
-@Qualifier annotation class RetrofitAuthenticated
+@Qualifier
+annotation class RetrofitAuthenticated

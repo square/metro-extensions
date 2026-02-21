@@ -1,5 +1,6 @@
 package com.squareup.development
 
-import javax.inject.Qualifier
+import dev.zacsweers.metro.Qualifier
 
-@Qualifier annotation class FakeMode
+@Qualifier
+annotation class FakeMode

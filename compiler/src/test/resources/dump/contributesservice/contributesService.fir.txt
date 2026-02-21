@@ -3,7 +3,7 @@ FILE: contributesService.kt
 
     @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
         @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|kotlin/Unit|)) public open fun provideMyService(serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
+            @R|dev/zacsweers/metro/Provides|() @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|kotlin/Unit|)) public open fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/MyService.ServiceContribution| {
             }
@@ -14,9 +14,9 @@ FILE: contributesService.kt
                 }
 
                 public final companion object Companion : R|kotlin/Any| {
-                    public final fun create(instance: R|com/test/MyService.ServiceContribution|, serviceCreator: R|dev/zacsweers/metro/Provider<com/squareup/api/ServiceCreator>|, @R|com/squareup/development/FakeMode|() isFakeMode: R|dev/zacsweers/metro/Provider<kotlin/Boolean>|): R|dev/zacsweers/metro/internal/Factory<com/test/MyService>|
+                    public final fun create(instance: R|com/test/MyService.ServiceContribution|, @R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|dev/zacsweers/metro/Provider<com/squareup/api/ServiceCreator>|, @R|com/squareup/development/FakeMode|() isFakeMode: R|dev/zacsweers/metro/Provider<kotlin/Boolean>|): R|dev/zacsweers/metro/internal/Factory<com/test/MyService>|
 
-                    public final fun provideMyService(instance: R|com/test/MyService.ServiceContribution|, serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
+                    public final fun provideMyService(instance: R|com/test/MyService.ServiceContribution|, @R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
                     private constructor(): R|com/test/MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion| {
                         super<R|kotlin/Any|>()
