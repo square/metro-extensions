@@ -117,15 +117,21 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
-    @TestMetadata("replacedServiceMultiCompilation.kt")
-    public void testReplacedServiceMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceMultiCompilation.kt");
+    @TestMetadata("replacedServiceOneCompilation.kt")
+    public void testReplacedServiceOneCompilation() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceOneCompilation.kt");
     }
 
     @Test
-    @TestMetadata("replacedServiceSingleCompilation.kt")
-    public void testReplacedServiceSingleCompilation() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceSingleCompilation.kt");
+    @TestMetadata("replacedServiceThreeCompilations.kt")
+    public void testReplacedServiceThreeCompilations() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceThreeCompilations.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedServiceTwoCompilations.kt")
+    public void testReplacedServiceTwoCompilations() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceTwoCompilations.kt");
     }
 
     @Test
