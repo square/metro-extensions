@@ -14,20 +14,24 @@ interface MyService
 class FakeMyService : MyService
 
 @DependencyGraph(Unit::class)
-abstract class MyGraph {
-  abstract val myService: MyService
+interface MyGraph {
+  val myService: MyService
 
   @Provides @RetrofitAuthenticated
   fun provideServiceCreator(): ServiceCreator = ServiceCreator.NoOp
 
-  @Provides @FakeMode
-  fun provideFakeMode(): Boolean = true
+  @DependencyGraph.Factory
+  interface Factory {
+    fun create(@Provides @FakeMode fake: Boolean): MyGraph
+  }
 }
 
 fun box(): String {
-  val graph = createGraph<MyGraph>()
-  val service = graph.myService
-  assertNotNull(service)
-  assertTrue(service is FakeMyService, "Expected FakeMyService but got: ${service::class}")
+  var graph = createGraphFactory<MyGraph.Factory>().create(fake = true)
+  assertTrue(graph.myService is FakeMyService, "Expected FakeMyService")
+
+  graph = createGraphFactory<MyGraph.Factory>().create(fake = false)
+  assertTrue(graph.myService !is FakeMyService, "Expected real MyService")
+
   return "OK"
 }
