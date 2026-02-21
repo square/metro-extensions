@@ -32,18 +32,16 @@ import org.jetbrains.kotlin.name.Name
  * IR extension that generates method bodies for `@Provides` functions created by
  * [ContributesServiceFir].
  *
- * Handles two function patterns:
+ * Handles three function patterns:
  *
- * 1. **Real service** (has `serviceCreator` + `isFakeMode`, no `fakeService`):
- *    ```
- *    if (isFakeMode) error("No fake service provided for MyService.")
- *    return serviceCreator.create(MyService::class.java)
- *    ```
+ * 1. **Real service with check** (has `serviceCreator` + `isFakeMode`):
+ *    `if (isFakeMode) error("No fake service provided for ..."); return serviceCreator.create(...)`
  *
- * 2. **Fake service switcher** (has `serviceCreator` + `fakeService` + `isFakeMode`):
- *    ```
- *    return if (isFakeMode) fakeService else serviceCreator.create(MyService::class.java)
- *    ```
+ * 2. **Real service provider under @RealService** (has `serviceCreator`, no `isFakeMode`):
+ *    `return serviceCreator.create(ReplacedService::class.java)`
+ *
+ * 3. **Switcher** (has `realService` + `fakeService` + `isFakeMode`):
+ *    `return if (isFakeMode) fakeService else realService`
  */
 @Suppress("DEPRECATION")
 internal class ContributesServiceIrExtension : IrGenerationExtension {
@@ -77,13 +75,14 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     val allParams = declaration.parameters
 
     // Detect function pattern by parameter names
-    val hasFakeService = allParams.any { it.name.asString() == "fakeService" }
+    val hasRealService = allParams.any { it.name.asString() == "realService" }
     val hasServiceCreator = allParams.any { it.name.asString() == "serviceCreator" }
     val hasIsFakeMode = allParams.any { it.name.asString() == "isFakeMode" }
 
     when {
-      hasFakeService -> generateFakeSwitcherBody(declaration)
+      hasRealService -> generateSwitcherBody(declaration)
       hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
+      hasServiceCreator -> generateRealServiceProviderBody(declaration)
     }
 
     return super.visitSimpleFunction(declaration)
@@ -165,20 +164,18 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
   }
 
   /**
-   * Fake service switcher — returns fake or real based on `@FakeMode`:
+   * Real service provider under `@RealService` qualifier (for fake service's contribution):
    * ```
-   * return if (isFakeMode) fakeService else serviceCreator.create(ReplacedService::class.java)
+   * return serviceCreator.create(ReplacedService::class.java)
    * ```
    */
-  private fun generateFakeSwitcherBody(declaration: IrSimpleFunction) {
+  private fun generateRealServiceProviderBody(declaration: IrSimpleFunction) {
     val serviceType = declaration.returnType
     val serviceClassSymbol =
       (serviceType as? IrSimpleType)?.classOrNull ?: return
 
     val allParams = declaration.parameters
     val serviceCreatorParam = allParams.first { it.name.asString() == "serviceCreator" }
-    val fakeServiceParam = allParams.first { it.name.asString() == "fakeService" }
-    val isFakeModeParam = allParams.first { it.name.asString() == "isFakeMode" }
 
     val serviceCreatorClassSymbol =
       pluginContext.referenceClass(ClassIds.SERVICE_CREATOR) ?: return
@@ -203,7 +200,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
 
     declaration.body =
       irBuilder.irBlockBody {
-        // serviceCreator.create(ReplacedService::class.java)
         val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
         val classRef =
           IrClassReferenceImpl(
@@ -222,13 +218,38 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
             arguments[1] = javaClassExpr
           }
 
-        // return if (isFakeMode) fakeService else serviceCreator.create(...)
+        +irReturn(createCall)
+      }
+  }
+
+  /**
+   * Switcher — returns fake or real based on `@FakeMode`:
+   * ```
+   * return if (isFakeMode) fakeService else realService
+   * ```
+   */
+  private fun generateSwitcherBody(declaration: IrSimpleFunction) {
+    val allParams = declaration.parameters
+    val realServiceParam = allParams.first { it.name.asString() == "realService" }
+    val fakeServiceParam = allParams.first { it.name.asString() == "fakeService" }
+    val isFakeModeParam = allParams.first { it.name.asString() == "isFakeMode" }
+
+    val irBuilder =
+      DeclarationIrBuilder(
+        pluginContext,
+        declaration.symbol,
+        declaration.startOffset,
+        declaration.endOffset,
+      )
+
+    declaration.body =
+      irBuilder.irBlockBody {
         +irReturn(
           irIfThenElse(
-            serviceType,
+            declaration.returnType,
             irGet(isFakeModeParam),
             irGet(fakeServiceParam),
-            createCall,
+            irGet(realServiceParam),
           )
         )
       }

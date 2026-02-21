@@ -130,8 +130,8 @@ public class ContributesServiceFir(session: FirSession) :
       if (replacesClassIds.isNotEmpty()) {
         buildFakeServiceFunctions(nestedClassId, owner, scopeArg, replacesClassIds.first())
       } else {
-        val qualifierAnnotation = findQualifierAnnotation(owner)
-        listOf(buildRealServiceProvidesFunction(nestedClassId, owner, scopeArg, qualifierAnnotation))
+        val qualifierClassId = findQualifierClassId(owner)
+        listOf(buildRealServiceProvidesFunction(nestedClassId, owner, scopeArg, qualifierClassId))
       }
 
     val klass = buildRegularClass {
@@ -189,7 +189,7 @@ public class ContributesServiceFir(session: FirSession) :
     classId: ClassId,
     outerOwner: FirClassSymbol<*>,
     scopeArg: FirExpression,
-    qualifierAnnotation: org.jetbrains.kotlin.fir.expressions.FirAnnotation?,
+    qualifierClassId: ClassId?,
   ): FirSimpleFunction {
     val outerClassId = outerOwner.classId
     val functionName = "provide${outerClassId.shortClassName.identifier}"
@@ -235,8 +235,8 @@ public class ContributesServiceFir(session: FirSession) :
         this.name = Name.identifier("serviceCreator")
         symbol = FirValueParameterSymbol()
         containingDeclarationSymbol = functionSymbol
-        if (qualifierAnnotation != null) {
-          annotations += qualifierAnnotation
+        if (qualifierClassId != null) {
+          annotations += buildSimpleAnnotation(qualifierClassId)
         }
       }
 
@@ -259,11 +259,12 @@ public class ContributesServiceFir(session: FirSession) :
   }
 
   /**
-   * Build the `@Provides` function for a fake service (has `replaces`).
+   * Build two `@Provides` functions for a fake service (has `replaces`).
    *
-   * The fake class has `@Inject`, so Metro can construct it. The `@ContributesTo(replaces=...)`
-   * annotation on the generated `ServiceContribution` interface handles replacing the real
-   * service's contribution.
+   * 1. Real service provider under `@RealService` qualifier:
+   *    `@Provides @SingleIn(scope) @RealService fun provideRealXxx(@Qualifier serviceCreator): ReplacedType`
+   * 2. Switcher that picks real or fake based on `@FakeMode`:
+   *    `@Provides fun provideXxx(@RealService real: ReplacedType, fake: FakeType, @FakeMode isFakeMode: Boolean): ReplacedType`
    */
   private fun buildFakeServiceFunctions(
     nestedClassId: ClassId,
@@ -274,7 +275,7 @@ public class ContributesServiceFir(session: FirSession) :
     val replacedSymbol =
       session.symbolProvider.getClassLikeSymbolByClassId(replacedClassId) as? FirClassSymbol<*>
         ?: return emptyList()
-    val qualifierAnnotation = findQualifierAnnotation(replacedSymbol)
+    val qualifierClassId = findQualifierClassId(replacedSymbol)
 
     val replacedType = replacedSymbol.defaultType()
     val fakeType = fakeOwner.defaultType()
@@ -293,17 +294,18 @@ public class ContributesServiceFir(session: FirSession) :
       )
 
     val replacedName = replacedClassId.shortClassName.identifier
-    val functionName = "provide${replacedName}"
-    val callableId = CallableId(nestedClassId, Name.identifier(functionName))
-    val functionSymbol = FirNamedFunctionSymbol(callableId)
 
-    val fn = buildSimpleFunction {
+    // Function 1: @Provides @SingleIn(scope) @RealService
+    val realFnName = "provideReal${replacedName}"
+    val realCallableId = CallableId(nestedClassId, Name.identifier(realFnName))
+    val realFnSymbol = FirNamedFunctionSymbol(realCallableId)
+
+    val realFn = buildSimpleFunction {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesServiceGeneratorKey.origin
-      symbol = functionSymbol
-      name = callableId.callableName
-      // Return the REPLACED service type, not the fake type
+      symbol = realFnSymbol
+      name = realCallableId.callableName
       returnTypeRef = replacedType.toFirResolvedTypeRef()
       dispatchReceiverType = dispatchType
       status =
@@ -321,13 +323,51 @@ public class ContributesServiceFir(session: FirSession) :
         returnTypeRef = serviceCreatorType.toFirResolvedTypeRef()
         this.name = Name.identifier("serviceCreator")
         symbol = FirValueParameterSymbol()
-        containingDeclarationSymbol = functionSymbol
-        if (qualifierAnnotation != null) {
-          annotations += qualifierAnnotation
+        containingDeclarationSymbol = realFnSymbol
+        if (qualifierClassId != null) {
+          annotations += buildSimpleAnnotation(qualifierClassId)
         }
       }
 
-      // Parameter: fakeService: FakeMyService (injected via @Inject constructor)
+      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, realFnSymbol)
+      annotations +=
+        buildAnnotationCallWithScope(ClassIds.SINGLE_IN, ArgNames.VALUE, scopeArg, realFnSymbol)
+      annotations += buildSimpleAnnotationCall(ClassIds.REAL_SERVICE, realFnSymbol)
+    }
+
+    // Function 2: @Provides switcher
+    val switcherFnName = "provide${replacedName}"
+    val switcherCallableId = CallableId(nestedClassId, Name.identifier(switcherFnName))
+    val switcherFnSymbol = FirNamedFunctionSymbol(switcherCallableId)
+
+    val switcherFn = buildSimpleFunction {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = ContributesServiceGeneratorKey.origin
+      symbol = switcherFnSymbol
+      name = switcherCallableId.callableName
+      returnTypeRef = replacedType.toFirResolvedTypeRef()
+      dispatchReceiverType = dispatchType
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.OPEN,
+          Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
+        )
+
+      // Parameter: @RealService realService: ReplacedType
+      this.valueParameters += buildValueParameter {
+        resolvePhase = FirResolvePhase.BODY_RESOLVE
+        moduleData = session.moduleData
+        origin = ContributesServiceGeneratorKey.origin
+        returnTypeRef = replacedType.toFirResolvedTypeRef()
+        this.name = Name.identifier("realService")
+        symbol = FirValueParameterSymbol()
+        containingDeclarationSymbol = switcherFnSymbol
+        annotations += buildSimpleAnnotation(ClassIds.REAL_SERVICE)
+      }
+
+      // Parameter: fakeService: FakeMyService
       this.valueParameters += buildValueParameter {
         resolvePhase = FirResolvePhase.BODY_RESOLVE
         moduleData = session.moduleData
@@ -335,7 +375,7 @@ public class ContributesServiceFir(session: FirSession) :
         returnTypeRef = fakeType.toFirResolvedTypeRef()
         this.name = Name.identifier("fakeService")
         symbol = FirValueParameterSymbol()
-        containingDeclarationSymbol = functionSymbol
+        containingDeclarationSymbol = switcherFnSymbol
       }
 
       // Parameter: @FakeMode isFakeMode: Boolean
@@ -346,14 +386,14 @@ public class ContributesServiceFir(session: FirSession) :
         returnTypeRef = session.builtinTypes.booleanType
         this.name = Name.identifier("isFakeMode")
         symbol = FirValueParameterSymbol()
-        containingDeclarationSymbol = functionSymbol
+        containingDeclarationSymbol = switcherFnSymbol
         annotations += buildSimpleAnnotation(ClassIds.FAKE_MODE)
       }
 
-      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, switcherFnSymbol)
     }
 
-    return listOf(fn)
+    return listOf(realFn, switcherFn)
   }
 
   /**
@@ -449,9 +489,10 @@ public class ContributesServiceFir(session: FirSession) :
     }
   }
 
-  private fun findQualifierAnnotation(
+  /** Find the qualifier annotation ClassId on a class (e.g., `@RetrofitAuthenticated`). */
+  private fun findQualifierClassId(
     classSymbol: FirClassSymbol<*>,
-  ): org.jetbrains.kotlin.fir.expressions.FirAnnotation? {
+  ): ClassId? {
     for (annotation in classSymbol.resolvedAnnotationsWithArguments) {
       val annotationClassId = annotation.toAnnotationClassIdSafe(session) ?: continue
       if (annotationClassId == ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID) continue
@@ -462,7 +503,7 @@ public class ContributesServiceFir(session: FirSession) :
         annotationSymbol.resolvedCompilerAnnotationsWithClassIds.any {
           it.toAnnotationClassIdSafe(session) in ClassIds.QUALIFIER_CLASS_IDS
         }
-      if (isQualifier) return annotation
+      if (isQualifier) return annotationClassId
     }
     return null
   }
