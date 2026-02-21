@@ -1,7 +1,9 @@
 package com.squareup.metro.extensions.service
 
+import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.SquareMetroExtensionsDiagnostics
+import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -12,9 +14,6 @@ import org.jetbrains.kotlin.fir.declarations.FirClass
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.declarations.utils.classId
-import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
-import org.jetbrains.kotlin.fir.expressions.FirArrayLiteral
-import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 
@@ -35,7 +34,8 @@ internal object ContributesServiceChecker : FirClassChecker(MppCheckerKind.Commo
         ann.toAnnotationClassId(session) == ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID
       } ?: return
 
-    val hasReplaces = hasReplacesArgument(annotation)
+    val hasReplaces =
+      extractClassIdsFromArrayArg(annotation, ArgNames.REPLACES, session).isNotEmpty()
 
     // Real services must be interfaces
     if (!hasReplaces && declaration.classKind != ClassKind.INTERFACE) {
@@ -69,20 +69,6 @@ internal object ContributesServiceChecker : FirClassChecker(MppCheckerKind.Commo
         }
       }
     }
-  }
-
-  private fun hasReplacesArgument(annotation: org.jetbrains.kotlin.fir.expressions.FirAnnotation): Boolean {
-    val annotationCall = annotation as? FirAnnotationCall ?: return false
-    for (arg in annotationCall.argumentList.arguments) {
-      if (arg is FirNamedArgumentExpression && arg.name.asString() == "replaces") {
-        val expr = arg.expression
-        if (expr is FirArrayLiteral) {
-          return expr.argumentList.arguments.isNotEmpty()
-        }
-        return true
-      }
-    }
-    return false
   }
 
   private fun countQualifiers(

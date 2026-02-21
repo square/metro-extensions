@@ -31,12 +31,25 @@ import org.jetbrains.kotlin.name.Name
  * IR extension that generates method bodies for `@Provides` functions created by
  * [ContributesServiceFir].
  *
- * For real services, generates:
- * ```
- * if (isFakeMode) error("No fake service provided for MyService.")
- * return serviceCreator.create(MyService::class.java)
- * ```
+ * Handles three function patterns:
+ *
+ * 1. **Real service with check** (has `serviceCreator` + `isFakeMode`):
+ *    ```
+ *    if (isFakeMode) error("No fake service provided for MyService.")
+ *    return serviceCreator.create(MyService::class.java)
+ *    ```
+ *
+ * 2. **Real service under @RealService** (has `serviceCreator`, no `isFakeMode`):
+ *    ```
+ *    return serviceCreator.create(MyService::class.java)
+ *    ```
+ *
+ * 3. **Switcher** (has `realService` + `fakeService` + `isFakeMode`):
+ *    ```
+ *    return if (isFakeMode) fakeService() else realService()
+ *    ```
  */
+@Suppress("DEPRECATION")
 internal class ContributesServiceIrExtension : IrGenerationExtension {
 
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
@@ -44,6 +57,7 @@ internal class ContributesServiceIrExtension : IrGenerationExtension {
   }
 }
 
+@Suppress("DEPRECATION")
 private class ContributesServiceIrTransformer(private val pluginContext: IrPluginContext) :
   IrElementTransformerVoid() {
 
@@ -64,29 +78,43 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
       return super.visitSimpleFunction(declaration)
     }
 
-    generateProvidesBody(declaration)
+    val allParams = declaration.parameters
+
+    // Detect function pattern by parameter names
+    val hasFakeService = allParams.any { it.name.asString() == "fakeService" }
+    val hasServiceCreator = allParams.any { it.name.asString() == "serviceCreator" }
+    val hasIsFakeMode = allParams.any { it.name.asString() == "isFakeMode" }
+
+    when {
+      hasFakeService && !hasServiceCreator -> generateFakeBindingBody(declaration)
+      hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
+      hasServiceCreator -> generateRealServiceBody(declaration)
+    }
+
     return super.visitSimpleFunction(declaration)
   }
 
-  private fun generateProvidesBody(declaration: IrSimpleFunction) {
+  /**
+   * Real service with fake mode check (no replaces):
+   * ```
+   * if (isFakeMode) error("No fake service provided for MyService.")
+   * return serviceCreator.create(MyService::class.java)
+   * ```
+   */
+  private fun generateRealServiceWithCheckBody(declaration: IrSimpleFunction) {
     val serviceType = declaration.returnType
     val serviceClassSymbol =
       (serviceType as? IrSimpleType)?.classOrNull ?: return
 
-    // In Kotlin 2.3's unified parameters model, parameters include dispatch receiver first.
-    // Our function is on an interface, so: [dispatch, serviceCreator, isFakeMode]
     val allParams = declaration.parameters
-    // Find value parameters (skip dispatch receiver)
     val serviceCreatorParam = allParams.first { it.name.asString() == "serviceCreator" }
     val isFakeModeParam = allParams.first { it.name.asString() == "isFakeMode" }
 
-    // Reference kotlin.error() function
     val errorFun =
       pluginContext
         .referenceFunctions(CallableId(FqName("kotlin"), Name.identifier("error")))
         .first()
 
-    // Reference ServiceCreator.create() function
     val serviceCreatorClassSymbol =
       pluginContext.referenceClass(ClassIds.SERVICE_CREATOR) ?: return
     val createFun =
@@ -94,7 +122,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
         .filterIsInstance<IrSimpleFunction>()
         .singleOrNull { it.name.asString() == "create" } ?: return
 
-    // Reference kotlin.jvm.java extension property getter
     val javaPropertySymbol =
       pluginContext
         .referenceProperties(CallableId(FqName("kotlin.jvm"), Name.identifier("java")))
@@ -111,7 +138,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
 
     declaration.body =
       irBuilder.irBlockBody {
-        // if (isFakeMode) error("No fake service provided for MyService.")
         val serviceName = serviceClassSymbol.owner.name.asString()
         val errorCall =
           irCall(errorFun).apply {
@@ -119,7 +145,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
           }
         +irIfThen(pluginContext.irBuiltIns.unitType, irGet(isFakeModeParam), errorCall)
 
-        // return serviceCreator.create(MyService::class.java)
         val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
         val classRef =
           IrClassReferenceImpl(
@@ -130,11 +155,9 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
             serviceClassSymbol.defaultType,
           )
 
-        // kotlin.jvm.java getter: [extensionReceiver]
         val javaClassExpr =
           irCall(javaGetter).apply { arguments[0] = classRef }
 
-        // ServiceCreator.create(service): [dispatchReceiver, valueArg]
         val createCall =
           irCall(createFun.symbol).apply {
             arguments[0] = irGet(serviceCreatorParam)
@@ -143,6 +166,91 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
           }
 
         +irReturn(createCall)
+      }
+  }
+
+  /**
+   * Real service provider under @RealService (for fake service's contribution):
+   * ```
+   * return serviceCreator.create(ReplacedService::class.java)
+   * ```
+   */
+  private fun generateRealServiceBody(declaration: IrSimpleFunction) {
+    val serviceType = declaration.returnType
+    val serviceClassSymbol =
+      (serviceType as? IrSimpleType)?.classOrNull ?: return
+
+    val allParams = declaration.parameters
+    val serviceCreatorParam = allParams.first { it.name.asString() == "serviceCreator" }
+
+    val serviceCreatorClassSymbol =
+      pluginContext.referenceClass(ClassIds.SERVICE_CREATOR) ?: return
+    val createFun =
+      serviceCreatorClassSymbol.owner.declarations
+        .filterIsInstance<IrSimpleFunction>()
+        .singleOrNull { it.name.asString() == "create" } ?: return
+
+    val javaPropertySymbol =
+      pluginContext
+        .referenceProperties(CallableId(FqName("kotlin.jvm"), Name.identifier("java")))
+        .firstOrNull() ?: return
+    val javaGetter = javaPropertySymbol.owner.getter?.symbol ?: return
+
+    val irBuilder =
+      DeclarationIrBuilder(
+        pluginContext,
+        declaration.symbol,
+        declaration.startOffset,
+        declaration.endOffset,
+      )
+
+    declaration.body =
+      irBuilder.irBlockBody {
+        val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
+        val classRef =
+          IrClassReferenceImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            kClassType,
+            serviceClassSymbol,
+            serviceClassSymbol.defaultType,
+          )
+
+        val javaClassExpr =
+          irCall(javaGetter).apply { arguments[0] = classRef }
+
+        val createCall =
+          irCall(createFun.symbol).apply {
+            arguments[0] = irGet(serviceCreatorParam)
+            typeArguments[0] = serviceType
+            arguments[1] = javaClassExpr
+          }
+
+        +irReturn(createCall)
+      }
+  }
+
+  /**
+   * Fake service binding: simply returns the fake service cast to the replaced type.
+   * ```
+   * return fakeService
+   * ```
+   */
+  private fun generateFakeBindingBody(declaration: IrSimpleFunction) {
+    val allParams = declaration.parameters
+    val fakeServiceParam = allParams.first { it.name.asString() == "fakeService" }
+
+    val irBuilder =
+      DeclarationIrBuilder(
+        pluginContext,
+        declaration.symbol,
+        declaration.startOffset,
+        declaration.endOffset,
+      )
+
+    declaration.body =
+      irBuilder.irBlockBody {
+        +irReturn(irGet(fakeServiceParam))
       }
   }
 }

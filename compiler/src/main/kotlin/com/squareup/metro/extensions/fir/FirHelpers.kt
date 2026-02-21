@@ -4,8 +4,10 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.FirCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
+import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
@@ -118,6 +120,86 @@ internal fun extractScopeClassId(
       } else {
         val name = ref.name
         session.symbolProvider.getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))?.classId
+      }
+    }
+    else -> null
+  }
+}
+
+/**
+ * Extracts [ClassId]s from a named array argument of a FIR annotation.
+ *
+ * Handles both resolved argument mappings and raw [FirAnnotationCall] argument lists. For example,
+ * given `@MyAnnotation(replaces = [Foo::class, Bar::class])`, calling this with `argName = "replaces"`
+ * returns `[ClassId(Foo), ClassId(Bar)]`.
+ */
+internal fun extractClassIdsFromArrayArg(
+  annotation: FirAnnotation,
+  argName: Name,
+  session: FirSession,
+  /** Package to try when resolving unresolved class references (e.g., for the FIR generation phase). */
+  fallbackPackage: FqName? = null,
+): List<ClassId> {
+  // Try argument mapping first (resolved annotations)
+  annotation.argumentMapping.mapping[argName]?.let { expr ->
+    return extractClassIdsFromArrayExpression(expr, session, fallbackPackage)
+  }
+
+  // Fall back to FirAnnotationCall argument list (for partially resolved annotations)
+  val annotationCall = annotation as? FirAnnotationCall ?: return emptyList()
+  for (arg in annotationCall.argumentList.arguments) {
+    val namedArg = arg as? FirNamedArgumentExpression ?: continue
+    if (namedArg.name == argName) {
+      return extractClassIdsFromArrayExpression(namedArg.expression, session, fallbackPackage)
+    }
+  }
+  return emptyList()
+}
+
+private fun extractClassIdsFromArrayExpression(
+  expr: FirExpression,
+  session: FirSession,
+  fallbackPackage: FqName?,
+): List<ClassId> {
+  val arrayElements =
+    when (expr) {
+      is FirCall -> expr.argumentList.arguments
+      else -> return emptyList()
+    }
+  return arrayElements.mapNotNull { element ->
+    if (element is FirGetClassCall) {
+      resolveClassIdFromGetClassCall(element, session, fallbackPackage)
+    } else {
+      null
+    }
+  }
+}
+
+private fun resolveClassIdFromGetClassCall(
+  getClassCall: FirGetClassCall,
+  session: FirSession,
+  fallbackPackage: FqName?,
+): ClassId? {
+  val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
+  return when (innerArg) {
+    is FirResolvedQualifier -> innerArg.classId
+    is FirPropertyAccessExpression -> {
+      val ref = innerArg.calleeReference
+      if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {
+        (ref.resolvedSymbol as FirClassLikeSymbol<*>).classId
+      } else {
+        // At the FIR generation phase, class references may not be fully resolved yet.
+        // Try looking up the name in the kotlin package (for built-in types like Unit),
+        // then in the fallback package (typically the same package as the annotated class).
+        val name = ref.name
+        session.symbolProvider
+          .getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))
+          ?.classId
+          ?: fallbackPackage?.let {
+            session.symbolProvider
+              .getClassLikeSymbolByClassId(ClassId(it, name))
+              ?.classId
+          }
       }
     }
     else -> null

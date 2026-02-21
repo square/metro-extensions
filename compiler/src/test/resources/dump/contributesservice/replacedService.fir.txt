@@ -34,23 +34,23 @@ FILE: replacedService.kt
             super<R|kotlin/Any|>()
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|kotlin/Unit|)) public open fun provideFakeMyService(serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/FakeMyService|
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|), replaces = <implicitArrayOf>(<getClass>(Q|com/test/MyService.ServiceContribution|))) public abstract interface ServiceContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() public open fun provideMyService(fakeService: R|com/test/FakeMyService|): R|com/test/MyService|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/FakeMyService.ServiceContribution| {
             }
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(provideFakeMyService), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(provideFakeMyService)) public final class ProvideFakeMyServiceMetroFactory : R|dev/zacsweers/metro/internal/Factory<com/test/FakeMyService>| {
-                private constructor(instance: R|com/test/FakeMyService.ServiceContribution|, serviceCreator: R|dev/zacsweers/metro/Provider<com/squareup/api/ServiceCreator>|, isFakeMode: R|dev/zacsweers/metro/Provider<kotlin/Boolean>|): R|com/test/FakeMyService.ServiceContribution.ProvideFakeMyServiceMetroFactory| {
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(provideMyService), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(provideMyService)) public final class ProvideMyServiceMetroFactory : R|dev/zacsweers/metro/internal/Factory<com/test/MyService>| {
+                private constructor(instance: R|com/test/FakeMyService.ServiceContribution|, fakeService: R|dev/zacsweers/metro/Provider<com/test/FakeMyService>|): R|com/test/FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory| {
                     super<R|kotlin/Any|>()
                 }
 
                 public final companion object Companion : R|kotlin/Any| {
-                    public final fun create(instance: R|com/test/FakeMyService.ServiceContribution|, serviceCreator: R|dev/zacsweers/metro/Provider<com/squareup/api/ServiceCreator>|, @R|com/squareup/development/FakeMode|() isFakeMode: R|dev/zacsweers/metro/Provider<kotlin/Boolean>|): R|dev/zacsweers/metro/internal/Factory<com/test/FakeMyService>|
+                    public final fun create(instance: R|com/test/FakeMyService.ServiceContribution|, fakeService: R|dev/zacsweers/metro/Provider<com/test/FakeMyService>|): R|dev/zacsweers/metro/internal/Factory<com/test/MyService>|
 
-                    public final fun provideFakeMyService(instance: R|com/test/FakeMyService.ServiceContribution|, serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/FakeMyService|
+                    public final fun provideMyService(instance: R|com/test/FakeMyService.ServiceContribution|, fakeService: R|com/test/FakeMyService|): R|com/test/MyService|
 
-                    private constructor(): R|com/test/FakeMyService.ServiceContribution.ProvideFakeMyServiceMetroFactory.Companion| {
+                    private constructor(): R|com/test/FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion| {
                         super<R|kotlin/Any|>()
                     }
 
