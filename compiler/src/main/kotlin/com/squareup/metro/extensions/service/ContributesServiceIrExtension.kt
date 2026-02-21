@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.builders.irBlockBody
 import org.jetbrains.kotlin.ir.builders.irCall
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irIfThen
+import org.jetbrains.kotlin.ir.builders.irIfThenElse
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irString
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -33,15 +34,15 @@ import org.jetbrains.kotlin.name.Name
  *
  * Handles two function patterns:
  *
- * 1. **Real service** (has `serviceCreator` + `isFakeMode`):
+ * 1. **Real service** (has `serviceCreator` + `isFakeMode`, no `fakeService`):
  *    ```
  *    if (isFakeMode) error("No fake service provided for MyService.")
  *    return serviceCreator.create(MyService::class.java)
  *    ```
  *
- * 2. **Fake service binding** (has `fakeService`):
+ * 2. **Fake service switcher** (has `serviceCreator` + `fakeService` + `isFakeMode`):
  *    ```
- *    return fakeService
+ *    return if (isFakeMode) fakeService else serviceCreator.create(MyService::class.java)
  *    ```
  */
 @Suppress("DEPRECATION")
@@ -81,7 +82,7 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     val hasIsFakeMode = allParams.any { it.name.asString() == "isFakeMode" }
 
     when {
-      hasFakeService && !hasServiceCreator -> generateFakeBindingBody(declaration)
+      hasFakeService -> generateFakeSwitcherBody(declaration)
       hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
     }
 
@@ -164,14 +165,33 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
   }
 
   /**
-   * Fake service binding: simply returns the fake service cast to the replaced type.
+   * Fake service switcher — returns fake or real based on `@FakeMode`:
    * ```
-   * return fakeService
+   * return if (isFakeMode) fakeService else serviceCreator.create(ReplacedService::class.java)
    * ```
    */
-  private fun generateFakeBindingBody(declaration: IrSimpleFunction) {
+  private fun generateFakeSwitcherBody(declaration: IrSimpleFunction) {
+    val serviceType = declaration.returnType
+    val serviceClassSymbol =
+      (serviceType as? IrSimpleType)?.classOrNull ?: return
+
     val allParams = declaration.parameters
+    val serviceCreatorParam = allParams.first { it.name.asString() == "serviceCreator" }
     val fakeServiceParam = allParams.first { it.name.asString() == "fakeService" }
+    val isFakeModeParam = allParams.first { it.name.asString() == "isFakeMode" }
+
+    val serviceCreatorClassSymbol =
+      pluginContext.referenceClass(ClassIds.SERVICE_CREATOR) ?: return
+    val createFun =
+      serviceCreatorClassSymbol.owner.declarations
+        .filterIsInstance<IrSimpleFunction>()
+        .singleOrNull { it.name.asString() == "create" } ?: return
+
+    val javaPropertySymbol =
+      pluginContext
+        .referenceProperties(CallableId(FqName("kotlin.jvm"), Name.identifier("java")))
+        .firstOrNull() ?: return
+    val javaGetter = javaPropertySymbol.owner.getter?.symbol ?: return
 
     val irBuilder =
       DeclarationIrBuilder(
@@ -183,7 +203,34 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
 
     declaration.body =
       irBuilder.irBlockBody {
-        +irReturn(irGet(fakeServiceParam))
+        // serviceCreator.create(ReplacedService::class.java)
+        val kClassType = pluginContext.irBuiltIns.kClassClass.typeWith(serviceType)
+        val classRef =
+          IrClassReferenceImpl(
+            UNDEFINED_OFFSET,
+            UNDEFINED_OFFSET,
+            kClassType,
+            serviceClassSymbol,
+            serviceClassSymbol.defaultType,
+          )
+        val javaClassExpr =
+          irCall(javaGetter).apply { arguments[0] = classRef }
+        val createCall =
+          irCall(createFun.symbol).apply {
+            arguments[0] = irGet(serviceCreatorParam)
+            typeArguments[0] = serviceType
+            arguments[1] = javaClassExpr
+          }
+
+        // return if (isFakeMode) fakeService else serviceCreator.create(...)
+        +irReturn(
+          irIfThenElse(
+            serviceType,
+            irGet(isFakeModeParam),
+            irGet(fakeServiceParam),
+            createCall,
+          )
+        )
       }
   }
 }

@@ -17,6 +17,8 @@ class FakeMyService : MyService
 interface MyGraph {
   val myService: MyService
 
+  val fakeService: FakeMyService
+
   @Provides @RetrofitAuthenticated
   fun provideServiceCreator(): ServiceCreator = ServiceCreator.NoOp
 
@@ -29,9 +31,11 @@ interface MyGraph {
 fun box(): String {
   var graph = createGraphFactory<MyGraph.Factory>().create(fake = true)
   assertTrue(graph.myService is FakeMyService, "Expected FakeMyService")
+  assertTrue(graph.fakeService is FakeMyService)
 
   graph = createGraphFactory<MyGraph.Factory>().create(fake = false)
   assertTrue(graph.myService !is FakeMyService, "Expected real MyService")
+  assertTrue(graph.fakeService is FakeMyService)
 
   return "OK"
 }

@@ -63,9 +63,9 @@ import org.jetbrains.kotlin.name.Name
  * `@ContributesService`.
  *
  * See `docs/use-cases.md` for the full specification. The generated output differs slightly from
- * the KSP processor: instead of a real/fake switcher with `@RealService` + `Provider<>`, fake
- * services use a simple binding that always delegates to the fake. The `@FakeMode` runtime check
- * only applies to real services (to catch missing fake implementations in debug builds).
+ * the KSP processor: instead of two separate functions (`@RealService` provider + `Provider<>`
+ * switcher), fake services use a single function that takes both the `ServiceCreator` and the fake
+ * service, switching between them based on `@FakeMode` at runtime.
  *
  * Functions are added directly to the class's declarations list (rather than through
  * `getCallableNamesForClass`/`generateFunctions`) so Metro can see them when deciding what nested
@@ -274,9 +274,16 @@ public class ContributesServiceFir(session: FirSession) :
     val replacedSymbol =
       session.symbolProvider.getClassLikeSymbolByClassId(replacedClassId) as? FirClassSymbol<*>
         ?: return emptyList()
+    val qualifierAnnotation = findQualifierAnnotation(replacedSymbol)
 
     val replacedType = replacedSymbol.defaultType()
     val fakeType = fakeOwner.defaultType()
+    val serviceCreatorType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(ClassIds.SERVICE_CREATOR),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
 
     val dispatchType =
       ConeClassLikeTypeImpl(
@@ -306,6 +313,20 @@ public class ContributesServiceFir(session: FirSession) :
           Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
         )
 
+      // Parameter: @Qualifier serviceCreator: ServiceCreator
+      this.valueParameters += buildValueParameter {
+        resolvePhase = FirResolvePhase.BODY_RESOLVE
+        moduleData = session.moduleData
+        origin = ContributesServiceGeneratorKey.origin
+        returnTypeRef = serviceCreatorType.toFirResolvedTypeRef()
+        this.name = Name.identifier("serviceCreator")
+        symbol = FirValueParameterSymbol()
+        containingDeclarationSymbol = functionSymbol
+        if (qualifierAnnotation != null) {
+          annotations += qualifierAnnotation
+        }
+      }
+
       // Parameter: fakeService: FakeMyService (injected via @Inject constructor)
       this.valueParameters += buildValueParameter {
         resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -315,6 +336,18 @@ public class ContributesServiceFir(session: FirSession) :
         this.name = Name.identifier("fakeService")
         symbol = FirValueParameterSymbol()
         containingDeclarationSymbol = functionSymbol
+      }
+
+      // Parameter: @FakeMode isFakeMode: Boolean
+      this.valueParameters += buildValueParameter {
+        resolvePhase = FirResolvePhase.BODY_RESOLVE
+        moduleData = session.moduleData
+        origin = ContributesServiceGeneratorKey.origin
+        returnTypeRef = session.builtinTypes.booleanType
+        this.name = Name.identifier("isFakeMode")
+        symbol = FirValueParameterSymbol()
+        containingDeclarationSymbol = functionSymbol
+        annotations += buildSimpleAnnotation(ClassIds.FAKE_MODE)
       }
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
