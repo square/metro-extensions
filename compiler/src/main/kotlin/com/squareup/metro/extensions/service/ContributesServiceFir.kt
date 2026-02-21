@@ -167,7 +167,9 @@ public class ContributesServiceFir(session: FirSession) :
     // functions to decide whether to generate ProvidesFactory).
     val providesFunctions =
       if (replacesClassIds.isNotEmpty()) {
-        buildFakeServiceFunctions(nestedClassId, owner, scopeArg, replacesClassIds.first())
+        replacesClassIds.flatMap { replacedClassId ->
+          buildFakeServiceFunctions(nestedClassId, owner, scopeArg, replacedClassId)
+        }
       } else {
         val qualifierClassId = findQualifierClassId(owner)
         listOf(buildRealServiceProvidesFunction(nestedClassId, owner, scopeArg, qualifierClassId))

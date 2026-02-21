@@ -117,6 +117,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("replacedMultipleServices.kt")
+    public void testReplacedMultipleServices() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedMultipleServices.kt");
+    }
+
+    @Test
     @TestMetadata("replacedServiceOneCompilation.kt")
     public void testReplacedServiceOneCompilation() {
       runTest("compiler/src/test/resources/box/contributesservice/replacedServiceOneCompilation.kt");
