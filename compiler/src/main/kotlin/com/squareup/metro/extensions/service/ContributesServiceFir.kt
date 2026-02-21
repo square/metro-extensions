@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
@@ -218,6 +219,7 @@ public class ContributesServiceFir(session: FirSession) :
       ArgNames.REPLACES,
       session,
       fallbackPackage = owner.classId.packageFqName,
+      ownerSymbol = owner,
     )
   }
 
@@ -468,6 +470,7 @@ public class ContributesServiceFir(session: FirSession) :
           arrayOf(replacedType),
           isMarkedNullable = false,
         )
+      val resolvedSymbol = session.symbolProvider.getClassLikeSymbolByClassId(replacedId)
       buildGetClassCall {
         coneTypeOrNull = kClassType
         argumentList = buildArgumentList {
@@ -475,7 +478,7 @@ public class ContributesServiceFir(session: FirSession) :
             packageFqName = replacedId.packageFqName
             relativeClassFqName = replacedId.relativeClassName
             coneTypeOrNull = replacedType
-            symbol = session.symbolProvider.getClassLikeSymbolByClassId(replacedId)
+            symbol = resolvedSymbol
             resolvedToCompanionObject = false
           }
         }

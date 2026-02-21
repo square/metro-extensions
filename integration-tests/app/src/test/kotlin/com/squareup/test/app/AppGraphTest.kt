@@ -46,30 +46,27 @@ class AppGraphTest {
     assertEquals("No fake service provided for AppService.", error.message)
   }
 
-  // TODO: Cross-module replacement doesn't work yet in integration tests.
-  //  The @ContributesTo(replaces=...) annotation on FakeLibService.ServiceContribution
-  //  can't resolve LibService.ServiceContribution from the classpath because generated
-  //  nested classes aren't visible to the symbol provider in downstream modules.
-  // @Test
-  // fun `replaced service returns fake when fake mode is enabled`() {
-  //   val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = true)
-  //   assertIs<FakeLibService>(graph.libService)
-  // }
+   @Test
+   fun `replaced service returns fake when fake mode is enabled`() {
+     val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = true)
+     assertIs<FakeLibService>(graph.libService)
+   }
 
-  // @Test
-  // fun `replaced service returns real when fake mode is disabled`() {
-  //   val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
-  //   assertIsNot<FakeLibService>(graph.libService)
-  // }
+   @Test
+   fun `replaced service returns real when fake mode is disabled`() {
+     val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
+     assertIsNot<FakeLibService>(graph.libService)
+   }
 
-  // TODO: @RealService accessor doesn't work in integration tests yet.
-  // @Test
-  // fun `real service qualifier always returns the real service`() {
-  //   val fakeGraph = createGraphFactory<AppGraph.Factory>().create(fakeMode = true)
-  //   assertIsNot<FakeLibService>(fakeGraph.realLibService)
-  //   assertIs<LibService>(fakeGraph.realLibService)
-  //
-  //   val realGraph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
-  //   assertIsNot<FakeLibService>(realGraph.realLibService)
-  // }
+  @Test
+  fun `real service qualifier always returns the real service`() {
+    val fakeGraph = createGraphFactory<AppGraph.Factory>().create(fakeMode = true)
+    assertIsNot<FakeLibService>(fakeGraph.realLibService)
+    assertIs<LibService>(fakeGraph.realLibService)
+    assertIs<FakeLibService>(fakeGraph.fakeLibService)
+
+    val realGraph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
+    assertIsNot<FakeLibService>(realGraph.realLibService)
+    assertIs<FakeLibService>(fakeGraph.fakeLibService)
+  }
 }
