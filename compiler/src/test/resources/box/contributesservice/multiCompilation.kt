@@ -16,8 +16,8 @@ import com.squareup.api.ServiceCreator
 import com.squareup.development.FakeMode
 
 @DependencyGraph(Unit::class)
-abstract class MyGraph {
-  abstract val myService: MyService
+interface MyGraph {
+  val myService: MyService
 
   @Provides @RetrofitAuthenticated
   fun provideServiceCreator(): ServiceCreator = ServiceCreator.NoOp

@@ -10,8 +10,8 @@ import com.squareup.services.anvil.ContributesService
 interface MyService
 
 @DependencyGraph(Unit::class)
-abstract class MyGraph {
-  abstract val myService: MyService
+interface MyGraph {
+  val myService: MyService
 
   @Provides @RetrofitAuthenticated
   fun provideServiceCreator(): ServiceCreator = ServiceCreator.NoOp
