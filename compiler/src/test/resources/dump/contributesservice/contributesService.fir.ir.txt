@@ -202,7 +202,7 @@ FILE fqName:com.test fileName:/contributesService.kt
       VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
       overridden:
         public open fun toString (): kotlin.String declared in kotlin.Any
-FILE fqName:metro.hints fileName:/private/var/folders/x3/qjyhv72x6j1b9_fsfl61p3500000gq/T/com.squareup.metro.extensions.runners.FirDumpTestGenerated$ContributesservicetestContributesService/kotlin-sources/main/comTestMyServiceServiceContributionUnit.kt
+FILE fqName:metro.hints fileName:/private/var/folders/x3/qjyhv72x6j1b9_fsfl61p3500000gq/T/com.squareup.metro.extensions.runners.FirDumpTestGenerated$Contributesservice1testContributesService/kotlin-sources/main/comTestMyServiceServiceContributionUnit.kt
   FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] name:Unit visibility:public modality:FINAL returnType:kotlin.Unit
     VALUE_PARAMETER kind:Regular name:contributed index:0 type:com.test.MyService.ServiceContribution
     BLOCK_BODY
