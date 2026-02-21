@@ -1,3 +1,5 @@
+// DUMP_IR
+
 package com.test
 
 import com.squareup.api.RetrofitAuthenticated

@@ -2,42 +2,48 @@ package com.squareup.metro.extensions.runners
 
 import com.squareup.metro.extensions.services.configureMetroImports
 import com.squareup.metro.extensions.services.configurePlugin
-import org.jetbrains.kotlin.test.FirParser
+import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.CodegenTestDirectives
+import org.jetbrains.kotlin.test.directives.ConfigurationDirectives
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives
-import org.jetbrains.kotlin.test.directives.TestPhaseDirectives
-import org.jetbrains.kotlin.test.runners.AbstractFirPhasedDiagnosticTest
+import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives
+import org.jetbrains.kotlin.test.runners.ir.AbstractFirLightTreeJvmIrTextTest
 import org.jetbrains.kotlin.test.services.EnvironmentBasedStandardLibrariesPathProvider
 import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
-import org.jetbrains.kotlin.test.services.TestPhase
 
-open class AbstractFirDumpTest : AbstractFirPhasedDiagnosticTest(FirParser.LightTree) {
+/**
+ * Dump test that always produces FIR golden files (`.fir.txt`). Test files can opt in to IR
+ * dumping by adding `// DUMP_IR` at the top, which produces an additional `.fir.ir.txt`
+ * golden file with the IR tree.
+ */
+open class AbstractFirDumpTest : AbstractFirLightTreeJvmIrTextTest() {
   override fun createKotlinStandardLibrariesPathProvider(): KotlinStandardLibrariesPathProvider {
     return EnvironmentBasedStandardLibrariesPathProvider
   }
 
-  override fun configure(builder: TestConfigurationBuilder) =
+  override fun configure(builder: TestConfigurationBuilder) {
+    super.configure(builder)
+
     with(builder) {
-      super.configure(builder)
-      /*
-       * Containers of different directives, which can be used in tests:
-       * - ModuleStructureDirectives
-       * - LanguageSettingsDirectives
-       * - DiagnosticsDirectives
-       * - FirDiagnosticsDirectives
-       *
-       * All of them are located in `org.jetbrains.kotlin.test.directives` package
-       */
+      configurePlugin()
+      configureMetroImports()
+
       defaultDirectives {
+        JvmEnvironmentConfigurationDirectives.JVM_TARGET.with(JvmTarget.JVM_11)
+        +ConfigurationDirectives.WITH_STDLIB
+        +JvmEnvironmentConfigurationDirectives.FULL_JDK
+
         +FirDiagnosticsDirectives.FIR_DUMP
         +FirDiagnosticsDirectives.DISABLE_GENERATED_FIR_TAGS
 
-        TestPhaseDirectives.RUN_PIPELINE_TILL.with(TestPhase.FRONTEND)
         +CodegenTestDirectives.IGNORE_DEXING
-      }
 
-      configurePlugin()
-      configureMetroImports()
+        // IR dump is NOT enabled by default. Add `// DUMP_IR` to individual test files
+        // to produce .fir.ir.txt golden files.
+        -CodegenTestDirectives.DUMP_IR
+        -CodegenTestDirectives.DUMP_KT_IR
+      }
     }
+  }
 }
