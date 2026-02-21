@@ -62,10 +62,49 @@ import org.jetbrains.kotlin.name.Name
  * Generates a nested `ServiceContribution` interface for classes annotated with
  * `@ContributesService`.
  *
- * See `docs/use-cases.md` for the full specification. The generated output differs slightly from
- * the KSP processor: instead of two separate functions (`@RealService` provider + `Provider<>`
- * switcher), fake services use a single function that takes both the `ServiceCreator` and the fake
- * service, switching between them based on `@FakeMode` at runtime.
+ * Given a **real service**:
+ * ```
+ * @ContributesService(SomeScope::class)
+ * @SomeQualifier
+ * interface MyService
+ * ```
+ *
+ * This generates:
+ * ```
+ * @ContributesTo(SomeScope::class)
+ * interface ServiceContribution {
+ *   @Provides @SingleIn(SomeScope::class)
+ *   fun provideMyService(
+ *     @SomeQualifier serviceCreator: ServiceCreator,
+ *     @FakeMode isFakeMode: Boolean,
+ *   ): MyService
+ * }
+ * ```
+ *
+ * Given a **fake service**:
+ * ```
+ * @ContributesService(SomeScope::class, replaces = [MyService::class])
+ * @Inject
+ * class FakeMyService : MyService
+ * ```
+ *
+ * This generates:
+ * ```
+ * @ContributesTo(SomeScope::class, replaces = [MyService.ServiceContribution::class])
+ * interface ServiceContribution {
+ *   @Provides @SingleIn(SomeScope::class) @RealService
+ *   fun provideRealMyService(
+ *     @SomeQualifier serviceCreator: ServiceCreator,
+ *   ): MyService
+ *
+ *   @Provides
+ *   fun provideMyService(
+ *     @RealService realService: MyService,
+ *     fakeService: FakeMyService,
+ *     @FakeMode isFakeMode: Boolean,
+ *   ): MyService
+ * }
+ * ```
  *
  * Functions are added directly to the class's declarations list (rather than through
  * `getCallableNamesForClass`/`generateFunctions`) so Metro can see them when deciding what nested
