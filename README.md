@@ -72,6 +72,12 @@ To use a different path for the Metro checkout, pass `-PlocalMetroPath=<path>`:
 ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=/path/to/metro
 ```
 
+To update expected test output files (`.fir.txt` golden files) after changing generated code:
+
+```bash
+./gradlew :compiler:test -PuseLocalMetro -PupdateTestData
+```
+
 To test with a different Kotlin version than the one defined in the version catalog, pass
 `-Pkotlin.version=<version>`:
 

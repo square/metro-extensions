@@ -112,6 +112,11 @@ tasks.withType(Test).configureEach { testTask ->
   // Properties required to run the internal test framework.
   systemProperty('idea.ignore.disabled.plugins', 'true')
   systemProperty('idea.home.path', rootDir)
+
+  // Pass -PupdateTestData to overwrite expected test output files (e.g. .fir.txt) with actuals.
+  if (project.hasProperty('updateTestData')) {
+    systemProperty('kotlin.test.update.test.data', 'true')
+  }
 }
 
 tasks.register('generateTests', JavaExec) {
