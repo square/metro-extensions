@@ -2,6 +2,7 @@ package com.test
 
 import com.squareup.api.RetrofitAuthenticated
 import com.squareup.api.ServiceCreator
+import com.squareup.dagger.SingleIn
 import com.squareup.development.FakeMode
 import com.squareup.services.anvil.ContributesService
 
@@ -10,6 +11,7 @@ import com.squareup.services.anvil.ContributesService
 interface MyService
 
 @DependencyGraph(Unit::class)
+@SingleIn(Unit::class)
 interface MyGraph {
   val myService: MyService
 
