@@ -2,7 +2,3 @@ plugins {
   id 'com.squareup.lib'
   alias libs.plugins.metro
 }
-
-dependencies {
-  api libs.javax.inject
-}
