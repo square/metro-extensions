@@ -76,9 +76,15 @@ public class ContributesServiceMetroExtension(private val session: FirSession) :
         scope.getSingleClassifier(metroContributionName) as? FirRegularClassSymbol
           ?: return@mapNotNull null
 
-      // Extract replaces ClassIds from the annotation — these are the origin ClassIds
-      // (e.g., MyService) that Metro uses to remove replaced contributions during merging.
-      val replacesClassIds = extractReplacesClassIds(parentSymbol)
+      // Extract replaces ClassIds. We include both the origin ClassId (e.g., MyService) and
+      // its ServiceContribution ClassId because Metro keys contributions differently depending
+      // on how they were discovered:
+      // - In-compilation (via MetroContributionExtension): keyed by originClassId
+      // - Cross-module (via hints): keyed by ServiceContribution ClassId (parent of MetroContribution)
+      val rawReplacesClassIds = extractReplacesClassIds(parentSymbol)
+      val replacesClassIds = rawReplacesClassIds.flatMap {
+        listOf(it, it.createNestedClassId(ContributesServiceIds.NESTED_INTERFACE_NAME))
+      }
 
       MetroContributionExtension.Contribution(
         supertype = metroContributionSymbol.defaultType(),
