@@ -179,10 +179,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           classSymbol.classId.createNestedClassId(
             ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
           )
-        ContributionHint(
-          contributingClassId = nestedInterfaceClassId,
-          scope = scopeClassId,
-        )
+        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = scopeClassId)
       }
   }
 

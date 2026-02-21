@@ -58,4 +58,26 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
       runTest("compiler/src/test/resources/dump/contributesrobot/contributesRobot.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/dump/contributesservice")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesservice {
+    @Test
+    public void testAllFilesPresentInContributesservice() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("contributesService.kt")
+    public void testContributesService() {
+      runTest("compiler/src/test/resources/dump/contributesservice/contributesService.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedService.kt")
+    public void testReplacedService() {
+      runTest("compiler/src/test/resources/dump/contributesservice/replacedService.kt");
+    }
+  }
 }

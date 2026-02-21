@@ -1,0 +1,600 @@
+FILE fqName:metro.hints fileName:/private/var/folders/x3/qjyhv72x6j1b9_fsfl61p3500000gq/T/com.squareup.metro.extensions.runners.FirDumpTestGenerated$ContributesservicetestReplacedService/kotlin-sources/main/comTestFakeMyServiceServiceContributionUnit.kt
+  FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] name:Unit visibility:public modality:FINAL returnType:kotlin.Unit
+    VALUE_PARAMETER kind:Regular name:contributed index:0 type:com.test.FakeMyService.ServiceContribution
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='public final fun Unit (contributed: com.test.FakeMyService.ServiceContribution): kotlin.Unit declared in metro.hints'
+        CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+          ARG message: CONST String type=kotlin.String value="Never called"
+FILE fqName:metro.hints fileName:/private/var/folders/x3/qjyhv72x6j1b9_fsfl61p3500000gq/T/com.squareup.metro.extensions.runners.FirDumpTestGenerated$ContributesservicetestReplacedService/kotlin-sources/main/comTestMyServiceServiceContributionUnit.kt
+  FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] name:Unit visibility:public modality:FINAL returnType:kotlin.Unit
+    VALUE_PARAMETER kind:Regular name:contributed index:0 type:com.test.MyService.ServiceContribution
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='public final fun Unit (contributed: com.test.MyService.ServiceContribution): kotlin.Unit declared in metro.hints'
+        CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+          ARG message: CONST String type=kotlin.String value="Never called"
+FILE fqName:com.test fileName:/replacedService.kt
+  CLASS CLASS name:FakeMyService modality:FINAL visibility:public superTypes:[com.test.MyService]
+    annotations:
+      ContributesService(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>, replaces = [CLASS_REFERENCE 'CLASS INTERFACE name:MyService modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<com.test.MyService>] type=kotlin.Array<kotlin.reflect.KClass<*>> varargElementType=kotlin.reflect.KClass<*>)
+      Inject
+    thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService
+    CLASS GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] INTERFACE name:ServiceContribution modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+      annotations:
+        ContributesTo(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>, replaces = [CLASS_REFERENCE 'CLASS GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] INTERFACE name:ServiceContribution modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<com.test.MyService.ServiceContribution>] type=kotlin.Array<kotlin.reflect.KClass<*>> varargElementType=kotlin.reflect.KClass<*>)
+      thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution
+      CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.MetroContributionClassDeclaration] INTERFACE name:MetroContributionToKotlinunitdHiVAhs modality:ABSTRACT visibility:public superTypes:[com.test.FakeMyService.ServiceContribution]
+        annotations:
+          Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+          MetroContribution(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+        thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution.MetroContributionToKotlinunitdHiVAhs
+        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+          overridden:
+            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in com.test.FakeMyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun hashCode (): kotlin.Int declared in com.test.FakeMyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:provideMyService visibility:public modality:OPEN returnType:com.test.MyService [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution
+          VALUE_PARAMETER kind:Regular name:realService index:1 type:com.test.MyService
+            annotations:
+              RealService
+          VALUE_PARAMETER kind:Regular name:fakeService index:2 type:com.test.FakeMyService
+          VALUE_PARAMETER kind:Regular name:isFakeMode index:3 type:kotlin.Boolean
+            annotations:
+              FakeMode
+          annotations:
+            Provides
+          overridden:
+            public open fun provideMyService (realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:provideRealMyService visibility:public modality:OPEN returnType:com.test.MyService [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution
+          VALUE_PARAMETER kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+            annotations:
+              RetrofitAuthenticated
+          annotations:
+            Provides
+            SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+            RealService
+          overridden:
+            public open fun provideRealMyService (serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun toString (): kotlin.String declared in com.test.FakeMyService.ServiceContribution
+      CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]
+        annotations:
+          Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+          CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
+        thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory
+        FIELD name:instance type:com.test.FakeMyService.ServiceContribution visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=com.test.FakeMyService.ServiceContribution origin=null
+        FIELD name:realService type:dev.zacsweers.metro.Provider<com.test.MyService> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'realService: dev.zacsweers.metro.Provider<com.test.MyService> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<com.test.MyService> origin=null
+        FIELD name:fakeService type:dev.zacsweers.metro.Provider<com.test.FakeMyService> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'fakeService: dev.zacsweers.metro.Provider<com.test.FakeMyService> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<com.test.FakeMyService> origin=null
+        FIELD name:isFakeMode type:dev.zacsweers.metro.Provider<kotlin.Boolean> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+        CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
+          thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+          CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion [primary]
+            BLOCK_BODY
+              DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+              INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=kotlin.Unit
+          FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+            overridden:
+              public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun hashCode (): kotlin.Int declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun toString (): kotlin.String declared in kotlin.Any
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryCreateFunction] name:create visibility:public modality:FINAL returnType:dev.zacsweers.metro.internal.Factory<com.test.MyService>
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.FakeMyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:realService index:2 type:dev.zacsweers.metro.Provider<com.test.MyService>
+              annotations:
+                RealService
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:fakeService index:3 type:dev.zacsweers.metro.Provider<com.test.FakeMyService>
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:4 type:dev.zacsweers.metro.Provider<kotlin.Boolean>
+              annotations:
+                FakeMode
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun create (instance: com.test.FakeMyService.ServiceContribution, realService: dev.zacsweers.metro.Provider<com.test.MyService>, fakeService: dev.zacsweers.metro.Provider<com.test.FakeMyService>, isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean>): dev.zacsweers.metro.internal.Factory<com.test.MyService> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion'
+                CONSTRUCTOR_CALL 'private constructor <init> (instance: com.test.FakeMyService.ServiceContribution, realService: dev.zacsweers.metro.Provider<com.test.MyService>, fakeService: dev.zacsweers.metro.Provider<com.test.FakeMyService>, isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean>) declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                  ARG instance: GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=com.test.FakeMyService.ServiceContribution origin=null
+                  ARG realService: GET_VAR 'realService: dev.zacsweers.metro.Provider<com.test.MyService> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<com.test.MyService> origin=null
+                  ARG fakeService: GET_VAR 'fakeService: dev.zacsweers.metro.Provider<com.test.FakeMyService> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<com.test.FakeMyService> origin=null
+                  ARG isFakeMode: GET_VAR 'isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean> declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryNewInstanceFunction] name:provideMyService visibility:public modality:FINAL returnType:com.test.MyService
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.FakeMyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:realService index:2 type:com.test.MyService
+              annotations:
+                RealService
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:fakeService index:3 type:com.test.FakeMyService
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:4 type:kotlin.Boolean
+              annotations:
+                FakeMode
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun provideMyService (instance: com.test.FakeMyService.ServiceContribution, realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion'
+                CALL 'public open fun provideMyService (realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution' type=com.test.MyService origin=null
+                  ARG <this>: GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=com.test.FakeMyService.ServiceContribution origin=null
+                  ARG realService: GET_VAR 'realService: com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=com.test.MyService origin=null
+                  ARG fakeService: GET_VAR 'fakeService: com.test.FakeMyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=com.test.FakeMyService origin=null
+                  ARG isFakeMode: GET_VAR 'isFakeMode: kotlin.Boolean declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=kotlin.Boolean origin=null
+        CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory [primary]
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:0 type:com.test.FakeMyService.ServiceContribution
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:realService index:1 type:dev.zacsweers.metro.Provider<com.test.MyService>
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:fakeService index:2 type:dev.zacsweers.metro.Provider<com.test.FakeMyService>
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:3 type:dev.zacsweers.metro.Provider<kotlin.Boolean>
+          BLOCK_BODY
+            DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+            INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]' type=kotlin.Unit
+        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+          overridden:
+            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun hashCode (): kotlin.Int declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun toString (): kotlin.String declared in dev.zacsweers.metro.internal.Factory
+        FUN name:invoke visibility:public modality:FINAL returnType:com.test.MyService [operator]
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory
+          overridden:
+            public abstract fun invoke (): T of dev.zacsweers.metro.internal.Factory declared in dev.zacsweers.metro.internal.Factory
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun invoke (): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory'
+              CALL 'public final fun provideMyService (instance: com.test.FakeMyService.ServiceContribution, realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion' type=com.test.MyService origin=null
+                ARG <this>: GET_OBJECT 'CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+                ARG instance: GET_FIELD 'FIELD name:instance type:com.test.FakeMyService.ServiceContribution visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory' type=com.test.FakeMyService.ServiceContribution origin=null
+                  receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                ARG realService: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=com.test.MyService origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:realService type:dev.zacsweers.metro.Provider<com.test.MyService> visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<com.test.MyService> origin=null
+                    receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                ARG fakeService: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=com.test.FakeMyService origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:fakeService type:dev.zacsweers.metro.Provider<com.test.FakeMyService> visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<com.test.FakeMyService> origin=null
+                    receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                ARG isFakeMode: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=kotlin.Boolean origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:isFakeMode type:dev.zacsweers.metro.Provider<kotlin.Boolean> visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+                    receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+        FUN name:mirrorFunction visibility:public modality:FINAL returnType:com.test.MyService
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:realService index:1 type:com.test.MyService
+            annotations:
+              RealService
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:fakeService index:2 type:com.test.FakeMyService
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:isFakeMode index:3 type:kotlin.Boolean
+            annotations:
+              FakeMode
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun mirrorFunction (realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideMyServiceMetroFactory'
+              CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+                ARG message: CONST String type=kotlin.String value="Never called"
+      CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideRealMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]
+        annotations:
+          Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+          CallableMetadata(callableName = "provideRealMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideRealMyService")
+        thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory
+        FIELD name:instance type:com.test.FakeMyService.ServiceContribution visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.<init>' type=com.test.FakeMyService.ServiceContribution origin=null
+        FIELD name:serviceCreator type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+        CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
+          thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion
+          CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion [primary]
+            BLOCK_BODY
+              DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+              INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=kotlin.Unit
+          FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+            overridden:
+              public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun hashCode (): kotlin.Int declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun toString (): kotlin.String declared in kotlin.Any
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryCreateFunction] name:create visibility:public modality:FINAL returnType:dev.zacsweers.metro.internal.Factory<com.test.MyService>
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.FakeMyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:2 type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>
+              annotations:
+                RetrofitAuthenticated
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun create (instance: com.test.FakeMyService.ServiceContribution, serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>): dev.zacsweers.metro.internal.Factory<com.test.MyService> declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion'
+                CONSTRUCTOR_CALL 'private constructor <init> (instance: com.test.FakeMyService.ServiceContribution, serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>) declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory' type=com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory origin=null
+                  ARG instance: GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion.create' type=com.test.FakeMyService.ServiceContribution origin=null
+                  ARG serviceCreator: GET_VAR 'serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryNewInstanceFunction] name:provideRealMyService visibility:public modality:FINAL returnType:com.test.MyService
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.FakeMyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:2 type:com.squareup.api.ServiceCreator
+              annotations:
+                RetrofitAuthenticated
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun provideRealMyService (instance: com.test.FakeMyService.ServiceContribution, serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion'
+                CALL 'public open fun provideRealMyService (serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution' type=com.test.MyService origin=null
+                  ARG <this>: GET_VAR 'instance: com.test.FakeMyService.ServiceContribution declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion.provideRealMyService' type=com.test.FakeMyService.ServiceContribution origin=null
+                  ARG serviceCreator: GET_VAR 'serviceCreator: com.squareup.api.ServiceCreator declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion.provideRealMyService' type=com.squareup.api.ServiceCreator origin=null
+        CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory [primary]
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:0 type:com.test.FakeMyService.ServiceContribution
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:1 type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>
+          BLOCK_BODY
+            DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+            INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideRealMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]' type=kotlin.Unit
+        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+          overridden:
+            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun hashCode (): kotlin.Int declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun toString (): kotlin.String declared in dev.zacsweers.metro.internal.Factory
+        FUN name:invoke visibility:public modality:FINAL returnType:com.test.MyService [operator]
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory
+          overridden:
+            public abstract fun invoke (): T of dev.zacsweers.metro.internal.Factory declared in dev.zacsweers.metro.internal.Factory
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun invoke (): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory'
+              CALL 'public final fun provideRealMyService (instance: com.test.FakeMyService.ServiceContribution, serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion' type=com.test.MyService origin=null
+                ARG <this>: GET_OBJECT 'CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.Companion
+                ARG instance: GET_FIELD 'FIELD name:instance type:com.test.FakeMyService.ServiceContribution visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory' type=com.test.FakeMyService.ServiceContribution origin=null
+                  receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory origin=null
+                ARG serviceCreator: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=com.squareup.api.ServiceCreator origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:serviceCreator type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> visibility:private [final] declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+                    receiver: GET_VAR '<this>: com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory.invoke' type=com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory origin=null
+        FUN name:mirrorFunction visibility:public modality:FINAL returnType:com.test.MyService
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+            annotations:
+              RetrofitAuthenticated
+          annotations:
+            SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+            RealService
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun mirrorFunction (serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution.ProvideRealMyServiceMetroFactory'
+              CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+                ARG message: CONST String type=kotlin.String value="Never called"
+      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+        overridden:
+          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun toString (): kotlin.String declared in kotlin.Any
+      FUN GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] name:provideMyService visibility:public modality:OPEN returnType:com.test.MyService
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:realService index:1 type:com.test.MyService
+          annotations:
+            RealService
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:fakeService index:2 type:com.test.FakeMyService
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:isFakeMode index:3 type:kotlin.Boolean
+          annotations:
+            FakeMode
+        annotations:
+          Provides
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public open fun provideMyService (realService: com.test.MyService, fakeService: com.test.FakeMyService, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.FakeMyService.ServiceContribution'
+            WHEN type=com.test.MyService origin=null
+              BRANCH
+                if: GET_VAR 'isFakeMode: kotlin.Boolean declared in com.test.FakeMyService.ServiceContribution.provideMyService' type=kotlin.Boolean origin=null
+                then: GET_VAR 'fakeService: com.test.FakeMyService declared in com.test.FakeMyService.ServiceContribution.provideMyService' type=com.test.FakeMyService origin=null
+              BRANCH
+                if: CONST Boolean type=kotlin.Boolean value=true
+                then: GET_VAR 'realService: com.test.MyService declared in com.test.FakeMyService.ServiceContribution.provideMyService' type=com.test.MyService origin=null
+      FUN GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] name:provideRealMyService visibility:public modality:OPEN returnType:com.test.MyService
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.ServiceContribution
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+          annotations:
+            RetrofitAuthenticated
+        annotations:
+          Provides
+          SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+          RealService
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public open fun provideRealMyService (serviceCreator: com.squareup.api.ServiceCreator): com.test.MyService declared in com.test.FakeMyService.ServiceContribution'
+            CALL 'public abstract fun create <T> (service: java.lang.Class<T of com.squareup.api.ServiceCreator.create>): T of com.squareup.api.ServiceCreator.create declared in com.squareup.api.ServiceCreator' type=T of com.squareup.api.ServiceCreator.create origin=null
+              TYPE_ARG T: com.test.MyService
+              ARG <this>: GET_VAR 'serviceCreator: com.squareup.api.ServiceCreator declared in com.test.FakeMyService.ServiceContribution.provideRealMyService' type=com.squareup.api.ServiceCreator origin=null
+              ARG service: CALL 'public final fun <get-java> <T> (<this>: kotlin.reflect.KClass<T of kotlin.jvm.<get-java>>): java.lang.Class<T of kotlin.jvm.<get-java>> declared in kotlin.jvm' type=java.lang.Class<T of kotlin.jvm.<get-java>> origin=null
+                TYPE_ARG T: <none>
+                ARG <this>: CLASS_REFERENCE 'CLASS INTERFACE name:MyService modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<com.test.MyService>
+    CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InjectConstructorFactoryClassDeclaration] OBJECT name:MetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.FakeMyService>]
+      annotations:
+        Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+      thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.FakeMyService.MetroFactory
+      CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.FakeMyService.MetroFactory [primary]
+        BLOCK_BODY
+          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InjectConstructorFactoryClassDeclaration] OBJECT name:MetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.FakeMyService>]' type=kotlin.Unit
+      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+        overridden:
+          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in dev.zacsweers.metro.internal.Factory
+      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun hashCode (): kotlin.Int declared in dev.zacsweers.metro.internal.Factory
+      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun toString (): kotlin.String declared in dev.zacsweers.metro.internal.Factory
+      FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryCreateFunction] name:create visibility:public modality:FINAL returnType:dev.zacsweers.metro.internal.Factory<com.test.FakeMyService>
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.MetroFactory
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun create (): dev.zacsweers.metro.internal.Factory<com.test.FakeMyService> declared in com.test.FakeMyService.MetroFactory'
+            GET_OBJECT 'CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InjectConstructorFactoryClassDeclaration] OBJECT name:MetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.FakeMyService>]' type=com.test.FakeMyService.MetroFactory
+      FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryNewInstanceFunction] name:newInstance visibility:public modality:FINAL returnType:com.test.FakeMyService
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.MetroFactory
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun newInstance (): com.test.FakeMyService declared in com.test.FakeMyService.MetroFactory'
+            CONSTRUCTOR_CALL 'public constructor <init> () declared in com.test.FakeMyService' type=com.test.FakeMyService origin=null
+      FUN name:invoke visibility:public modality:FINAL returnType:com.test.FakeMyService [operator]
+        VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.MetroFactory
+        overridden:
+          public abstract fun invoke (): T of dev.zacsweers.metro.internal.Factory declared in dev.zacsweers.metro.internal.Factory
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun invoke (): com.test.FakeMyService declared in com.test.FakeMyService.MetroFactory'
+            CALL 'public final fun newInstance (): com.test.FakeMyService declared in com.test.FakeMyService.MetroFactory' type=com.test.FakeMyService origin=null
+              ARG <this>: GET_OBJECT 'CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InjectConstructorFactoryClassDeclaration] OBJECT name:MetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.FakeMyService>]' type=com.test.FakeMyService.MetroFactory
+      FUN name:mirrorFunction visibility:public modality:FINAL returnType:com.test.FakeMyService
+        VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.FakeMyService.MetroFactory
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun mirrorFunction (): com.test.FakeMyService declared in com.test.FakeMyService.MetroFactory'
+            CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+              ARG message: CONST String type=kotlin.String value="Never called"
+    CONSTRUCTOR visibility:public returnType:com.test.FakeMyService [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:FakeMyService modality:FINAL visibility:public superTypes:[com.test.MyService]' type=kotlin.Unit
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in com.test.MyService
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in com.test.MyService
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      overridden:
+        public open fun toString (): kotlin.String declared in com.test.MyService
+  CLASS INTERFACE name:MyService modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+    annotations:
+      ContributesService(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>, replaces = <null>)
+      RetrofitAuthenticated
+    thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.MyService
+    CLASS GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] INTERFACE name:ServiceContribution modality:ABSTRACT visibility:public superTypes:[kotlin.Any]
+      annotations:
+        ContributesTo(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>, replaces = <null>)
+      thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.MyService.ServiceContribution
+      CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.MetroContributionClassDeclaration] INTERFACE name:MetroContributionToKotlinunitdHiVAhs modality:ABSTRACT visibility:public superTypes:[com.test.MyService.ServiceContribution]
+        annotations:
+          Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+          MetroContribution(scope = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+        thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.MyService.ServiceContribution.MetroContributionToKotlinunitdHiVAhs
+        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+          overridden:
+            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in com.test.MyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun hashCode (): kotlin.Int declared in com.test.MyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:provideMyService visibility:public modality:OPEN returnType:com.test.MyService [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution
+          VALUE_PARAMETER kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+            annotations:
+              RetrofitAuthenticated
+          VALUE_PARAMETER kind:Regular name:isFakeMode index:2 type:kotlin.Boolean
+            annotations:
+              FakeMode
+          annotations:
+            Provides
+            SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+          overridden:
+            public open fun provideMyService (serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution
+        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun toString (): kotlin.String declared in com.test.MyService.ServiceContribution
+      CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]
+        annotations:
+          Deprecated(message = "This synthesized declaration should not be used directly", replaceWith = <null>, level = GET_ENUM 'ENUM_ENTRY IR_EXTERNAL_DECLARATION_STUB name:HIDDEN' type=kotlin.DeprecationLevel)
+          CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
+        thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory
+        FIELD name:instance type:com.test.MyService.ServiceContribution visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'instance: com.test.MyService.ServiceContribution declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=com.test.MyService.ServiceContribution origin=null
+        FIELD name:serviceCreator type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+        FIELD name:isFakeMode type:dev.zacsweers.metro.Provider<kotlin.Boolean> visibility:private [final]
+          EXPRESSION_BODY
+            GET_VAR 'isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean> declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.<init>' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+        CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
+          thisReceiver: VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+          CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion [primary]
+            BLOCK_BODY
+              DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+              INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=kotlin.Unit
+          FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+            overridden:
+              public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun hashCode (): kotlin.Int declared in kotlin.Any
+          FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+            overridden:
+              public open fun toString (): kotlin.String declared in kotlin.Any
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryCreateFunction] name:create visibility:public modality:FINAL returnType:dev.zacsweers.metro.internal.Factory<com.test.MyService>
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.MyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:2 type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>
+              annotations:
+                RetrofitAuthenticated
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:3 type:dev.zacsweers.metro.Provider<kotlin.Boolean>
+              annotations:
+                FakeMode
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun create (instance: com.test.MyService.ServiceContribution, serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>, isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean>): dev.zacsweers.metro.internal.Factory<com.test.MyService> declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion'
+                CONSTRUCTOR_CALL 'private constructor <init> (instance: com.test.MyService.ServiceContribution, serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>, isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean>) declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory' type=com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                  ARG instance: GET_VAR 'instance: com.test.MyService.ServiceContribution declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=com.test.MyService.ServiceContribution origin=null
+                  ARG serviceCreator: GET_VAR 'serviceCreator: dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+                  ARG isFakeMode: GET_VAR 'isFakeMode: dev.zacsweers.metro.Provider<kotlin.Boolean> declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.create' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+          FUN GENERATED[dev.zacsweers.metro.compiler.fir.Keys.FactoryNewInstanceFunction] name:provideMyService visibility:public modality:FINAL returnType:com.test.MyService
+            VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:1 type:com.test.MyService.ServiceContribution
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:2 type:com.squareup.api.ServiceCreator
+              annotations:
+                RetrofitAuthenticated
+            VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:3 type:kotlin.Boolean
+              annotations:
+                FakeMode
+            BLOCK_BODY
+              RETURN type=kotlin.Nothing from='public final fun provideMyService (instance: com.test.MyService.ServiceContribution, serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion'
+                CALL 'public open fun provideMyService (serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution' type=com.test.MyService origin=null
+                  ARG <this>: GET_VAR 'instance: com.test.MyService.ServiceContribution declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=com.test.MyService.ServiceContribution origin=null
+                  ARG serviceCreator: GET_VAR 'serviceCreator: com.squareup.api.ServiceCreator declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=com.squareup.api.ServiceCreator origin=null
+                  ARG isFakeMode: GET_VAR 'isFakeMode: kotlin.Boolean declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion.provideMyService' type=kotlin.Boolean origin=null
+        CONSTRUCTOR GENERATED[dev.zacsweers.metro.compiler.fir.Keys.Default] visibility:private returnType:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory [primary]
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.InstanceParameter] kind:Regular name:instance index:0 type:com.test.MyService.ServiceContribution
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:serviceCreator index:1 type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator>
+          VALUE_PARAMETER GENERATED[dev.zacsweers.metro.compiler.fir.Keys.RegularParameter] kind:Regular name:isFakeMode index:2 type:dev.zacsweers.metro.Provider<kotlin.Boolean>
+          BLOCK_BODY
+            DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () declared in kotlin.Any'
+            INSTANCE_INITIALIZER_CALL classDescriptor='CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryClassDeclaration] CLASS name:ProvideMyServiceMetroFactory modality:FINAL visibility:public superTypes:[dev.zacsweers.metro.internal.Factory<com.test.MyService>]' type=kotlin.Unit
+        FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+          overridden:
+            public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun hashCode (): kotlin.Int declared in dev.zacsweers.metro.internal.Factory
+        FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+          VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+          overridden:
+            public open fun toString (): kotlin.String declared in dev.zacsweers.metro.internal.Factory
+        FUN name:invoke visibility:public modality:FINAL returnType:com.test.MyService [operator]
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory
+          overridden:
+            public abstract fun invoke (): T of dev.zacsweers.metro.internal.Factory declared in dev.zacsweers.metro.internal.Factory
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun invoke (): com.test.MyService declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory'
+              CALL 'public final fun provideMyService (instance: com.test.MyService.ServiceContribution, serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion' type=com.test.MyService origin=null
+                ARG <this>: GET_OBJECT 'CLASS GENERATED[dev.zacsweers.metro.compiler.fir.Keys.ProviderFactoryCompanionDeclaration] OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.Companion
+                ARG instance: GET_FIELD 'FIELD name:instance type:com.test.MyService.ServiceContribution visibility:private [final] declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory' type=com.test.MyService.ServiceContribution origin=null
+                  receiver: GET_VAR '<this>: com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                ARG serviceCreator: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=com.squareup.api.ServiceCreator origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:serviceCreator type:dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> visibility:private [final] declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<com.squareup.api.ServiceCreator> origin=null
+                    receiver: GET_VAR '<this>: com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+                ARG isFakeMode: CALL 'public abstract fun invoke (): T of dev.zacsweers.metro.Provider declared in dev.zacsweers.metro.Provider' type=kotlin.Boolean origin=null
+                  ARG <this>: GET_FIELD 'FIELD name:isFakeMode type:dev.zacsweers.metro.Provider<kotlin.Boolean> visibility:private [final] declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory' type=dev.zacsweers.metro.Provider<kotlin.Boolean> origin=null
+                    receiver: GET_VAR '<this>: com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory.invoke' type=com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory origin=null
+        FUN name:mirrorFunction visibility:public modality:FINAL returnType:com.test.MyService
+          VALUE_PARAMETER INSTANCE_RECEIVER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+            annotations:
+              RetrofitAuthenticated
+          VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:isFakeMode index:2 type:kotlin.Boolean
+            annotations:
+              FakeMode
+          annotations:
+            SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='public final fun mirrorFunction (serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution.ProvideMyServiceMetroFactory'
+              CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+                ARG message: CONST String type=kotlin.String value="Never called"
+      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+        overridden:
+          public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+        overridden:
+          public open fun toString (): kotlin.String declared in kotlin.Any
+      FUN GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] name:provideMyService visibility:public modality:OPEN returnType:com.test.MyService
+        VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:com.test.MyService.ServiceContribution
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:serviceCreator index:1 type:com.squareup.api.ServiceCreator
+          annotations:
+            RetrofitAuthenticated
+        VALUE_PARAMETER GENERATED[com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey] kind:Regular name:isFakeMode index:2 type:kotlin.Boolean
+          annotations:
+            FakeMode
+        annotations:
+          Provides
+          SingleIn(value = CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<kotlin.Unit>)
+        BLOCK_BODY
+          WHEN type=kotlin.Unit origin=null
+            BRANCH
+              if: GET_VAR 'isFakeMode: kotlin.Boolean declared in com.test.MyService.ServiceContribution.provideMyService' type=kotlin.Boolean origin=null
+              then: CALL 'public final fun error (message: kotlin.Any): kotlin.Nothing declared in kotlin' type=kotlin.Nothing origin=null
+                ARG message: CONST String type=kotlin.String value="No fake service provided for MyService."
+          RETURN type=kotlin.Nothing from='public open fun provideMyService (serviceCreator: com.squareup.api.ServiceCreator, isFakeMode: kotlin.Boolean): com.test.MyService declared in com.test.MyService.ServiceContribution'
+            CALL 'public abstract fun create <T> (service: java.lang.Class<T of com.squareup.api.ServiceCreator.create>): T of com.squareup.api.ServiceCreator.create declared in com.squareup.api.ServiceCreator' type=T of com.squareup.api.ServiceCreator.create origin=null
+              TYPE_ARG T: com.test.MyService
+              ARG <this>: GET_VAR 'serviceCreator: com.squareup.api.ServiceCreator declared in com.test.MyService.ServiceContribution.provideMyService' type=com.squareup.api.ServiceCreator origin=null
+              ARG service: CALL 'public final fun <get-java> <T> (<this>: kotlin.reflect.KClass<T of kotlin.jvm.<get-java>>): java.lang.Class<T of kotlin.jvm.<get-java>> declared in kotlin.jvm' type=java.lang.Class<T of kotlin.jvm.<get-java>> origin=null
+                TYPE_ARG T: <none>
+                ARG <this>: CLASS_REFERENCE 'CLASS INTERFACE name:MyService modality:ABSTRACT visibility:public superTypes:[kotlin.Any]' type=kotlin.reflect.KClass<com.test.MyService>
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN returnType:kotlin.Boolean [fake_override,operator]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      VALUE_PARAMETER kind:Regular name:other index:1 type:kotlin.Any?
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean declared in kotlin.Any
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN returnType:kotlin.Int [fake_override]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN returnType:kotlin.String [fake_override]
+      VALUE_PARAMETER kind:DispatchReceiver name:<this> index:0 type:kotlin.Any
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any

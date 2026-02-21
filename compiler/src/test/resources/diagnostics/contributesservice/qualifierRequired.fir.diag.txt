@@ -1,0 +1,1 @@
+/qualifierRequired.kt:(134,166): error: A qualifier for Retrofit services is required. @RetrofitAuthenticated is the most commonly used qualifier. For more options take a look at RetrofitAnnotations.kt.

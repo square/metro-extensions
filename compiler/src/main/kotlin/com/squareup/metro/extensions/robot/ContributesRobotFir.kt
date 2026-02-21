@@ -173,17 +173,11 @@ public class ContributesRobotFir(session: FirSession) :
       .filterIsInstance<FirRegularClassSymbol>()
       .mapNotNull { classSymbol ->
         val scopeClassId =
-          extractScopeClassId(
-            classSymbol,
-            ContributesRobotIds.CONTRIBUTES_ROBOT_CLASS_ID,
-            session,
-          ) ?: return@mapNotNull null
+          extractScopeClassId(classSymbol, ContributesRobotIds.CONTRIBUTES_ROBOT_CLASS_ID, session)
+            ?: return@mapNotNull null
         val nestedInterfaceClassId =
           classSymbol.classId.createNestedClassId(ContributesRobotIds.NESTED_INTERFACE_NAME)
-        ContributionHint(
-          contributingClassId = nestedInterfaceClassId,
-          scope = scopeClassId,
-        )
+        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = scopeClassId)
       }
   }
 

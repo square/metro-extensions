@@ -5,6 +5,7 @@ Kotlin compiler plugin extending [Metro](https://github.com/ZacSweers/metro) DI 
 ## Commands
 - `./gradlew :compiler:test --quiet` — run all compiler tests
 - `./gradlew :compiler:test --tests 'ClassName.testName' --quiet` — run a single test
+- `./gradlew :compiler:test -PupdateTestData` — update expected test output files (`.fir.txt`) with actuals
 - `./gradlew :compiler:generateTests` — regenerate JUnit classes after adding test data files
 - `./gradlew :compiler:apiCheck --quiet` / `./gradlew :gradle-plugin:apiCheck --quiet` — validate binary compatibility
 - `./gradlew apiDump` — update API dump files after public API changes
