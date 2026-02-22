@@ -19,6 +19,9 @@ internal object SquareMetroExtensionsDiagnostics : KtDiagnosticsContainer() {
   val CONTRIBUTES_SERVICE_ERROR by
     error1<KtElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
 
+  val CONTRIBUTES_FEATURE_FLAG_ERROR by
+    error1<KtElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
+
   override fun getRendererFactory(): BaseDiagnosticRendererFactory {
     return SquareMetroExtensionsErrorMessages
   }
@@ -36,6 +39,11 @@ private object SquareMetroExtensionsErrorMessages : BaseDiagnosticRendererFactor
         put(SquareMetroExtensionsDiagnostics.CONTRIBUTES_ROBOT_ERROR, "{0}", CommonRenderers.STRING)
         put(
           SquareMetroExtensionsDiagnostics.CONTRIBUTES_SERVICE_ERROR,
+          "{0}",
+          CommonRenderers.STRING,
+        )
+        put(
+          SquareMetroExtensionsDiagnostics.CONTRIBUTES_FEATURE_FLAG_ERROR,
           "{0}",
           CommonRenderers.STRING,
         )

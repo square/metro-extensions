@@ -1,18 +1,23 @@
 package com.squareup.metro.extensions.fir
 
+import com.squareup.metro.extensions.ArgNames
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.FirAnnotationResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirCall
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
 import org.jetbrains.kotlin.fir.expressions.FirNamedArgumentExpression
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
+import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
+import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.SupertypeSupplier
 import org.jetbrains.kotlin.fir.resolve.TypeResolutionConfiguration
@@ -22,9 +27,12 @@ import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.resolve.typeResolver
 import org.jetbrains.kotlin.fir.scopes.createImportingScopes
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
@@ -48,6 +56,49 @@ internal fun buildAnnotationWithScope(
         )
         .toFirResolvedTypeRef()
     argumentMapping = buildAnnotationArgumentMapping { mapping[argName] = scopeArg }
+  }
+}
+
+/**
+ * Build an annotation with a scope argument as [FirAnnotationCall] so Metro recognizes it.
+ *
+ * Metro's `metroAnnotations()` checks `annotation !is FirAnnotationCall` and skips plain
+ * [FirAnnotation] instances. Uses [buildResolvedArgumentList] so the FIR-to-IR converter recognizes
+ * the arguments.
+ */
+@OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+internal fun buildAnnotationCallWithScope(
+  classId: ClassId,
+  argName: Name,
+  scopeArg: FirExpression,
+  containingSymbol: FirBasedSymbol<*>,
+  session: FirSession,
+): FirAnnotationCall {
+  val annotationType =
+    ConeClassLikeTypeImpl(
+      ConeClassLikeLookupTagImpl(classId),
+      emptyArray(),
+      isMarkedNullable = false,
+    )
+  val annotationClassSymbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
+  val constructorSymbol =
+    (annotationClassSymbol as FirClassSymbol<*>)
+      .declarationSymbols
+      .filterIsInstance<FirConstructorSymbol>()
+      .first()
+  val scopeParam = constructorSymbol.fir.valueParameters.first { it.name == argName }
+
+  return org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall {
+    annotationTypeRef = annotationType.toFirResolvedTypeRef()
+    argumentMapping = buildAnnotationArgumentMapping { mapping[argName] = scopeArg }
+    argumentList =
+      buildResolvedArgumentList(original = null, mapping = linkedMapOf(scopeArg to scopeParam))
+    calleeReference = buildResolvedNamedReference {
+      name = classId.shortClassName
+      resolvedSymbol = constructorSymbol
+    }
+    containingDeclarationSymbol = containingSymbol
+    annotationResolvePhase = FirAnnotationResolvePhase.Types
   }
 }
 
@@ -87,6 +138,10 @@ internal fun findAnnotation(
  *
  * At the SUPERTYPES stage, `argumentMapping` is not yet populated, so this reads the raw
  * `argumentList` from the [FirAnnotationCall].
+ *
+ * Unwraps [FirNamedArgumentExpression] to return the underlying expression, since named arguments
+ * (e.g., `scope = AppScope::class`) wrap the actual [FirGetClassCall] in a named wrapper that
+ * downstream consumers (like Metro's `scopeArgument()`) don't expect.
  */
 internal fun extractScopeArgument(
   classSymbol: FirClassSymbol<*>,
@@ -95,31 +150,36 @@ internal fun extractScopeArgument(
 ): FirExpression? {
   val annotation = findAnnotation(classSymbol, annotationClassId, session) ?: return null
   val annotationCall = annotation as? FirAnnotationCall ?: return null
-  return annotationCall.argumentList.arguments.firstOrNull()
+  val firstArg = annotationCall.argumentList.arguments.firstOrNull() ?: return null
+  // Unwrap named arguments (e.g., `scope = AppScope::class`) to get the bare expression.
+  return if (firstArg is FirNamedArgumentExpression) firstArg.expression else firstArg
 }
 
 /**
  * Extracts the scope [ClassId] from an annotation like `@SomeAnnotation(SomeScope::class)`.
  *
- * At the COMPILER_REQUIRED_ANNOTATIONS phase, annotation arguments may not be fully resolved. The
- * inner argument of `SomeScope::class` may be:
- * - [FirResolvedQualifier] (fully resolved) — extract classId directly
- * - [FirPropertyAccessExpression] (partially resolved) — extract from the resolved reference
+ * Uses `resolvedAnnotationsWithArguments` to get the annotation with argument resolution. Even
+ * after resolution, the inner `::class` expression may contain an unresolved
+ * [FirSimpleNamedReference][org.jetbrains.kotlin.fir.references.FirSimpleNamedReference] for
+ * non-builtin scope classes (e.g., `AppScope`). In that case, the function scans the containing
+ * file's explicit imports to resolve the class by simple name.
  */
 internal fun extractScopeClassId(
   classSymbol: FirRegularClassSymbol,
   annotationClassId: ClassId,
   session: FirSession,
 ): ClassId? {
-  val annotation =
-    classSymbol.resolvedCompilerAnnotationsWithClassIds.firstOrNull { ann ->
-      ann.toAnnotationClassIdSafe(session) == annotationClassId
-    } ?: return null
-
+  val annotation = findAnnotation(classSymbol, annotationClassId, session) ?: return null
   val annotationCall = annotation as? FirAnnotationCall ?: return null
-  val firstArg = annotationCall.argumentList.arguments.firstOrNull() ?: return null
 
-  val getClassCall = firstArg as? FirGetClassCall ?: return null
+  // Try the resolved argument mapping first (populated after full resolution), then fall back
+  // to the raw argument list.
+  val scopeExpr =
+    annotationCall.argumentMapping.mapping[ArgNames.SCOPE]
+      ?: annotationCall.argumentList.arguments.firstOrNull()
+      ?: return null
+
+  val getClassCall = scopeExpr as? FirGetClassCall ?: return null
   val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
 
   return when (innerArg) {
@@ -129,9 +189,26 @@ internal fun extractScopeClassId(
       if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {
         (ref.resolvedSymbol as FirClassLikeSymbol<*>).classId
       } else {
-        // Scopes are typically well-known types in the kotlin package (Unit, Int, etc.)
+        // At the COMPILER_REQUIRED_ANNOTATIONS phase, references may not be fully resolved.
+        // Scan the containing file's explicit imports for a matching simple name, then fall back
+        // to the kotlin package for well-known types (Unit, Int, etc.).
         val name = ref.name
-        session.symbolProvider.getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))?.classId
+        val file = session.firProvider.getFirClassifierContainerFileIfAny(classSymbol)
+        val importedClassId =
+          file?.imports?.firstNotNullOfOrNull { import ->
+            if (import.isAllUnder) return@firstNotNullOfOrNull null
+            val importedFqName = import.importedFqName ?: return@firstNotNullOfOrNull null
+            if (importedFqName.shortName() == name) {
+              val classId = ClassId.topLevel(importedFqName)
+              session.symbolProvider.getClassLikeSymbolByClassId(classId)?.classId
+            } else {
+              null
+            }
+          }
+        importedClassId
+          ?: session.symbolProvider
+            .getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))
+            ?.classId
       }
     }
     else -> null

@@ -1,0 +1,1 @@
+/mustBePublic.kt:(289,370): error: com.test.InternalFlag is not public. Feature flags must be public so that generated contributions are visible when merging dependency graphs.
