@@ -1,5 +1,6 @@
 [versions]
 autoservice = "0.1.4"
+jdk = "21"
 binary-compat-validator = "0.18.1"
 buildconfig = "6.0.7"
 kotlin = "2.3.10"

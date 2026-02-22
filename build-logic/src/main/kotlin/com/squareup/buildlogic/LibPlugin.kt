@@ -4,6 +4,7 @@ import com.ncorti.ktfmt.gradle.KtfmtExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.testing.Test
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("unused")
@@ -30,6 +31,11 @@ class LibPlugin : Plugin<Project> {
     pluginManager.apply(Plugins.KOTLIN_JVM)
 
     dependencies.add("implementation", dependencies.platform(libs.findLibrary("kotlin-bom").get()))
+
+    val jdkVersion = libs.findVersion("jdk").get().requiredVersion.toInt()
+    extensions.configure(KotlinJvmExtension::class.java) {
+      it.jvmToolchain(jdkVersion)
+    }
 
     tasks.withType(KotlinCompile::class.java).configureEach {
       it.compilerOptions.allWarningsAsErrors.set(ci)
