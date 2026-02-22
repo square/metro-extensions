@@ -210,4 +210,32 @@ public class BoxTestGenerated extends AbstractBoxTest {
       runTest("compiler/src/test/resources/box/contributesservice/singleCompilation.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/box/developmentappcomponent")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Developmentappcomponent {
+    @Test
+    public void testAllFilesPresentInDevelopmentappcomponent() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("excludeLoggedInComponent.kt")
+    public void testExcludeLoggedInComponent() {
+      runTest("compiler/src/test/resources/box/developmentappcomponent/excludeLoggedInComponent.kt");
+    }
+
+    @Test
+    @TestMetadata("multiCompilation.kt")
+    public void testMultiCompilation() {
+      runTest("compiler/src/test/resources/box/developmentappcomponent/multiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("singleCompilation.kt")
+    public void testSingleCompilation() {
+      runTest("compiler/src/test/resources/box/developmentappcomponent/singleCompilation.kt");
+    }
+  }
 }

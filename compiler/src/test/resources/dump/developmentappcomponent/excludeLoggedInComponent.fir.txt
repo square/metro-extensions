@@ -1,0 +1,63 @@
+Module: deps
+FILE: module_deps_excludeLoggedInComponent.kt
+    package com.squareup.development.shell.login.screen
+
+    public final class LoginScreenModule : R|kotlin/Any| {
+        public constructor(): R|com/squareup/development/shell/login/screen/LoginScreenModule| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+Module: deps2
+FILE: module_deps2_excludeLoggedInComponent.kt
+    package com.squareup.development.shell.component
+
+    public final class DevelopmentLoggedInComponent : R|kotlin/Any| {
+        public constructor(): R|com/squareup/development/shell/component/DevelopmentLoggedInComponent| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+Module: main
+FILE: module_main_excludeLoggedInComponent.kt
+    package com.test
+
+    @R|com/squareup/development/shell/DevelopmentAppComponent|(generateLoggedInComponent = Boolean(false)) public final class MyApp : R|com/squareup/development/shell/DevelopmentApplication| {
+        public constructor(): R|com/test/MyApp| {
+            super<R|com/squareup/development/shell/DevelopmentApplication|>()
+        }
+
+        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|com/squareup/dagger/AppScope|), excludes = <implicitArrayOf>(<getClass>(Q|com/squareup/development/shell/login/screen/LoginScreenModule|), <getClass>(Q|com/squareup/development/shell/component/DevelopmentLoggedInComponent|))) @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/DependencyGraph.Factory|() public abstract interface Factory : R|kotlin/Any|, R|com/squareup/development/shell/DevelopmentAppComponent.Factory| {
+                public abstract fun create(@R|dev/zacsweers/metro/Provides|() application: R|android/app/Application|): R|com/test/MyApp.MetroComponent|
+
+                @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroImplMarker|() public final object Impl : R|com/test/MyApp.MetroComponent.Factory| {
+                    @R|dev/zacsweers/metro/internal/GraphFactoryInvokeFunctionMarker|() public final override fun create(application: R|android/app/Application|): R|kotlin/Any|
+
+                    private constructor(): R|com/test/MyApp.MetroComponent.Factory.Impl| {
+                        super<R|kotlin/Any|>()
+                    }
+
+                }
+
+            }
+
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroImplMarker|() public final class Impl : R|com/test/MyApp.MetroComponent| {
+                private constructor(application: R|android/app/Application|): R|com/test/MyApp.MetroComponent.Impl| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+            public final companion object Companion : R|kotlin/Any| {
+                public final fun factory(): R|com/test/MyApp.MetroComponent.Factory|
+
+                private constructor(): R|com/test/MyApp.MetroComponent.Companion| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+        }
+
+    }
