@@ -4,7 +4,7 @@ import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey
-import com.squareup.metro.extensions.fir.buildAnnotationWithScope
+import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildFirArrayLiteral
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
@@ -202,7 +202,14 @@ public class ContributesServiceFir(session: FirSession) :
         // both in-compilation (FIR supertypes) and cross-module (IR merger).
         annotations += buildContributesToWithReplaces(scopeArg, replacesClassIds, owner)
       } else {
-        annotations += buildAnnotationWithScope(ClassIds.CONTRIBUTES_TO, ArgNames.SCOPE, scopeArg)
+        annotations +=
+          buildAnnotationCallWithScope(
+            ClassIds.CONTRIBUTES_TO,
+            ArgNames.SCOPE,
+            scopeArg,
+            owner,
+            session,
+          )
       }
       // Add the function(s) directly to the class declarations
       for (fn in providesFunctions) {
@@ -302,7 +309,13 @@ public class ContributesServiceFir(session: FirSession) :
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
       annotations +=
-        buildAnnotationCallWithScope(ClassIds.SINGLE_IN, ArgNames.VALUE, scopeArg, functionSymbol)
+        buildAnnotationCallWithScope(
+          ClassIds.SINGLE_IN,
+          ArgNames.VALUE,
+          scopeArg,
+          functionSymbol,
+          session,
+        )
     }
   }
 
@@ -380,7 +393,13 @@ public class ContributesServiceFir(session: FirSession) :
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, realFnSymbol)
       annotations +=
-        buildAnnotationCallWithScope(ClassIds.SINGLE_IN, ArgNames.VALUE, scopeArg, realFnSymbol)
+        buildAnnotationCallWithScope(
+          ClassIds.SINGLE_IN,
+          ArgNames.VALUE,
+          scopeArg,
+          realFnSymbol,
+          session,
+        )
       annotations += buildSimpleAnnotationCall(ClassIds.REAL_SERVICE, realFnSymbol)
     }
 
@@ -593,50 +612,6 @@ public class ContributesServiceFir(session: FirSession) :
               .filterIsInstance<FirConstructorSymbol>()
               .first()
           }
-      }
-      containingDeclarationSymbol = containingSymbol
-      annotationResolvePhase = FirAnnotationResolvePhase.Types
-    }
-  }
-
-  /**
-   * Build an annotation with scope argument as [FirAnnotationCall].
-   *
-   * Uses [buildResolvedArgumentList] so the FIR-to-IR converter recognizes the arguments. The
-   * converter checks `argumentList is FirResolvedArgumentList` to extract the argument mapping — a
-   * plain `buildArgumentList` would be treated as unresolved.
-   */
-  @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
-  private fun buildAnnotationCallWithScope(
-    classId: ClassId,
-    argName: Name,
-    scopeArg: FirExpression,
-    containingSymbol: FirBasedSymbol<*>,
-  ): FirAnnotationCall {
-    val annotationType =
-      ConeClassLikeTypeImpl(
-        ConeClassLikeLookupTagImpl(classId),
-        emptyArray(),
-        isMarkedNullable = false,
-      )
-
-    // Look up the annotation constructor and its parameter
-    val annotationClassSymbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
-    val constructorSymbol =
-      (annotationClassSymbol as FirClassSymbol<*>)
-        .declarationSymbols
-        .filterIsInstance<FirConstructorSymbol>()
-        .first()
-    val scopeParam = constructorSymbol.fir.valueParameters.first { it.name == argName }
-
-    return buildAnnotationCall {
-      annotationTypeRef = annotationType.toFirResolvedTypeRef()
-      argumentMapping = buildAnnotationArgumentMapping { mapping[argName] = scopeArg }
-      argumentList =
-        buildResolvedArgumentList(original = null, mapping = linkedMapOf(scopeArg to scopeParam))
-      calleeReference = buildResolvedNamedReference {
-        name = classId.shortClassName
-        resolvedSymbol = constructorSymbol
       }
       containingDeclarationSymbol = containingSymbol
       annotationResolvePhase = FirAnnotationResolvePhase.Types

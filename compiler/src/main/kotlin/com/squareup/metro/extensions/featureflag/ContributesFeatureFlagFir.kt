@@ -1,13 +1,11 @@
-package com.squareup.metro.extensions.scoped
+package com.squareup.metro.extensions.featureflag
 
 import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
-import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGeneratorKey
+import com.squareup.metro.extensions.Keys.ContributesFeatureFlagGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildFirFunction
-import com.squareup.metro.extensions.fir.extractScopeArgument
-import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
@@ -19,7 +17,6 @@ import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
-import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.origin
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -27,12 +24,14 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotationResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
+import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
+import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
-import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
@@ -42,69 +41,68 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
 /**
- * Generates a nested `MultibindingScopedContribution` interface for classes annotated with
- * `@ContributesMultibindingScoped`.
+ * Generates a nested `FeatureFlagContribution` interface for classes annotated with
+ * `@ContributesFeatureFlag` or `@ContributesDynamicConfigurationFlag`.
  *
- * For a class like:
+ * Given:
  * ```
- * @Inject
- * @ContributesMultibindingScoped(SomeScope::class)
- * class MyService : Scoped
+ * @ContributesFeatureFlag(description = "My flag", removeBy = Date(April, 1, 2030))
+ * object MyFlag : BooleanFeatureFlag("flagKey", DeviceId)
  * ```
  *
- * This generator produces:
+ * This generates:
  * ```
- * @ContributesTo(SomeScope::class)
- * interface MultibindingScopedContribution {
- *   @Binds @IntoSet @ForScope(SomeScope::class)
- *   fun bindsMyService(myService: MyService): Scoped
+ * @ContributesTo(AppScope::class)
+ * interface FeatureFlagContribution {
+ *   @Provides @IntoSet
+ *   fun providesMyFlag(): FeatureFlag
  * }
  * ```
  *
- * Implements [MetroFirDeclarationGenerationExtension] so that Metro's
- * [CompositeMetroFirDeclarationGenerationExtension][dev.zacsweers.metro.compiler.fir.generators.CompositeMetroFirDeclarationGenerationExtension]
- * automatically delegates callbacks from Metro's native generators (e.g.,
- * `ContributionsFirGenerator`, `InjectedClassFirGenerator`) to process the generated
- * `MultibindingScopedContribution` interface. This eliminates the need to manually discover and
- * call other generators.
+ * The scope is always `AppScope` — the real annotations don't have a scope parameter, matching the
+ * original KSP processor which hardcoded `AppScope::class`.
  *
- * The generated interface and its `@Binds` function use the plugin's own
- * [GeneratedDeclarationKey][org.jetbrains.kotlin.GeneratedDeclarationKey] origin. Metro's composite
- * handles the routing: when Metro's native generators return names for our generated class, the
- * composite tracks ownership so the correct generator is called for each declaration.
+ * The function body is generated by [ContributesFeatureFlagIrExtension] in the IR phase as `return
+ * MyFlag` (the object instance).
  *
- * The function is added directly to the class's declarations list (rather than through
- * `getCallableNamesForClass`/`generateFunctions`) so Metro can see it when deciding what nested
- * classes to generate.
+ * Functions are added directly to the class's declarations list (rather than through
+ * `getCallableNamesForClass`/`generateFunctions`) so Metro can see them when deciding what nested
+ * classes to generate (e.g., ProvidesFactory).
  */
-public class ContributesMultibindingScopedFir(session: FirSession) :
+public class ContributesFeatureFlagFir(session: FirSession) :
   MetroFirDeclarationGenerationExtension(session) {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
-    register(ContributesMultibindingScopedIds.PREDICATE)
+    register(ContributesFeatureFlagIds.PREDICATE)
+  }
+
+  override fun getContributionHints(): List<ContributionHint> {
+    return session.predicateBasedProvider
+      .getSymbolsByPredicate(ContributesFeatureFlagIds.PREDICATE)
+      .filterIsInstance<FirRegularClassSymbol>()
+      .mapNotNull { classSymbol ->
+        if (findMatchingAnnotationClassId(classSymbol) == null) return@mapNotNull null
+        val nestedInterfaceClassId =
+          classSymbol.classId.createNestedClassId(ContributesFeatureFlagIds.NESTED_INTERFACE_NAME)
+        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = ClassIds.APP_SCOPE)
+      }
   }
 
   override fun getNestedClassifiersNames(
     classSymbol: FirClassSymbol<*>,
     context: NestedClassGenerationContext,
   ): Set<Name> {
-    if (
-      hasAnnotation(
-        classSymbol,
-        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
-        session,
-      )
-    ) {
-      return setOf(ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME)
+    if (findMatchingAnnotationClassId(classSymbol) != null) {
+      return setOf(ContributesFeatureFlagIds.NESTED_INTERFACE_NAME)
     }
     return emptySet()
   }
@@ -114,34 +112,20 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     name: Name,
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
-    if (name != ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME) return null
-    if (
-      !hasAnnotation(
-        owner,
-        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
-        session,
-      )
-    )
-      return null
-    val scopeArg =
-      extractScopeArgument(
-        owner,
-        ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
-        session,
-      ) ?: return null
+    if (name != ContributesFeatureFlagIds.NESTED_INTERFACE_NAME) return null
+    if (findMatchingAnnotationClassId(owner) == null) return null
+
+    val scopeArg = buildAppScopeClassExpression() ?: return null
 
     val nestedClassId = owner.classId.createNestedClassId(name)
     val classSymbol = FirRegularClassSymbol(nestedClassId)
 
-    // Build the @Binds function and add it directly to the class declarations.
-    // This makes it visible to Metro's getNestedClassifiersNames (which checks for @Binds
-    // functions to decide whether to generate BindsMirror).
-    val bindsFunction = buildBindsFunction(nestedClassId, owner, scopeArg)
+    val providesFunction = buildProvidesFunction(nestedClassId, owner)
 
     val klass = buildRegularClass {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
-      origin = ContributesMultibindingScopedGeneratorKey.origin
+      origin = ContributesFeatureFlagGeneratorKey.origin
       source = owner.source
       classKind = ClassKind.INTERFACE
       scopeProvider = session.kotlinScopeProvider
@@ -162,50 +146,64 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           owner,
           session,
         )
-      // Add the function directly to the class declarations
-      declarations += bindsFunction
+      declarations += providesFunction
     }
 
     return klass.symbol
   }
 
-  override fun getContributionHints(): List<ContributionHint> {
-    return session.predicateBasedProvider
-      .getSymbolsByPredicate(ContributesMultibindingScopedIds.PREDICATE)
-      .filterIsInstance<FirRegularClassSymbol>()
-      .mapNotNull { classSymbol ->
-        val scopeClassId =
-          extractScopeClassId(
-            classSymbol,
-            ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
-            session,
-          ) ?: return@mapNotNull null
-        val nestedInterfaceClassId =
-          classSymbol.classId.createNestedClassId(
-            ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
-          )
-        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = scopeClassId)
-      }
-  }
-
-  private fun buildBindsFunction(
-    classId: ClassId,
-    outerOwner: FirClassSymbol<*>,
-    scopeArg: FirExpression,
-  ): FirDeclaration {
-    val outerClassId = outerOwner.classId
-    val functionName = "binds${outerClassId.shortClassName.identifier}"
-    val callableId = CallableId(classId, Name.identifier(functionName))
-
-    val scopedType =
+  /** Build a synthetic `AppScope::class` expression for the hardcoded scope. */
+  private fun buildAppScopeClassExpression(): FirExpression? {
+    val appScopeClassId = ClassIds.APP_SCOPE
+    val appScopeType =
       ConeClassLikeTypeImpl(
-        ConeClassLikeLookupTagImpl(ClassIds.SCOPED),
+        ConeClassLikeLookupTagImpl(appScopeClassId),
         emptyArray(),
         isMarkedNullable = false,
       )
-    val outerClassType = outerOwner.defaultType()
-    val paramName = outerClassId.shortClassName.identifier.replaceFirstChar { it.lowercase() }
-    // Build the dispatch receiver type manually since classSymbol isn't bound to FIR yet
+    val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+    val kClassType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(kClassClassId),
+        arrayOf(appScopeType),
+        isMarkedNullable = false,
+      )
+    val appScopeSymbol =
+      session.symbolProvider.getClassLikeSymbolByClassId(appScopeClassId) ?: return null
+
+    return buildGetClassCall {
+      coneTypeOrNull = kClassType
+      argumentList = buildArgumentList {
+        arguments += buildResolvedQualifier {
+          packageFqName = appScopeClassId.packageFqName
+          relativeClassFqName = appScopeClassId.relativeClassName
+          coneTypeOrNull = appScopeType
+          symbol = appScopeSymbol
+          resolvedToCompanionObject = false
+        }
+      }
+    }
+  }
+
+  /**
+   * Build the `@Provides @IntoSet` function that returns `FeatureFlag`.
+   *
+   * Generates: `@Provides @IntoSet fun providesMyFlag(): FeatureFlag`
+   */
+  private fun buildProvidesFunction(
+    classId: ClassId,
+    outerOwner: FirClassSymbol<*>,
+  ): FirDeclaration {
+    val outerClassId = outerOwner.classId
+    val functionName = "provides${outerClassId.shortClassName.identifier}"
+    val callableId = CallableId(classId, Name.identifier(functionName))
+
+    val featureFlagType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(ClassIds.FEATURE_FLAG),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
     val dispatchType =
       ConeClassLikeTypeImpl(
         ConeClassLikeLookupTagImpl(classId),
@@ -218,42 +216,35 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     return buildFirFunction {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
-      origin = ContributesMultibindingScopedGeneratorKey.origin
+      origin = ContributesFeatureFlagGeneratorKey.origin
       symbol = functionSymbol
       name = callableId.callableName
-      returnTypeRef = scopedType.toFirResolvedTypeRef()
+      returnTypeRef = featureFlagType.toFirResolvedTypeRef()
       dispatchReceiverType = dispatchType
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.ABSTRACT,
+          Modality.OPEN,
           Visibilities.Public.toEffectiveVisibility(outerOwner, forClass = true),
         )
-      this.valueParameters += buildValueParameter {
-        resolvePhase = FirResolvePhase.BODY_RESOLVE
-        moduleData = session.moduleData
-        origin = ContributesMultibindingScopedGeneratorKey.origin
-        returnTypeRef = outerClassType.toFirResolvedTypeRef()
-        this.name = Name.identifier(paramName)
-        symbol = FirValueParameterSymbol()
-        containingDeclarationSymbol = functionSymbol
-      }
-      annotations += buildSimpleAnnotationCall(ClassIds.BINDS, functionSymbol)
+      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
       annotations += buildSimpleAnnotationCall(ClassIds.INTO_SET, functionSymbol)
-      annotations +=
-        buildAnnotationCallWithScope(
-          ClassIds.FOR_SCOPE,
-          ArgNames.VALUE,
-          scopeArg,
-          functionSymbol,
-          session,
-        )
     }
   }
 
   /**
+   * Returns the matching annotation ClassId if the class has one of the feature flag annotations.
+   */
+  private fun findMatchingAnnotationClassId(classSymbol: FirClassSymbol<*>): ClassId? {
+    for (annotationClassId in ContributesFeatureFlagIds.ANNOTATION_CLASS_IDS) {
+      if (hasAnnotation(classSymbol, annotationClassId, session)) return annotationClassId
+    }
+    return null
+  }
+
+  /**
    * Build an annotation as [FirAnnotationCall] so Metro recognizes it. Metro's `metroAnnotations()`
-   * checks `annotation !is FirAnnotationCall` and skips plain [FirAnnotation] instances.
+   * checks `annotation !is FirAnnotationCall` and skips plain `FirAnnotation` instances.
    */
   @OptIn(DirectDeclarationsAccess::class)
   private fun buildSimpleAnnotationCall(
@@ -289,6 +280,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     override fun create(
       session: FirSession,
       options: MetroOptions,
-    ): MetroFirDeclarationGenerationExtension = ContributesMultibindingScopedFir(session)
+    ): MetroFirDeclarationGenerationExtension = ContributesFeatureFlagFir(session)
   }
 }

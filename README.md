@@ -35,6 +35,13 @@ Contributes a UI test robot class to a Metro dependency graph. The annotated cla
 `@ContributesTo` interface with an accessor function (`get{ClassName}()`), so the robot is
 automatically available on the `@DependencyGraph` without manually writing a component interface.
 
+#### `@ContributesFeatureFlag(description: String, removeBy: Date, ...)` / `@ContributesDynamicConfigurationFlag(description: String, ...)`
+
+Contributes a `FeatureFlag` object into `Set<FeatureFlag>` via `@IntoSet`. Always scoped to
+`AppScope`. The annotated type must be a Kotlin `object` implementing `FeatureFlag`. The
+`description` and `removeBy` parameters are metadata for linters and tooling, not used by the
+generated binding. `@ContributesDynamicConfigurationFlag` is identical but for permanent flags.
+
 #### `@ContributesService(scope: KClass<*>, replaces: Array<KClass<*>> = [])`
 
 Contributes a Retrofit service binding to a Metro dependency graph. The annotated interface must have

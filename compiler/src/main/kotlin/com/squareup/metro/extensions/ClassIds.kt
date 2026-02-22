@@ -50,6 +50,10 @@ internal object ClassIds {
 
   val FAKE_MODE = ClassId(FqName("com.squareup.development"), Name.identifier("FakeMode"))
 
+  val FEATURE_FLAG = ClassId(FqName("com.squareup.featureflags"), Name.identifier("FeatureFlag"))
+
+  val APP_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("AppScope"))
+
   val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
 
   val METRO_QUALIFIER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Qualifier"))

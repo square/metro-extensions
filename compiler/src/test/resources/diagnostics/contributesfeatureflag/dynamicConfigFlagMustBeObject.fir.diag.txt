@@ -1,0 +1,1 @@
+/dynamicConfigFlagMustBeObject.kt:(207,268): error: com.test.NotAnObject is not a Kotlin object. Feature flags should not have any arguments and should not be initialized more than once.

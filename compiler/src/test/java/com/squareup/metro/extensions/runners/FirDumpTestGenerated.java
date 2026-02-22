@@ -22,6 +22,22 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   }
 
   @Nested
+  @TestMetadata("compiler/src/test/resources/dump/contributesfeatureflag")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesfeatureflag {
+    @Test
+    public void testAllFilesPresentInContributesfeatureflag() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("contributesFeatureFlag.kt")
+    public void testContributesFeatureFlag() {
+      runTest("compiler/src/test/resources/dump/contributesfeatureflag/contributesFeatureFlag.kt");
+    }
+  }
+
+  @Nested
   @TestMetadata("compiler/src/test/resources/dump/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {
