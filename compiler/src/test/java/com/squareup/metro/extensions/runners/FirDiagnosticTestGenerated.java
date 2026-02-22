@@ -120,4 +120,32 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
       runTest("compiler/src/test/resources/diagnostics/contributesservice/tooManyQualifiers.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/diagnostics/developmentappcomponent")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Developmentappcomponent {
+    @Test
+    public void testAllFilesPresentInDevelopmentappcomponent() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("featureComponentWithoutScope.kt")
+    public void testFeatureComponentWithoutScope() {
+      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/featureComponentWithoutScope.kt");
+    }
+
+    @Test
+    @TestMetadata("featureScopeWithoutComponent.kt")
+    public void testFeatureScopeWithoutComponent() {
+      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/featureScopeWithoutComponent.kt");
+    }
+
+    @Test
+    @TestMetadata("mustExtendDevelopmentApplication.kt")
+    public void testMustExtendDevelopmentApplication() {
+      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/mustExtendDevelopmentApplication.kt");
+    }
+  }
 }

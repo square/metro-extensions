@@ -303,3 +303,79 @@ object AppLifecycleLoggerBindingContainer {
 
 Note: the scope from the annotation (`AppScope`) is used in two places -- as the
 `@ContributesTo` scope and as the `@ForScope` qualifier value.
+
+---
+
+## @DevelopmentAppComponent
+
+Generates a complete Metro `@DependencyGraph` component for development/demo apps.
+Eliminates the need to manually define the application component interface, its factory,
+and its factory provider. The scope is always `AppScope`.
+
+The annotated class must extend `DevelopmentApplication`, which provides a reflection-based
+`provideGraphFactory()` method to locate the generated factory at runtime.
+
+### Annotation definition
+
+```kotlin
+annotation class DevelopmentAppComponent(
+  val generateLoggedInComponent: Boolean = true,
+  val featureScope: KClass<*> = Unit::class,
+  val featureComponent: KClass<*> = Unit::class,
+) {
+  interface Factory {
+    fun create(application: Application): Any
+  }
+}
+```
+
+### Target
+
+Classes extending `DevelopmentApplication`.
+
+### Usage
+
+```kotlin
+@DevelopmentAppComponent
+class MyDemoApp : DevelopmentApplication()
+```
+
+### Generated output (pseudo)
+
+Inside the annotated class, two nested types are generated:
+
+```kotlin
+@SingleIn(AppScope::class)
+@DependencyGraph(AppScope::class)
+interface MetroComponent {
+  @DependencyGraph.Factory
+  interface Factory : DevelopmentAppComponent.Factory {
+    override fun create(@Provides application: Application): MetroComponent
+  }
+}
+```
+
+Metro processes the generated `@DependencyGraph` interface and creates the implementation
+class. All `@ContributesTo(AppScope::class)` contributions are automatically merged into
+the graph. The `application` parameter is provided as a binding via `@Provides`.
+
+At runtime, `DevelopmentApplication.provideGraphFactory()` uses reflection to find the
+Metro-generated `Factory.Impl` singleton and returns it as a `DevelopmentAppComponent.Factory`.
+
+### generateLoggedInComponent = false
+
+When `generateLoggedInComponent` is set to `false`, the `@DependencyGraph` annotation
+includes `excludes` to remove the logged-in scope infrastructure:
+
+```kotlin
+@DependencyGraph(
+  scope = AppScope::class,
+  excludes = [LoginScreenModule::class, DevelopmentLoggedInComponent::class],
+)
+interface MetroComponent { ... }
+```
+
+### Validation
+
+- The annotated class must extend `DevelopmentApplication`.
+- If `featureComponent` is specified, `featureScope` must also be specified (and vice versa).

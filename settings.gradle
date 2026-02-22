@@ -39,5 +39,6 @@ rootProject.name = 'metro-extensions'
 
 include ':compiler'
 include ':integration-tests:app'
+include ':integration-tests:demo'
 include ':integration-tests:lib'
 include ':stubs'
