@@ -18,4 +18,8 @@ internal object Keys {
   data object ContributesFeatureFlagGeneratorKey : GeneratedDeclarationKey() {
     override fun toString(): String = "ContributesFeatureFlagGenerator"
   }
+
+  data object DevelopmentAppComponentGeneratorKey : GeneratedDeclarationKey() {
+    override fun toString(): String = "DevelopmentAppComponentGenerator"
+  }
 }

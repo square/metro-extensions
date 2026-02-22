@@ -1,0 +1,1 @@
+/mustExtendDevelopmentApplication.kt:(142,166): error: com.test.MyApp is annotated with @DevelopmentAppComponent, but isn't extending com.squareup.development.shell.DevelopmentApplication.

@@ -1,0 +1,1 @@
+/featureComponentWithoutScope.kt:(231,303): error: MyApp uses @DevelopmentAppComponent with featureComponent FeatureComponent, but no featureScope was provided.
