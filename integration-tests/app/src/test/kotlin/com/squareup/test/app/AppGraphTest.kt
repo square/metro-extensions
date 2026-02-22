@@ -1,7 +1,9 @@
 package com.squareup.test.app
 
 import com.squareup.test.app.data.FakeLibService
+import com.squareup.test.app.data.TestFeatureFlag
 import com.squareup.test.app.data.TestRobot
+import com.squareup.test.lib.LibFeatureFlag
 import com.squareup.test.lib.LibRobot
 import com.squareup.test.lib.LibService
 import dev.zacsweers.metro.createGraphFactory
@@ -10,6 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
+import kotlin.test.assertTrue
 
 class AppGraphTest {
   @Test
@@ -31,6 +34,24 @@ class AppGraphTest {
 
     val testRobot = graphClass.getMethod("getTestRobot").invoke(graph)
     assertIs<TestRobot>(testRobot)
+  }
+
+  @Test
+  fun `feature flags set contains lib, app, and test contributions`() {
+    val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
+    val flags = graph.featureFlags
+    assertEquals(3, flags.size)
+    assertTrue(flags.contains(LibFeatureFlag))
+    assertTrue(flags.contains(AppFeatureFlag))
+    assertTrue(flags.contains(TestFeatureFlag))
+  }
+
+  @Test
+  fun `feature flag instances are singletons`() {
+    val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
+    assertTrue(graph.featureFlags.any { it === LibFeatureFlag })
+    assertTrue(graph.featureFlags.any { it === AppFeatureFlag })
+    assertTrue(graph.featureFlags.any { it === TestFeatureFlag })
   }
 
   @Test

@@ -1,0 +1,72 @@
+// FILE: comTestMyFeatureFlagFeatureFlagContributionAppScope.kt
+package metro.hints
+
+fun AppScope(contributed: FeatureFlagContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: contributesFeatureFlag.kt
+package com.test
+
+@ContributesFeatureFlag(description = "My flag", removeBy = Date(month = Month.April, day = 1, year = 2030))
+object MyFeatureFlag : BooleanFeatureFlag {
+  @ContributesTo(scope = AppScope::class)
+  interface FeatureFlagContribution {
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @MetroContribution(scope = AppScope::class)
+    interface MetroContributionToComsquareupdaggerappScopegan-ZFI : FeatureFlagContribution {
+    }
+
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "providesMyFeatureFlag", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "providesMyFeatureFlag")
+    class ProvidesMyFeatureFlagMetroFactory : Factory<FeatureFlag> {
+      private /* final field */ val instance: FeatureFlagContribution = instance
+      companion object Companion {
+        private constructor() /* primary */ {
+          super/*Any*/()
+          /* <init>() */
+
+        }
+
+        fun create(instance: FeatureFlagContribution): Factory<FeatureFlag> {
+          return ProvidesMyFeatureFlagMetroFactory(instance = instance)
+        }
+
+        fun providesMyFeatureFlag(instance: FeatureFlagContribution): FeatureFlag {
+          return instance.providesMyFeatureFlag()
+        }
+
+      }
+
+      private constructor(instance: FeatureFlagContribution) /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      override operator fun invoke(): FeatureFlag {
+        return Companion.providesMyFeatureFlag(instance = <this>.#instance)
+      }
+
+      @IntoSet
+      fun mirrorFunction(): FeatureFlag {
+        return error(message = "Never called")
+      }
+
+    }
+
+    @Provides
+    @IntoSet
+    fun providesMyFeatureFlag(): FeatureFlag {
+      return MyFeatureFlag
+    }
+
+  }
+
+  private constructor() /* primary */ {
+    super/*BooleanFeatureFlag*/(flagKey = "my-flag-key")
+    /* <init>() */
+
+  }
+
+}
