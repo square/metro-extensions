@@ -22,6 +22,40 @@ public class BoxTestGenerated extends AbstractBoxTest {
   }
 
   @Nested
+  @TestMetadata("compiler/src/test/resources/box/contributesfeatureflag")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesfeatureflag {
+    @Test
+    public void testAllFilesPresentInContributesfeatureflag() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("dynamicConfigurationFlag.kt")
+    public void testDynamicConfigurationFlag() {
+      runTest("compiler/src/test/resources/box/contributesfeatureflag/dynamicConfigurationFlag.kt");
+    }
+
+    @Test
+    @TestMetadata("multiCompilation.kt")
+    public void testMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesfeatureflag/multiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("multipleFlags.kt")
+    public void testMultipleFlags() {
+      runTest("compiler/src/test/resources/box/contributesfeatureflag/multipleFlags.kt");
+    }
+
+    @Test
+    @TestMetadata("singleCompilation.kt")
+    public void testSingleCompilation() {
+      runTest("compiler/src/test/resources/box/contributesfeatureflag/singleCompilation.kt");
+    }
+  }
+
+  @Nested
   @TestMetadata("compiler/src/test/resources/box/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {

@@ -22,6 +22,40 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   }
 
   @Nested
+  @TestMetadata("compiler/src/test/resources/diagnostics/contributesfeatureflag")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Contributesfeatureflag {
+    @Test
+    public void testAllFilesPresentInContributesfeatureflag() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("dynamicConfigFlagMustBeObject.kt")
+    public void testDynamicConfigFlagMustBeObject() {
+      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/dynamicConfigFlagMustBeObject.kt");
+    }
+
+    @Test
+    @TestMetadata("mustBeObject.kt")
+    public void testMustBeObject() {
+      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustBeObject.kt");
+    }
+
+    @Test
+    @TestMetadata("mustBePublic.kt")
+    public void testMustBePublic() {
+      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustBePublic.kt");
+    }
+
+    @Test
+    @TestMetadata("mustImplementFeatureFlag.kt")
+    public void testMustImplementFeatureFlag() {
+      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustImplementFeatureFlag.kt");
+    }
+  }
+
+  @Nested
   @TestMetadata("compiler/src/test/resources/diagnostics/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {

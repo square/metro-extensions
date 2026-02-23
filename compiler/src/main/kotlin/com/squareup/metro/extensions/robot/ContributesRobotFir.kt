@@ -4,7 +4,7 @@ import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesRobotGeneratorKey
-import com.squareup.metro.extensions.fir.buildAnnotationWithScope
+import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
@@ -108,7 +108,14 @@ public class ContributesRobotFir(session: FirSession) :
           Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
         )
       superTypeRefs += session.builtinTypes.anyType
-      annotations += buildAnnotationWithScope(ClassIds.CONTRIBUTES_TO, ArgNames.SCOPE, scopeArg)
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.CONTRIBUTES_TO,
+          ArgNames.SCOPE,
+          scopeArg,
+          owner,
+          session,
+        )
     }
 
     return klass.symbol

@@ -110,6 +110,12 @@ tasks.withType(Test).configureEach { testTask ->
   workingDir = rootDir
   maxHeapSize = '2g'
 
+  testLogging {
+    showStandardStreams = true
+    showStackTraces true
+    exceptionFormat = 'short'
+  }
+
   // Properties required to run the internal test framework.
   systemProperty('idea.ignore.disabled.plugins', 'true')
   systemProperty('idea.home.path', rootDir)
