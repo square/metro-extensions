@@ -26,13 +26,13 @@ class AppGraphTest {
     val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
     val graphClass = graph::class.java
 
-    val appRobot = graphClass.getMethod("getAppRobot").invoke(graph)
+    val appRobot = graphClass.getMethod("getAppRobotContribution").invoke(graph)
     assertIs<AppRobot>(appRobot)
 
-    val libRobot = graphClass.getMethod("getLibRobot").invoke(graph)
+    val libRobot = graphClass.getMethod("getLibRobotContribution").invoke(graph)
     assertIs<LibRobot>(libRobot)
 
-    val testRobot = graphClass.getMethod("getTestRobot").invoke(graph)
+    val testRobot = graphClass.getMethod("getTestRobotContribution").invoke(graph)
     assertIs<TestRobot>(testRobot)
   }
 

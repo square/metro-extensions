@@ -52,7 +52,7 @@ import org.jetbrains.kotlin.name.Name
  * ```
  * @ContributesTo(SomeScope::class)
  * interface RobotContribution {
- *   fun getAbcRobot(): AbcRobot
+ *   fun getAbcRobotContribution(): AbcRobot
  * }
  * ```
  *
@@ -129,7 +129,10 @@ public class ContributesRobotFir(session: FirSession) :
 
     // The outer class is the @ContributesRobot-annotated class that owns this nested interface.
     val outerClassId = classSymbol.classId.outerClassId ?: return emptySet()
-    val functionName = "get${outerClassId.shortClassName.identifier}"
+    // Use "Contribution" suffix to avoid JVM signature clashes: Kotlin synthesizes
+    // a property from getXxx() methods, causing "Platform declaration clash" when Metro's graph
+    // impl generates both a property getter and a function for the same JVM signature.
+    val functionName = "get${outerClassId.shortClassName.identifier}Contribution"
     return setOf(Name.identifier(functionName))
   }
 

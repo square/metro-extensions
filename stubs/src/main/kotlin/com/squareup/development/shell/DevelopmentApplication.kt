@@ -2,8 +2,7 @@ package com.squareup.development.shell
 
 import com.squareup.di.GraphFactoryProvider
 
-abstract class DevelopmentApplication :
-  GraphFactoryProvider<DevelopmentAppComponent.Factory> {
+abstract class DevelopmentApplication : GraphFactoryProvider<DevelopmentAppComponent.Factory> {
 
   /**
    * Uses reflection to find the Metro-generated `MetroComponent.Factory.Impl` singleton inside the
