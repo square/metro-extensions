@@ -6,7 +6,6 @@ import dev.zacsweers.metro.createGraphFactory
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class DemoAppTest {
   @Test

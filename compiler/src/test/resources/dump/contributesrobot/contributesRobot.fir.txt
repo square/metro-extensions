@@ -7,7 +7,7 @@ FILE: contributesRobot.kt
         }
 
         @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface RobotContribution : R|kotlin/Any| {
-            public abstract fun getAbcRobot(): R|com/test/AbcRobot|
+            public abstract fun getAbcRobotContribution(): R|com/test/AbcRobot|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/AbcRobot.RobotContribution| {
             }
