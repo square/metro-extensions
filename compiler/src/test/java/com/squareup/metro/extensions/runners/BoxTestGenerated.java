@@ -37,6 +37,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("hintGeneratedFir.kt")
+    public void testHintGeneratedFir() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/hintGeneratedFir.kt");
+    }
+
+    @Test
+    @TestMetadata("hintGeneratedIr.kt")
+    public void testHintGeneratedIr() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/hintGeneratedIr.kt");
+    }
+
+    @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/multiCompilation.kt");
@@ -80,6 +92,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @TestMetadata("composeScreenRobot.kt")
     public void testComposeScreenRobot() {
       runTest("compiler/src/test/resources/box/contributesrobot/composeScreenRobot.kt");
+    }
+
+    @Test
+    @TestMetadata("hintGeneratedFir.kt")
+    public void testHintGeneratedFir() {
+      runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedFir.kt");
+    }
+
+    @Test
+    @TestMetadata("hintGeneratedIr.kt")
+    public void testHintGeneratedIr() {
+      runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedIr.kt");
     }
 
     @Test

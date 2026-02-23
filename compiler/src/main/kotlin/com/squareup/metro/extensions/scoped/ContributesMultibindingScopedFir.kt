@@ -7,6 +7,7 @@ import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGenerator
 import com.squareup.metro.extensions.fir.buildAnnotationWithScope
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
+import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
@@ -29,6 +30,7 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMappi
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
+import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.defaultType
@@ -160,6 +162,28 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     }
 
     return klass.symbol
+  }
+
+  override fun getContributionHints(): List<ContributionHint> {
+    return session.predicateBasedProvider
+      .getSymbolsByPredicate(ContributesMultibindingScopedIds.PREDICATE)
+      .filterIsInstance<FirRegularClassSymbol>()
+      .mapNotNull { classSymbol ->
+        val scopeClassId =
+          extractScopeClassId(
+            classSymbol,
+            ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
+            session,
+          ) ?: return@mapNotNull null
+        val nestedInterfaceClassId =
+          classSymbol.classId.createNestedClassId(
+            ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
+          )
+        ContributionHint(
+          contributingClassId = nestedInterfaceClassId,
+          scope = scopeClassId,
+        )
+      }
   }
 
   private fun buildBindsFunction(
