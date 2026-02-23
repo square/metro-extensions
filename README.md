@@ -42,6 +42,15 @@ Contributes a `FeatureFlag` object into `Set<FeatureFlag>` via `@IntoSet`. Alway
 `description` and `removeBy` parameters are metadata for linters and tooling, not used by the
 generated binding. `@ContributesDynamicConfigurationFlag` is identical but for permanent flags.
 
+#### `@DevelopmentAppComponent`
+
+Generates a complete Metro `@DependencyGraph(AppScope::class)` component for development/demo apps.
+The annotated class must extend `DevelopmentApplication`. At compile time, the plugin generates a
+nested `MetroComponent` interface with a `@DependencyGraph.Factory` that takes an `Application`
+parameter. All `@ContributesTo(AppScope::class)` contributions are automatically merged into the
+graph. At runtime, `DevelopmentApplication.provideGraphFactory()` uses reflection to locate the
+generated factory.
+
 #### `@ContributesService(scope: KClass<*>, replaces: Array<KClass<*>> = [])`
 
 Contributes a Retrofit service binding to a Metro dependency graph. The annotated interface must have

@@ -54,6 +54,31 @@ internal object ClassIds {
 
   val APP_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("AppScope"))
 
+  val DEVELOPMENT_APP_COMPONENT =
+    ClassId(FqName("com.squareup.development.shell"), Name.identifier("DevelopmentAppComponent"))
+
+  val DEVELOPMENT_APPLICATION =
+    ClassId(FqName("com.squareup.development.shell"), Name.identifier("DevelopmentApplication"))
+
+  val DEPENDENCY_GRAPH_FACTORY = DEPENDENCY_GRAPH.createNestedClassId(Name.identifier("Factory"))
+
+  val DEVELOPMENT_APP_COMPONENT_FACTORY =
+    DEVELOPMENT_APP_COMPONENT.createNestedClassId(Name.identifier("Factory"))
+
+  val APPLICATION = ClassId(FqName("android.app"), Name.identifier("Application"))
+
+  val LOGIN_SCREEN_MODULE =
+    ClassId(
+      FqName("com.squareup.development.shell.login.screen"),
+      Name.identifier("LoginScreenModule"),
+    )
+
+  val DEVELOPMENT_LOGGED_IN_COMPONENT =
+    ClassId(
+      FqName("com.squareup.development.shell.component"),
+      Name.identifier("DevelopmentLoggedInComponent"),
+    )
+
   val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
 
   val METRO_QUALIFIER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Qualifier"))

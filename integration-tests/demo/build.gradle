@@ -1,0 +1,16 @@
+plugins {
+  id 'com.squareup.lib'
+  id 'com.squareup.metro.extensions'
+  alias libs.plugins.metro
+}
+
+metro {
+  // The generated MetroComponent factory takes an Application parameter (@Provides) that may not
+  // be consumed in this demo app. Suppress the warning since this is expected.
+  unusedGraphInputsSeverity = dev.zacsweers.metro.gradle.DiagnosticSeverity.NONE
+}
+
+dependencies {
+  implementation project(':stubs')
+  testImplementation libs.kotlin.test
+}

@@ -96,4 +96,26 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
       runTest("compiler/src/test/resources/dump/contributesservice/replacedService.kt");
     }
   }
+
+  @Nested
+  @TestMetadata("compiler/src/test/resources/dump/developmentappcomponent")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Developmentappcomponent {
+    @Test
+    public void testAllFilesPresentInDevelopmentappcomponent() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("developmentAppComponent.kt")
+    public void testDevelopmentAppComponent() {
+      runTest("compiler/src/test/resources/dump/developmentappcomponent/developmentAppComponent.kt");
+    }
+
+    @Test
+    @TestMetadata("excludeLoggedInComponent.kt")
+    public void testExcludeLoggedInComponent() {
+      runTest("compiler/src/test/resources/dump/developmentappcomponent/excludeLoggedInComponent.kt");
+    }
+  }
 }

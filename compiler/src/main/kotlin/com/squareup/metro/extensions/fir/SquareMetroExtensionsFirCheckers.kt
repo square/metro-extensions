@@ -1,5 +1,6 @@
 package com.squareup.metro.extensions.fir
 
+import com.squareup.metro.extensions.developmentapp.DevelopmentAppComponentChecker
 import com.squareup.metro.extensions.featureflag.ContributesFeatureFlagChecker
 import com.squareup.metro.extensions.robot.ContributesRobotChecker
 import com.squareup.metro.extensions.scoped.ContributesMultibindingScopedChecker
@@ -21,6 +22,7 @@ internal class SquareMetroExtensionsFirCheckers(session: FirSession) :
           ContributesMultibindingScopedReplacesChecker,
           ContributesRobotChecker,
           ContributesServiceChecker,
+          DevelopmentAppComponentChecker,
         )
     }
 }
