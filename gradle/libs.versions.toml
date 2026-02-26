@@ -5,7 +5,7 @@ buildconfig = "6.0.7"
 kotlin = "2.3.10"
 ktfmt = "0.25.0"
 maven-publish = "0.36.0"
-metro = "0.10.4"
+metro = "0.11.1"
 
 [libraries]
 javax-inject = { module = "javax.inject:javax.inject", version = "1" }
