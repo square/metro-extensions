@@ -1,7 +1,7 @@
 [versions]
 autoservice = "0.1.4"
 binary-compat-validator = "0.18.1"
-buildconfig = "6.0.7"
+buildconfig = "6.0.9"
 kotlin = "2.3.10"
 ktfmt = "0.25.0"
 maven-publish = "0.36.0"
