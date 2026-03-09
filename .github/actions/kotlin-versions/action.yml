@@ -16,10 +16,12 @@ runs:
   steps:
     - id: versions
       shell: bash
+      env:
+        PREVIEW_VERSIONS: ${{ inputs.preview-versions }}
       run: |
         base=$(grep '^kotlin = ' gradle/libs.versions.toml | sed 's/kotlin = "\(.*\)"/\1/')
         matrix="[\"${base}\""
-        IFS=',' read -ra previews <<< "${{ inputs.preview-versions }}"
+        IFS=',' read -ra previews <<< "$PREVIEW_VERSIONS"
         for v in "${previews[@]}"; do
           v=$(echo "$v" | xargs)  # trim whitespace
           [ -n "$v" ] && matrix+=", \"${v}\""
