@@ -1,3 +1,8 @@
+public class com/squareup/metro/extensions/SquareMetroExtensionsExtension {
+	public fun <init> ()V
+	public final fun isReleaseBuild (Lkotlin/jvm/functions/Function1;)V
+}
+
 public final class com/squareup/metro/extensions/SquareMetroExtensionsPlugin : org/jetbrains/kotlin/gradle/plugin/KotlinCompilerPluginSupportPlugin {
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
