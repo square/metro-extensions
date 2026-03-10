@@ -5,6 +5,7 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
+import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.buildFirArrayLiteral
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
@@ -226,6 +227,14 @@ public class ContributesServiceFir(session: FirSession) :
             session,
           )
       }
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.ORIGIN,
+          ArgNames.VALUE,
+          buildClassExpression(owner, session),
+          classSymbol,
+          session,
+        )
       // Add the function(s) directly to the class declarations
       for (fn in providesFunctions) {
         declarations += fn

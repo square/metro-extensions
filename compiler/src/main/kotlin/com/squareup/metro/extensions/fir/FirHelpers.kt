@@ -16,6 +16,9 @@ import org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier
 import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
+import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
+import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
+import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
@@ -404,6 +407,46 @@ private fun resolveClassIdViaTypeResolver(
   } catch (_: Exception) {
     // Resolution can fail if the type isn't importable in this context.
     null
+  }
+}
+
+/**
+ * Build a synthetic `OwnerClass::class` expression for the given [classSymbol].
+ *
+ * Used to build the `@Origin(OwnerClass::class)` annotation on generated contribution interfaces so
+ * Metro can trace contributions back to their source class for `replaces`/`excludes` handling in
+ * multi-compilation scenarios.
+ */
+internal fun buildClassExpression(
+  classSymbol: FirClassSymbol<*>,
+  session: FirSession,
+): FirExpression {
+  val classId = classSymbol.classId
+  val classType =
+    ConeClassLikeTypeImpl(
+      ConeClassLikeLookupTagImpl(classId),
+      emptyArray(),
+      isMarkedNullable = false,
+    )
+  val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+  val kClassType =
+    ConeClassLikeTypeImpl(
+      ConeClassLikeLookupTagImpl(kClassClassId),
+      arrayOf(classType),
+      isMarkedNullable = false,
+    )
+
+  return buildGetClassCall {
+    coneTypeOrNull = kClassType
+    argumentList = buildArgumentList {
+      arguments += buildResolvedQualifier {
+        packageFqName = classId.packageFqName
+        relativeClassFqName = classId.relativeClassName
+        coneTypeOrNull = classType
+        symbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
+        resolvedToCompanionObject = false
+      }
+    }
   }
 }
 

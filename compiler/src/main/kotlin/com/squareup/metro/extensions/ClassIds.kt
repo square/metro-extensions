@@ -108,6 +108,8 @@ internal object ClassIds {
 
   val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
 
+  val ORIGIN = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Origin"))
+
   val METRO_QUALIFIER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Qualifier"))
 
   val QUALIFIER_CLASS_IDS = setOf(JAVAX_QUALIFIER, METRO_QUALIFIER)

@@ -5,7 +5,6 @@ fun Unit(contributed: ServiceContribution) {
   return error(message = "Never called")
 }
 
-
 // FILE: contributesService.kt
 package com.test
 
@@ -13,6 +12,7 @@ package com.test
 @RetrofitAuthenticated
 interface MyService {
   @ContributesTo(scope = Unit::class)
+  @Origin(value = MyService::class)
   interface ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @MetroContribution(scope = Unit::class)

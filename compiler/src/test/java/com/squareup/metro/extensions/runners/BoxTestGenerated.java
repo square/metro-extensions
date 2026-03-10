@@ -95,6 +95,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("replacedScopedBindingMultiCompilation.kt")
+    public void testReplacedScopedBindingMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/replacedScopedBindingMultiCompilation.kt");
+    }
+
+    @Test
+    @TestMetadata("replacedScopedBindingMultiCompilationWithExtension.kt")
+    public void testReplacedScopedBindingMultiCompilationWithExtension() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/replacedScopedBindingMultiCompilationWithExtension.kt");
+    }
+
+    @Test
     @TestMetadata("scopedInSuperTypes.kt")
     public void testScopedInSuperTypes() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/scopedInSuperTypes.kt");
