@@ -14,7 +14,10 @@ public class SquareMetroExtensionsPluginComponentRegistrar : CompilerPluginRegis
   override val supportsK2: Boolean = true
 
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
-    FirExtensionRegistrarAdapter.registerExtension(SquareMetroExtensionsPluginRegistrar())
+    val isReleaseBuild = configuration.get(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, false)
+    FirExtensionRegistrarAdapter.registerExtension(
+      SquareMetroExtensionsPluginRegistrar(isReleaseBuild)
+    )
     IrGenerationExtension.registerExtension(ContributesServiceIrExtension())
     IrGenerationExtension.registerExtension(ContributesFeatureFlagIrExtension())
   }

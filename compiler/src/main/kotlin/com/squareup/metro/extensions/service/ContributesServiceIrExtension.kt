@@ -79,6 +79,7 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     when {
       hasRealService -> generateSwitcherBody(declaration)
       hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
+      // In release builds, no @FakeMode param — just return serviceCreator.create(...)
       hasServiceCreator -> generateRealServiceProviderBody(declaration)
     }
 

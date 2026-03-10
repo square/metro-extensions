@@ -12,6 +12,7 @@ import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.squareMetroExtensionsConfig
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -66,7 +67,7 @@ import org.jetbrains.kotlin.name.Name
  * Generates a nested `ServiceContribution` interface for classes annotated with
  * `@ContributesService`.
  *
- * Given a **real service**:
+ * Given a **real service** in a non-release build:
  * ```
  * @ContributesService(SomeScope::class)
  * @SomeQualifier
@@ -81,6 +82,17 @@ import org.jetbrains.kotlin.name.Name
  *   fun provideMyService(
  *     @SomeQualifier serviceCreator: ServiceCreator,
  *     @FakeMode isFakeMode: Boolean,
+ *   ): MyService
+ * }
+ * ```
+ *
+ * In a **release build**, the `@FakeMode isFakeMode` parameter is omitted:
+ * ```
+ * @ContributesTo(SomeScope::class)
+ * interface ServiceContribution {
+ *   @Provides @SingleIn(SomeScope::class)
+ *   fun provideMyService(
+ *     @SomeQualifier serviceCreator: ServiceCreator,
  *   ): MyService
  * }
  * ```
@@ -118,6 +130,9 @@ import org.jetbrains.kotlin.name.Name
  */
 public class ContributesServiceFir(session: FirSession) :
   MetroFirDeclarationGenerationExtension(session) {
+
+  private val isReleaseBuild: Boolean
+    get() = session.squareMetroExtensionsConfig.isReleaseBuild
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(ContributesServiceIds.PREDICATE)
@@ -295,16 +310,18 @@ public class ContributesServiceFir(session: FirSession) :
         }
       }
 
-      // Parameter: @FakeMode isFakeMode: Boolean
-      this.valueParameters += buildValueParameter {
-        resolvePhase = FirResolvePhase.BODY_RESOLVE
-        moduleData = session.moduleData
-        origin = ContributesServiceGeneratorKey.origin
-        returnTypeRef = session.builtinTypes.booleanType
-        this.name = Name.identifier("isFakeMode")
-        symbol = FirValueParameterSymbol()
-        containingDeclarationSymbol = functionSymbol
-        annotations += buildSimpleAnnotation(ClassIds.FAKE_MODE)
+      // Parameter: @FakeMode isFakeMode: Boolean (only for non-release builds)
+      if (!isReleaseBuild) {
+        this.valueParameters += buildValueParameter {
+          resolvePhase = FirResolvePhase.BODY_RESOLVE
+          moduleData = session.moduleData
+          origin = ContributesServiceGeneratorKey.origin
+          returnTypeRef = session.builtinTypes.booleanType
+          this.name = Name.identifier("isFakeMode")
+          symbol = FirValueParameterSymbol()
+          containingDeclarationSymbol = functionSymbol
+          annotations += buildSimpleAnnotation(ClassIds.FAKE_MODE)
+        }
       }
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)

@@ -1,5 +1,6 @@
 package com.squareup.metro.extensions.services
 
+import com.squareup.metro.extensions.SquareMetroExtensionsConfig
 import com.squareup.metro.extensions.SquareMetroExtensionsPluginComponentRegistrar
 import dev.zacsweers.metro.compiler.MetroCommandLineProcessor
 import dev.zacsweers.metro.compiler.MetroCompilerPluginRegistrar
@@ -43,6 +44,12 @@ private class ExtensionRegistrarConfigurator(testServices: TestServices) :
         }
       metroCliProcessor.processOption(option, "true", configuration)
     }
+
+    // Configure isReleaseBuild from directive (defaults to false)
+    if (MetroDirectives.IS_RELEASE_BUILD in module.directives) {
+      configuration.put(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, true)
+    }
+
     // Register Metro's actual compiler plugin
     with(metroRegistrar) { registerExtensions(configuration) }
     // Register our custom extensions

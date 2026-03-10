@@ -1,0 +1,68 @@
+// FILE: comTestMyServiceServiceContributionUnit.kt
+package metro.hints
+
+fun Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: contributesServiceReleaseBuild.kt
+package com.test
+
+@ContributesService(scope = Unit::class)
+@RetrofitAuthenticated
+interface MyService {
+  @ContributesTo(scope = Unit::class)
+  interface ServiceContribution {
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @MetroContribution(scope = Unit::class)
+    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
+    }
+
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
+    class ProvideMyServiceMetroFactory : Factory<MyService> {
+      private /* final field */ val instance: ServiceContribution = instance
+      private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
+      companion object Companion {
+        private constructor() /* primary */ {
+          super/*Any*/()
+          /* <init>() */
+
+        }
+
+        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
+        }
+
+        fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+          return instance.provideMyService(serviceCreator = serviceCreator)
+        }
+
+      }
+
+      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      override operator fun invoke(): MyService {
+        return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
+      }
+
+      @SingleIn(value = Unit::class)
+      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+        return error(message = "Never called")
+      }
+
+    }
+
+    @Provides
+    @SingleIn(value = Unit::class)
+    fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+    }
+
+  }
+
+}
