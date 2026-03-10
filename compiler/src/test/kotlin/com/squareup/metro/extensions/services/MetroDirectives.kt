@@ -7,4 +7,7 @@ object MetroDirectives : SimpleDirectivesContainer() {
     directive("Enable generation of contribution hints in FIR instead of IR.")
 
   val IS_RELEASE_BUILD by directive("Treat compilation as a release build.")
+
+  val DISABLE_DEVELOPMENT_APP_COMPONENT by
+    directive("Disable the @DevelopmentAppComponent FIR extension.")
 }

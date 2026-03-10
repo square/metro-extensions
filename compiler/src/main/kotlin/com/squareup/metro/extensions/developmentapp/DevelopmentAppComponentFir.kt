@@ -9,6 +9,7 @@ import com.squareup.metro.extensions.fir.buildFirArrayLiteral
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.squareMetroExtensionsConfig
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -87,7 +88,9 @@ public class DevelopmentAppComponentFir(session: FirSession) :
   MetroFirDeclarationGenerationExtension(session) {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
-    register(DevelopmentAppComponentIds.PREDICATE)
+    if (session.squareMetroExtensionsConfig.enableDevelopmentAppComponent) {
+      register(DevelopmentAppComponentIds.PREDICATE)
+    }
   }
 
   override fun getNestedClassifiersNames(

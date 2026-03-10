@@ -30,7 +30,11 @@ public class SquareMetroExtensionsPlugin : KotlinCompilerPluginSupportPlugin {
     return project.provider {
       val predicate = extension.isReleaseBuildPredicate ?: isReleaseBuildPredicateDefault
       listOf(
-        SubpluginOption(key = "isReleaseBuild", value = predicate(kotlinCompilation).toString())
+        SubpluginOption(key = "isReleaseBuild", value = predicate(kotlinCompilation).toString()),
+        SubpluginOption(
+          key = "enableDevelopmentAppComponent",
+          value = extension.enableDevelopmentAppComponent.get().toString(),
+        ),
       )
     }
   }

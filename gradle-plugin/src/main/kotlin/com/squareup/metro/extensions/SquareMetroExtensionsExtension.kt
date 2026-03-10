@@ -1,5 +1,8 @@
 package com.squareup.metro.extensions
 
+import javax.inject.Inject
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 
 /**
@@ -11,15 +14,26 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
  *   isReleaseBuild { compilation ->
  *     compilation.name.endsWith("release", ignoreCase = true)
  *   }
+ *
+ *   // Disable the DevelopmentAppComponent FIR extension.
+ *   enableDevelopmentAppComponent.set(false)
  * }
  * ```
  *
  * By default, a compilation is considered a release build if its name ends with "release"
  * (case-insensitive), matching Android build variant naming conventions.
  */
-public open class SquareMetroExtensionsExtension {
+public abstract class SquareMetroExtensionsExtension @Inject constructor(objects: ObjectFactory) {
 
   internal var isReleaseBuildPredicate: ((KotlinCompilation<*>) -> Boolean)? = null
+
+  /**
+   * Whether the `@DevelopmentAppComponent` FIR extension is enabled. When `false`, the extension
+   * will not generate `MetroComponent` and `MetroComponent.Factory` interfaces for classes
+   * annotated with `@DevelopmentAppComponent`. Defaults to `true`.
+   */
+  public val enableDevelopmentAppComponent: Property<Boolean> =
+    objects.property(Boolean::class.java).convention(true)
 
   /**
    * Sets a predicate that determines whether a given [KotlinCompilation] is a release build.

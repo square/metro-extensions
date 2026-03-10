@@ -15,8 +15,10 @@ public class SquareMetroExtensionsPluginComponentRegistrar : CompilerPluginRegis
 
   override fun ExtensionStorage.registerExtensions(configuration: CompilerConfiguration) {
     val isReleaseBuild = configuration.get(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, false)
+    val enableDevelopmentAppComponent =
+      configuration.get(SquareMetroExtensionsConfig.ENABLE_DEVELOPMENT_APP_COMPONENT_KEY, true)
     FirExtensionRegistrarAdapter.registerExtension(
-      SquareMetroExtensionsPluginRegistrar(isReleaseBuild)
+      SquareMetroExtensionsPluginRegistrar(isReleaseBuild, enableDevelopmentAppComponent)
     )
     IrGenerationExtension.registerExtension(ContributesServiceIrExtension())
     IrGenerationExtension.registerExtension(ContributesFeatureFlagIrExtension())
