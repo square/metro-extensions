@@ -19,6 +19,7 @@ package com.test
 @Inject
 class FakeMyService : MyService {
   @ContributesTo(scope = Unit::class, replaces = [ServiceContribution::class])
+  @Origin(value = FakeMyService::class)
   interface ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @MetroContribution(scope = Unit::class)
@@ -160,6 +161,7 @@ class FakeMyService : MyService {
 @RetrofitAuthenticated
 interface MyService {
   @ContributesTo(scope = Unit::class)
+  @Origin(value = MyService::class)
   interface ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @MetroContribution(scope = Unit::class)

@@ -2,7 +2,7 @@ FILE: replacedService.kt
     package com.test
 
     @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface ServiceContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|)) public abstract interface ServiceContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Provides|() @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|kotlin/Unit|)) public open fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/MyService.ServiceContribution| {
@@ -26,7 +26,7 @@ FILE: replacedService.kt
             super<R|kotlin/Any|>()
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|), replaces = <implicitArrayOf>(<getClass>(Q|com/test/MyService.ServiceContribution|))) public abstract interface ServiceContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|), replaces = <implicitArrayOf>(<getClass>(Q|com/test/MyService.ServiceContribution|))) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/FakeMyService|)) public abstract interface ServiceContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Provides|() @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RealService|() public open fun provideRealMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
 
             @R|dev/zacsweers/metro/Provides|() public open fun provideMyService(@R|com/squareup/api/RealService|() realService: R|com/test/MyService|, fakeService: R|com/test/FakeMyService|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|

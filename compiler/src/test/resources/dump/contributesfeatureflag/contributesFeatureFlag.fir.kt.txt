@@ -11,6 +11,7 @@ package com.test
 @ContributesFeatureFlag(description = "My flag", removeBy = Date(month = Month.April, day = 1, year = 2030))
 object MyFeatureFlag : BooleanFeatureFlag {
   @ContributesTo(scope = AppScope::class)
+  @Origin(value = MyFeatureFlag::class)
   interface FeatureFlagContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @MetroContribution(scope = AppScope::class)

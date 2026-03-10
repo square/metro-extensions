@@ -5,6 +5,7 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesRobotGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
+import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
@@ -115,6 +116,14 @@ public class ContributesRobotFir(session: FirSession) :
           ArgNames.SCOPE,
           scopeArg,
           owner,
+          session,
+        )
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.ORIGIN,
+          ArgNames.VALUE,
+          buildClassExpression(owner, session),
+          classSymbol,
           session,
         )
     }

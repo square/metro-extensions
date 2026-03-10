@@ -6,7 +6,7 @@ FILE: contributesMultibindingScoped.kt
             super<R|kotlin/Any|>()
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyTestClass|)) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|com/squareup/dagger/ForScope|(value = <getClass>(Q|kotlin/Unit|)) public abstract fun bindsMyTestClass(myTestClass: R|com/test/MyTestClass|): R|mortar/Scoped|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/MyTestClass.MultibindingScopedContribution| {

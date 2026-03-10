@@ -5,6 +5,7 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesFeatureFlagGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
+import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -144,6 +145,14 @@ public class ContributesFeatureFlagFir(session: FirSession) :
           ArgNames.SCOPE,
           scopeArg,
           owner,
+          session,
+        )
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.ORIGIN,
+          ArgNames.VALUE,
+          buildClassExpression(owner, session),
+          classSymbol,
           session,
         )
       declarations += providesFunction

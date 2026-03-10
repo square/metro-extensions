@@ -5,6 +5,7 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
+import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
@@ -160,6 +161,16 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           ArgNames.SCOPE,
           scopeArg,
           owner,
+          session,
+        )
+      // @Origin(OwnerClass::class) so Metro can trace this contribution back to the
+      // outer class for replaces/excludes in multi-compilation scenarios.
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.ORIGIN,
+          ArgNames.VALUE,
+          buildClassExpression(owner, session),
+          classSymbol,
           session,
         )
       // Add the function directly to the class declarations
