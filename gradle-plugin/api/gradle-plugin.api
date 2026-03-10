@@ -1,5 +1,6 @@
-public class com/squareup/metro/extensions/SquareMetroExtensionsExtension {
-	public fun <init> ()V
+public abstract class com/squareup/metro/extensions/SquareMetroExtensionsExtension {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun getEnableDevelopmentAppComponent ()Lorg/gradle/api/provider/Property;
 	public final fun isReleaseBuild (Lkotlin/jvm/functions/Function1;)V
 }
 

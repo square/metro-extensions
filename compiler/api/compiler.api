@@ -1,4 +1,5 @@
 public final class com/squareup/metro/extensions/SquareMetroExtensionsCommandLineProcessor : org/jetbrains/kotlin/compiler/plugin/CommandLineProcessor {
+	public static final field OPTION_ENABLE_DEVELOPMENT_APP_COMPONENT Ljava/lang/String;
 	public static final field OPTION_IS_RELEASE_BUILD Ljava/lang/String;
 	public fun <init> ()V
 	public fun appendList (Lorg/jetbrains/kotlin/config/CompilerConfiguration;Lorg/jetbrains/kotlin/config/CompilerConfigurationKey;Ljava/lang/Object;)V
@@ -18,7 +19,7 @@ public final class com/squareup/metro/extensions/SquareMetroExtensionsPluginComp
 }
 
 public final class com/squareup/metro/extensions/SquareMetroExtensionsPluginRegistrar : org/jetbrains/kotlin/fir/extensions/FirExtensionRegistrar {
-	public fun <init> (Z)V
+	public fun <init> (ZZ)V
 }
 
 public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppComponentFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {

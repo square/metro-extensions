@@ -50,6 +50,11 @@ private class ExtensionRegistrarConfigurator(testServices: TestServices) :
       configuration.put(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, true)
     }
 
+    // Configure enableDevelopmentAppComponent from directive (defaults to true)
+    if (MetroDirectives.DISABLE_DEVELOPMENT_APP_COMPONENT in module.directives) {
+      configuration.put(SquareMetroExtensionsConfig.ENABLE_DEVELOPMENT_APP_COMPONENT_KEY, false)
+    }
+
     // Register Metro's actual compiler plugin
     with(metroRegistrar) { registerExtensions(configuration) }
     // Register our custom extensions

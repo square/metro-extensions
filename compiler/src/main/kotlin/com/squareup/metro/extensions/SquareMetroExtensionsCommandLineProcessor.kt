@@ -17,7 +17,13 @@ public class SquareMetroExtensionsCommandLineProcessor : CommandLineProcessor {
         valueDescription = "<true|false>",
         description = "Whether this is a release build",
         required = false,
-      )
+      ),
+      CliOption(
+        optionName = OPTION_ENABLE_DEVELOPMENT_APP_COMPONENT,
+        valueDescription = "<true|false>",
+        description = "Whether the @DevelopmentAppComponent FIR extension is enabled",
+        required = false,
+      ),
     )
 
   override fun processOption(
@@ -28,11 +34,17 @@ public class SquareMetroExtensionsCommandLineProcessor : CommandLineProcessor {
     when (option.optionName) {
       OPTION_IS_RELEASE_BUILD ->
         configuration.put(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, value.toBooleanStrict())
+      OPTION_ENABLE_DEVELOPMENT_APP_COMPONENT ->
+        configuration.put(
+          SquareMetroExtensionsConfig.ENABLE_DEVELOPMENT_APP_COMPONENT_KEY,
+          value.toBooleanStrict(),
+        )
       else -> error("Unexpected config option: '${option.optionName}'")
     }
   }
 
   internal companion object {
     const val OPTION_IS_RELEASE_BUILD = "isReleaseBuild"
+    const val OPTION_ENABLE_DEVELOPMENT_APP_COMPONENT = "enableDevelopmentAppComponent"
   }
 }

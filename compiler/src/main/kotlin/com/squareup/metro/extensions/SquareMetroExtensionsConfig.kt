@@ -11,14 +11,22 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionSessionComponent
  * [ContributesServiceFir][service.ContributesServiceFir]) can access it via
  * `session.squareMetroExtensionsConfig`.
  */
-internal class SquareMetroExtensionsConfig(session: FirSession, val isReleaseBuild: Boolean) :
-  FirExtensionSessionComponent(session) {
+internal class SquareMetroExtensionsConfig(
+  session: FirSession,
+  val isReleaseBuild: Boolean,
+  val enableDevelopmentAppComponent: Boolean,
+) : FirExtensionSessionComponent(session) {
 
   companion object {
     val IS_RELEASE_BUILD_KEY = CompilerConfigurationKey.create<Boolean>("is release build")
 
-    fun getFactory(isReleaseBuild: Boolean): Factory {
-      return Factory { session -> SquareMetroExtensionsConfig(session, isReleaseBuild) }
+    val ENABLE_DEVELOPMENT_APP_COMPONENT_KEY =
+      CompilerConfigurationKey.create<Boolean>("enable development app component")
+
+    fun getFactory(isReleaseBuild: Boolean, enableDevelopmentAppComponent: Boolean): Factory {
+      return Factory { session ->
+        SquareMetroExtensionsConfig(session, isReleaseBuild, enableDevelopmentAppComponent)
+      }
     }
   }
 }
