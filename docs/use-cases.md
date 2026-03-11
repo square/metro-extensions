@@ -125,13 +125,14 @@ class LoginScreenRobot : ComposeScreenRobot<LoginScreenRobot>() {
 ```kotlin
 @ContributesTo(AppScope::class)
 interface LoginScreenRobotComponent {
-  fun getLoginScreenRobot(): LoginScreenRobot
+  fun getcom_squareup_example_LoginScreenRobotComponent(): LoginScreenRobot
 }
 ```
 
 This exposes the robot as an accessor on the merged graph, making it injectable at
-the test site. Each robot gets its own contributed interface with a unique accessor
-method name.
+the test site. Each robot gets its own contributed interface with a package-qualified
+accessor method name derived from the robot fqcn, avoiding collisions when different
+packages contribute robots with the same class name.
 
 ---
 

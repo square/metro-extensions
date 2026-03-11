@@ -36,6 +36,7 @@ import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -52,7 +53,7 @@ import org.jetbrains.kotlin.name.Name
  * ```
  * @ContributesTo(SomeScope::class)
  * interface RobotContribution {
- *   fun getAbcRobotContribution(): AbcRobot
+ *   fun getcom_test_AbcRobotComponent(): AbcRobot
  * }
  * ```
  *
@@ -129,11 +130,9 @@ public class ContributesRobotFir(session: FirSession) :
 
     // The outer class is the @ContributesRobot-annotated class that owns this nested interface.
     val outerClassId = classSymbol.classId.outerClassId ?: return emptySet()
-    // Use "Contribution" suffix to avoid JVM signature clashes: Kotlin synthesizes
-    // a property from getXxx() methods, causing "Platform declaration clash" when Metro's graph
-    // impl generates both a property getter and a function for the same JVM signature.
-    val functionName = "get${outerClassId.shortClassName.identifier}Contribution"
-    return setOf(Name.identifier(functionName))
+    // Build the accessor from the robot's fqcn so robots with the same simple class name from
+    // different packages still generate unique accessor method names.
+    return setOf(robotAccessorFunctionName(outerClassId))
   }
 
   override fun generateFunctions(
@@ -194,6 +193,22 @@ public class ContributesRobotFir(session: FirSession) :
   private fun isGeneratedContributionInterface(classSymbol: FirClassSymbol<*>): Boolean {
     return classSymbol.origin == ContributesRobotGeneratorKey.origin &&
       classSymbol.name == ContributesRobotIds.NESTED_INTERFACE_NAME
+  }
+
+  private fun robotAccessorFunctionName(contributorClassId: ClassId): Name {
+    return Name.identifier(fqcnBasedAccessorName(contributorClassId))
+  }
+
+  private fun fqcnBasedAccessorName(contributorClassId: ClassId): String {
+    val packageName = contributorClassId.packageFqName.asString()
+    val generatedPackage =
+      if (packageName.isEmpty()) {
+        ""
+      } else {
+        "${packageName.replace('.', '_')}_"
+      }
+    val fileName = contributorClassId.relativeClassName.asString().replace('.', '_') + "Component"
+    return "get$generatedPackage$fileName"
   }
 
   @AutoService(MetroFirDeclarationGenerationExtension.Factory::class)
