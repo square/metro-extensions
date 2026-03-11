@@ -10,7 +10,7 @@ interface MyGraph
 
 fun box(): String {
   val graph = createGraph<MyGraph>()
-  val method = graph::class.java.getMethod("getAbcRobotContribution")
+  val method = graph::class.java.getMethod("getcom_test_AbcRobotComponent")
   val robot = method.invoke(graph)
   assertNotNull(robot)
   assertTrue(robot is AbcRobot, "Expected AbcRobot but got: $robot")
