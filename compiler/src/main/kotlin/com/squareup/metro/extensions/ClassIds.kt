@@ -67,6 +67,8 @@ internal object ClassIds {
 
   val APPLICATION = ClassId(FqName("android.app"), Name.identifier("Application"))
 
+  val ACTIVITY_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("ActivityScope"))
+
   val LOGIN_SCREEN_MODULE =
     ClassId(
       FqName("com.squareup.development.shell.login.screen"),
@@ -78,6 +80,31 @@ internal object ClassIds {
       FqName("com.squareup.development.shell.component"),
       Name.identifier("DevelopmentLoggedInComponent"),
     )
+
+  val DEVELOPMENT_LOGIN_SCREEN_COMPONENT =
+    ClassId(
+      FqName("com.squareup.development.shell.login.screen"),
+      Name.identifier("DevelopmentLoginScreenComponent"),
+    )
+
+  val CONTRIBUTED_DEVELOPMENT_LOGIN_SCREEN_COMPONENT =
+    ClassId(
+      FqName("com.squareup.development.shell.login.screen"),
+      Name.identifier("ContributedDevelopmentLoginScreenComponent"),
+    )
+
+  val DEFAULT_FEATURE_MODULE =
+    ClassId(FqName("com.squareup.development.shell"), Name.identifier("DefaultFeatureModule"))
+
+  val DEVELOPMENT_FEATURE_SCOPE_COMPONENT =
+    ClassId(
+      FqName("com.squareup.development.shell"),
+      Name.identifier("DevelopmentFeatureScopeComponent"),
+    )
+
+  val DAGGER_MODULE = ClassId(FqName("dagger"), Name.identifier("Module"))
+
+  val BINDS_INSTANCE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provides"))
 
   val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
 

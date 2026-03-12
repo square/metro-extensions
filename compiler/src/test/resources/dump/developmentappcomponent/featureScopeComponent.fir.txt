@@ -1,0 +1,89 @@
+Module: deps
+FILE: module_deps_featureScopeComponent.kt
+    package com.squareup.dagger
+
+    public abstract class ActivityScope : R|kotlin/Any| {
+        private constructor(): R|com/squareup/dagger/ActivityScope| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+Module: deps2
+FILE: module_deps2_featureScopeComponent.kt
+    package com.squareup.development.shell.login.screen
+
+    public abstract interface DevelopmentLoginScreenComponent : R|kotlin/Any| {
+    }
+    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface ContributedDevelopmentLoginScreenComponent : R|com/squareup/development/shell/login/screen/DevelopmentLoginScreenComponent| {
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface MetroContributionToActivityScope : R|com/squareup/development/shell/login/screen/ContributedDevelopmentLoginScreenComponent| {
+        }
+
+    }
+Module: deps3
+FILE: module_deps3_featureScopeComponent.kt
+    package com.squareup.development.shell
+
+    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface DefaultFeatureModule : R|kotlin/Any| {
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface MetroContributionToActivityScope : R|com/squareup/development/shell/DefaultFeatureModule| {
+        }
+
+    }
+Module: main
+FILE: module_main_featureScopeComponent.kt
+    package com.test
+
+    public sealed interface FeatureScope : R|kotlin/Any| {
+    }
+    public abstract interface FeatureComponent : R|kotlin/Any| {
+    }
+    @R|com/squareup/development/shell/DevelopmentAppComponent|(featureScope = <getClass>(Q|com/test/FeatureScope|), featureComponent = <getClass>(Q|com/test/FeatureComponent|)) public final class MyApp : R|com/squareup/development/shell/DevelopmentApplication| {
+        public constructor(): R|com/test/MyApp| {
+            super<R|com/squareup/development/shell/DevelopmentApplication|>()
+        }
+
+        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|com/squareup/dagger/AppScope|)) @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/DependencyGraph.Factory|() public abstract interface Factory : R|kotlin/Any|, R|com/squareup/development/shell/DevelopmentAppComponent.Factory| {
+                public abstract fun create(@R|dev/zacsweers/metro/Provides|() application: R|android/app/Application|): R|com/test/MyApp.MetroComponent|
+
+                @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroImplMarker|() public final object Impl : R|com/test/MyApp.MetroComponent.Factory| {
+                    @R|dev/zacsweers/metro/internal/GraphFactoryInvokeFunctionMarker|() public final override fun create(application: R|android/app/Application|): R|kotlin/Any|
+
+                    private constructor(): R|com/test/MyApp.MetroComponent.Factory.Impl| {
+                        super<R|kotlin/Any|>()
+                    }
+
+                }
+
+            }
+
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroImplMarker|() public final class Impl : R|com/test/MyApp.MetroComponent| {
+                private constructor(application: R|android/app/Application|): R|com/test/MyApp.MetroComponent.Impl| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+            public final companion object Companion : R|kotlin/Any| {
+                public final fun factory(): R|com/test/MyApp.MetroComponent.Factory|
+
+                private constructor(): R|com/test/MyApp.MetroComponent.Companion| {
+                    super<R|kotlin/Any|>()
+                }
+
+            }
+
+        }
+
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/test/FeatureScope|)) public abstract interface FeatureLoginScreenComponent : R|kotlin/Any|, R|com/squareup/development/shell/login/screen/DevelopmentLoginScreenComponent| {
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/test/FeatureScope|)) public abstract interface MetroContributionToComtestfeatureScopezm1PXK0 : R|com/test/MyApp.FeatureLoginScreenComponent| {
+            }
+
+        }
+
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|), replaces = <implicitArrayOf>(<getClass>(Q|com/squareup/development/shell/login/screen/ContributedDevelopmentLoginScreenComponent|))) public abstract interface NoopLoginScreenComponent : R|kotlin/Any| {
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface MetroContributionToComsquareupdaggeractivityScopeUexyOBc : R|com/test/MyApp.NoopLoginScreenComponent| {
+            }
+
+        }
+
+    }

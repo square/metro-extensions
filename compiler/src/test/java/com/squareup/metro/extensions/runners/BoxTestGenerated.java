@@ -233,6 +233,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("featureScopeComponent.kt")
+    public void testFeatureScopeComponent() {
+      runTest("compiler/src/test/resources/box/developmentappcomponent/featureScopeComponent.kt");
+    }
+
+    @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
       runTest("compiler/src/test/resources/box/developmentappcomponent/multiCompilation.kt");
