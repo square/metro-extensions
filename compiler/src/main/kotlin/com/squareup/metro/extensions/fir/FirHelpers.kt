@@ -174,10 +174,17 @@ internal fun extractScopeClassId(
 
   // Try the resolved argument mapping first (populated after full resolution), then fall back
   // to the raw argument list.
-  val scopeExpr =
+  val rawScopeExpr =
     annotationCall.argumentMapping.mapping[ArgNames.SCOPE]
       ?: annotationCall.argumentList.arguments.firstOrNull()
       ?: return null
+
+  val scopeExpr =
+    if (rawScopeExpr is FirNamedArgumentExpression) {
+      rawScopeExpr.expression
+    } else {
+      rawScopeExpr
+    }
 
   val getClassCall = scopeExpr as? FirGetClassCall ?: return null
   val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
