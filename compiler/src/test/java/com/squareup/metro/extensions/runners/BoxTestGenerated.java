@@ -153,6 +153,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("namedScopeArgument.kt")
+    public void testNamedScopeArgument() {
+      runTest("compiler/src/test/resources/box/contributesrobot/namedScopeArgument.kt");
+    }
+
+    @Test
     @TestMetadata("screenRobot.kt")
     public void testScreenRobot() {
       runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
