@@ -133,5 +133,11 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     public void testExcludeLoggedInComponent() {
       runTest("compiler/src/test/resources/dump/developmentappcomponent/excludeLoggedInComponent.kt");
     }
+
+    @Test
+    @TestMetadata("featureScopeComponent.kt")
+    public void testFeatureScopeComponent() {
+      runTest("compiler/src/test/resources/dump/developmentappcomponent/featureScopeComponent.kt");
+    }
   }
 }

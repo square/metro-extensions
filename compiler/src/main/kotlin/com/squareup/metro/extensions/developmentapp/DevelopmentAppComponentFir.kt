@@ -34,8 +34,10 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
+import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
+import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
@@ -93,13 +95,48 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     }
   }
 
+  override fun getContributionHints(): List<ContributionHint> {
+    return session.predicateBasedProvider
+      .getSymbolsByPredicate(DevelopmentAppComponentIds.PREDICATE)
+      .filterIsInstance<FirRegularClassSymbol>()
+      .flatMap { classSymbol: FirRegularClassSymbol ->
+        val featureScopeId =
+          readClassArgument(classSymbol, "featureScope")
+            ?: return@flatMap emptyList<ContributionHint>()
+        val parentId = classSymbol.classId
+        listOf(
+          // FeatureLoginScreenComponent contributes to featureScope
+          ContributionHint(
+            contributingClassId =
+              parentId.createNestedClassId(
+                DevelopmentAppComponentIds.FEATURE_LOGIN_SCREEN_COMPONENT_NAME
+              ),
+            scope = featureScopeId,
+          ),
+          // NoopLoginScreenComponent contributes to ActivityScope (replaces default)
+          ContributionHint(
+            contributingClassId =
+              parentId.createNestedClassId(
+                DevelopmentAppComponentIds.NOOP_LOGIN_SCREEN_COMPONENT_NAME
+              ),
+            scope = ClassIds.ACTIVITY_SCOPE,
+          ),
+        )
+      }
+  }
+
   override fun getNestedClassifiersNames(
     classSymbol: FirClassSymbol<*>,
     context: NestedClassGenerationContext,
   ): Set<Name> {
-    // Case 1: The annotated class itself — generate MetroComponent
+    // Case 1: The annotated class itself — generate MetroComponent + feature scope types
     if (hasAnnotation(classSymbol, ClassIds.DEVELOPMENT_APP_COMPONENT, session)) {
-      return setOf(DevelopmentAppComponentIds.METRO_COMPONENT_NAME)
+      val names = mutableSetOf(DevelopmentAppComponentIds.METRO_COMPONENT_NAME)
+      if (hasFeatureScope(classSymbol)) {
+        names += DevelopmentAppComponentIds.FEATURE_LOGIN_SCREEN_COMPONENT_NAME
+        names += DevelopmentAppComponentIds.NOOP_LOGIN_SCREEN_COMPONENT_NAME
+      }
+      return names
     }
 
     // Case 2: Our generated MetroComponent — generate Factory inside it.
@@ -125,6 +162,10 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     return when (name) {
       DevelopmentAppComponentIds.METRO_COMPONENT_NAME -> generateMetroComponent(owner, name)
       DevelopmentAppComponentIds.FACTORY_NAME -> generateFactory(owner, name)
+      DevelopmentAppComponentIds.FEATURE_LOGIN_SCREEN_COMPONENT_NAME ->
+        generateFeatureLoginScreenComponent(owner, name)
+      DevelopmentAppComponentIds.NOOP_LOGIN_SCREEN_COMPONENT_NAME ->
+        generateNoopLoginScreenComponent(owner, name)
       else -> null
     }
   }
@@ -288,6 +329,363 @@ public class DevelopmentAppComponentFir(session: FirSession) :
         containingDeclarationSymbol = functionSymbol
         annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
       }
+    }
+  }
+
+  // -- Feature scope support --
+  // When featureScope/featureComponent are set on @DevelopmentAppComponent, the KSP generator
+  // creates three additional types that redirect the DevelopmentLoginScreenComponent from
+  // ActivityScope to the feature scope and provide the feature component class. We replicate
+  // this behavior here.
+
+  /** Check whether the annotated class has featureScope set (non-Unit). */
+  private fun hasFeatureScope(classSymbol: FirClassSymbol<*>): Boolean {
+    return readClassArgument(classSymbol, "featureScope") != null
+  }
+
+  /** Read a KClass argument from @DevelopmentAppComponent, returning null if absent or Unit. */
+  private fun readClassArgument(classSymbol: FirClassSymbol<*>, argName: String): ClassId? {
+    val annotation =
+      findAnnotation(classSymbol, ClassIds.DEVELOPMENT_APP_COMPONENT, session) ?: return null
+    val annotationCall = annotation as? FirAnnotationCall ?: return null
+    val name = Name.identifier(argName)
+
+    val rawExpr =
+      annotationCall.argumentMapping.mapping[name]
+        ?: annotationCall.argumentList.arguments
+          .filterIsInstance<FirNamedArgumentExpression>()
+          .firstOrNull { it.name == name }
+          ?.expression
+
+    val getClassCall =
+      rawExpr as? org.jetbrains.kotlin.fir.expressions.FirGetClassCall ?: return null
+    val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
+
+    // Resolve using the same strategy as extractScopeClassId in FirHelpers:
+    // try FirResolvedQualifier first, then FirPropertyAccessExpression with import scanning.
+    val classId =
+      when (innerArg) {
+        is org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier -> innerArg.classId
+        is org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression -> {
+          val ref = innerArg.calleeReference
+          if (
+            ref is org.jetbrains.kotlin.fir.references.FirResolvedNamedReference &&
+              ref.resolvedSymbol is org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>
+          ) {
+            (ref.resolvedSymbol as org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>)
+              .classId
+          } else {
+            // Scan the containing file's imports for a matching simple name
+            val simpleName = ref.name
+            val regSymbol = classSymbol as? FirRegularClassSymbol
+            val file = regSymbol?.let { session.firProvider.getFirClassifierContainerFileIfAny(it) }
+            val fromImports =
+              file?.imports?.firstNotNullOfOrNull { import ->
+                if (import.isAllUnder) return@firstNotNullOfOrNull null
+                val importedFqName = import.importedFqName ?: return@firstNotNullOfOrNull null
+                if (importedFqName.shortName() == simpleName) {
+                  val cid = ClassId.topLevel(importedFqName)
+                  session.symbolProvider.getClassLikeSymbolByClassId(cid)?.classId
+                } else null
+              }
+            // Also check the same package as the annotated class
+            fromImports
+              ?: session.symbolProvider
+                .getClassLikeSymbolByClassId(ClassId(classSymbol.classId.packageFqName, simpleName))
+                ?.classId
+          }
+        }
+        else -> null
+      }
+
+    // Unit is used as the default / "not set" value
+    if (classId?.asSingleFqName()?.asString() == "kotlin.Unit") return null
+    return classId
+  }
+
+  /**
+   * Generate `@ContributesTo(featureScope)` interface extending `DevelopmentLoginScreenComponent`.
+   * This moves the FeatureProvider accessor from ActivityScope to the feature scope.
+   */
+  private fun generateFeatureLoginScreenComponent(
+    owner: FirClassSymbol<*>,
+    name: Name,
+  ): FirClassLikeSymbol<*>? {
+    val featureScopeId = readClassArgument(owner, "featureScope") ?: return null
+    val nestedClassId = owner.classId.createNestedClassId(name)
+    val classSymbol = FirRegularClassSymbol(nestedClassId)
+
+    // Supertype: DevelopmentLoginScreenComponent
+    val loginScreenType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(ClassIds.DEVELOPMENT_LOGIN_SCREEN_COMPONENT),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+
+    buildRegularClass {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = DevelopmentAppComponentGeneratorKey.origin
+      source = owner.source
+      classKind = ClassKind.INTERFACE
+      scopeProvider = session.kotlinScopeProvider
+      this.name = nestedClassId.shortClassName
+      symbol = classSymbol
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.ABSTRACT,
+          Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
+        )
+      superTypeRefs += session.builtinTypes.anyType
+      superTypeRefs += loginScreenType.toFirResolvedTypeRef()
+
+      val featureScopeExpr = buildScopeClassExpression(featureScopeId) ?: return null
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.CONTRIBUTES_TO,
+          ArgNames.SCOPE,
+          featureScopeExpr,
+          classSymbol,
+          session,
+        )
+    }
+
+    return classSymbol
+  }
+
+  /**
+   * Generate `@ContributesTo(ActivityScope, replaces=[ContributedDevelopmentLoginScreenComponent])`
+   * empty interface. This removes the default login screen component from ActivityScope.
+   */
+  private fun generateNoopLoginScreenComponent(
+    owner: FirClassSymbol<*>,
+    name: Name,
+  ): FirClassLikeSymbol<*>? {
+    if (!hasFeatureScope(owner)) return null
+    val nestedClassId = owner.classId.createNestedClassId(name)
+    val classSymbol = FirRegularClassSymbol(nestedClassId)
+
+    buildRegularClass {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = DevelopmentAppComponentGeneratorKey.origin
+      source = owner.source
+      classKind = ClassKind.INTERFACE
+      scopeProvider = session.kotlinScopeProvider
+      this.name = nestedClassId.shortClassName
+      symbol = classSymbol
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.ABSTRACT,
+          Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
+        )
+      superTypeRefs += session.builtinTypes.anyType
+
+      // @ContributesTo(scope = ActivityScope::class, replaces =
+      // [ContributedDevelopmentLoginScreenComponent::class])
+      val scopeExpr = buildScopeClassExpression(ClassIds.ACTIVITY_SCOPE) ?: return null
+      val replacesArray =
+        buildExcludesArrayLiteral(listOf(ClassIds.CONTRIBUTED_DEVELOPMENT_LOGIN_SCREEN_COMPONENT))
+      annotations +=
+        buildContributesToWithReplaces(scopeExpr, replacesArray, classSymbol) ?: return null
+    }
+
+    return classSymbol
+  }
+
+  /**
+   * Generate `@ContributesTo(ActivityScope, replaces=[DefaultFeatureModule]) @Module` object
+   * providing the feature component class. This is an object with a @Provides method.
+   */
+  private fun generateFeatureModule(owner: FirClassSymbol<*>, name: Name): FirClassLikeSymbol<*>? {
+    if (!hasFeatureScope(owner)) return null
+    val featureComponentId = readClassArgument(owner, "featureComponent") ?: return null
+    // Only generate if all needed types are on the classpath
+    if (session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.ACTIVITY_SCOPE) == null)
+      return null
+    if (session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.DEFAULT_FEATURE_MODULE) == null)
+      return null
+    val nestedClassId = owner.classId.createNestedClassId(name)
+    val classSymbol = FirRegularClassSymbol(nestedClassId)
+
+    buildRegularClass {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = DevelopmentAppComponentGeneratorKey.origin
+      source = owner.source
+      classKind = ClassKind.INTERFACE
+      scopeProvider = session.kotlinScopeProvider
+      this.name = nestedClassId.shortClassName
+      symbol = classSymbol
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.ABSTRACT,
+          Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
+        )
+      superTypeRefs += session.builtinTypes.anyType
+
+      // @ContributesTo(scope = ActivityScope::class, replaces = [DefaultFeatureModule::class])
+      val scopeExpr = buildScopeClassExpression(ClassIds.ACTIVITY_SCOPE) ?: return null
+      val replacesArray = buildExcludesArrayLiteral(listOf(ClassIds.DEFAULT_FEATURE_MODULE))
+      annotations +=
+        buildContributesToWithReplaces(scopeExpr, replacesArray, classSymbol) ?: return null
+
+      // @Module (Dagger annotation — only if on classpath)
+      session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.DAGGER_MODULE)?.let {
+        annotations += buildSimpleAnnotationCall(ClassIds.DAGGER_MODULE, classSymbol)
+      }
+
+      // @Provides @DevelopmentFeatureScopeComponent fun provideFeatureScopeComponent(): KClass<*>?
+      declarations +=
+        buildProvideFeatureScopeComponentFunction(nestedClassId, classSymbol, featureComponentId)
+    }
+
+    return classSymbol
+  }
+
+  /**
+   * Build `@Provides @DevelopmentFeatureScopeComponent fun provideFeatureScopeComponent():
+   * KClass<*>?` that returns the feature component class. The body is not needed — Metro treats
+   * this as an abstract @Provides in a binding container (interface), so the graph implementation
+   * provides it. However, since we want it to return a constant, we make it a default method in the
+   * interface. For FIR, we just declare the signature; the IR extension would need to fill in the
+   * body.
+   *
+   * Actually, Metro's binding containers with @Provides are handled as abstract declarations whose
+   * return value is provided by the graph. We just need the signature with the right annotations
+   * and return type.
+   */
+  private fun buildProvideFeatureScopeComponentFunction(
+    featureModuleClassId: ClassId,
+    featureModuleSymbol: FirRegularClassSymbol,
+    featureComponentId: ClassId,
+  ): org.jetbrains.kotlin.fir.declarations.FirFunction {
+    val callableId =
+      CallableId(featureModuleClassId, Name.identifier("provideFeatureScopeComponent"))
+    val functionSymbol = FirNamedFunctionSymbol(callableId)
+
+    // Return type: KClass<*>? (nullable)
+    val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+    val starProjection = org.jetbrains.kotlin.fir.types.ConeStarProjection
+    val kClassStarType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(kClassClassId),
+        arrayOf(starProjection),
+        isMarkedNullable = true,
+      )
+
+    val dispatchType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(featureModuleClassId),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+
+    return buildFirFunction {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = DevelopmentAppComponentGeneratorKey.origin
+      symbol = functionSymbol
+      name = callableId.callableName
+      returnTypeRef = kClassStarType.toFirResolvedTypeRef()
+      dispatchReceiverType = dispatchType
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.ABSTRACT,
+          Visibilities.Public.toEffectiveVisibility(featureModuleSymbol, forClass = true),
+        )
+
+      // @Provides
+      this.annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+      // @DevelopmentFeatureScopeComponent (qualifier)
+      if (
+        session.symbolProvider.getClassLikeSymbolByClassId(
+          ClassIds.DEVELOPMENT_FEATURE_SCOPE_COMPONENT
+        ) != null
+      ) {
+        this.annotations +=
+          buildSimpleAnnotationCall(ClassIds.DEVELOPMENT_FEATURE_SCOPE_COMPONENT, functionSymbol)
+      }
+    }
+  }
+
+  /** Build a `ScopeClass::class` expression from a ClassId. */
+  private fun buildScopeClassExpression(scopeClassId: ClassId): FirExpression? {
+    val scopeType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(scopeClassId),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+    val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+    val kClassType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(kClassClassId),
+        arrayOf(scopeType),
+        isMarkedNullable = false,
+      )
+    val scopeSymbol =
+      session.symbolProvider.getClassLikeSymbolByClassId(scopeClassId) ?: return null
+    return buildGetClassCall {
+      coneTypeOrNull = kClassType
+      argumentList = buildArgumentList {
+        arguments += buildResolvedQualifier {
+          packageFqName = scopeClassId.packageFqName
+          relativeClassFqName = scopeClassId.relativeClassName
+          coneTypeOrNull = scopeType
+          symbol = scopeSymbol
+          resolvedToCompanionObject = false
+        }
+      }
+    }
+  }
+
+  /** Build `@ContributesTo(scope = X, replaces = [...])` annotation. */
+  @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+  private fun buildContributesToWithReplaces(
+    scopeArg: FirExpression,
+    replacesArg: FirExpression,
+    containingSymbol: FirBasedSymbol<*>,
+  ): FirAnnotationCall? {
+    val annotationType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(ClassIds.CONTRIBUTES_TO),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+    val annotationClassSymbol =
+      session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.CONTRIBUTES_TO) ?: return null
+    val constructorSymbol =
+      (annotationClassSymbol as FirClassSymbol<*>)
+        .declarationSymbols
+        .filterIsInstance<FirConstructorSymbol>()
+        .first()
+    val scopeParam = constructorSymbol.fir.valueParameters.first { it.name == ArgNames.SCOPE }
+    val replacesParam =
+      constructorSymbol.fir.valueParameters.first { it.name == Name.identifier("replaces") }
+
+    return buildAnnotationCall {
+      annotationTypeRef = annotationType.toFirResolvedTypeRef()
+      argumentMapping = buildAnnotationArgumentMapping {
+        mapping[ArgNames.SCOPE] = scopeArg
+        mapping[Name.identifier("replaces")] = replacesArg
+      }
+      argumentList =
+        buildResolvedArgumentList(
+          original = null,
+          mapping = linkedMapOf(scopeArg to scopeParam, replacesArg to replacesParam),
+        )
+      calleeReference = buildResolvedNamedReference {
+        name = ClassIds.CONTRIBUTES_TO.shortClassName
+        resolvedSymbol = constructorSymbol
+      }
+      containingDeclarationSymbol = containingSymbol
+      annotationResolvePhase = FirAnnotationResolvePhase.Types
     }
   }
 
