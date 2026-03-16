@@ -27,11 +27,7 @@ FILE: scopedInSuperTypes.kt
 
         }
 
-        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|dev/zacsweers/metro/internal/Factory<com/test/Service>| {
-            public final fun create(): R|dev/zacsweers/metro/internal/Factory<com/test/Service>|
-
-            public final fun newInstance(): R|com/test/Service|
-
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|kotlin/Any| {
             private constructor(): R|com/test/Service.MetroFactory| {
                 super<R|kotlin/Any|>()
             }
