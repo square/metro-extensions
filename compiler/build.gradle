@@ -18,6 +18,13 @@ def isKotlin2320OrLater = kotlinParts[0] > 2 ||
 // TODO: Remove this when upgrading to Kotlin 2.3.20.
 sourceSets.main.kotlin.srcDir(isKotlin2320OrLater ? 'src/main/kotlin-2.3.20' : 'src/main/kotlin-pre-2.3.20')
 
+def libsVersionsToml = rootProject.file('gradle/libs.versions.toml')
+def kotlinVersionMatch = libsVersionsToml.getText('UTF-8') =~ /(?m)^kotlin\s*=\s*"([^"]+)"/
+if (!kotlinVersionMatch.find()) {
+  throw new GradleException("Unable to find kotlin version in ${libsVersionsToml}")
+}
+def catalogKotlinVersion = kotlinVersionMatch.group(1)
+
 configurations {
   annotationsRuntimeClasspath {
     transitive = false
@@ -125,10 +132,10 @@ tasks.withType(Test).configureEach { testTask ->
     systemProperty('kotlin.test.update.test.data', 'true')
   }
 
-  // Detect preview Kotlin builds (e.g., 2.3.20-RC, 2.4.0-Beta1). Dump test golden files are
-  // version-sensitive and only match stable releases.
-  def kotlinVersion = libs.versions.kotlin.get()
-  if (kotlinVersion =~ /.*-[A-Za-z].*/) {
+  // Dump test golden files are version-sensitive and only match the version from
+  // gradle/libs.versions.toml. Skip them whenever Kotlin is overridden to a different version.
+  def effectiveKotlinVersion = libs.versions.kotlin.get()
+  if (effectiveKotlinVersion != catalogKotlinVersion) {
     systemProperty('squareMetroExtensions.previewKotlinBuild', 'true')
   }
 }
