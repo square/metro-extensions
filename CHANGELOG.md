@@ -17,6 +17,20 @@
 ### Other Notes & Contributions
 
 
+## [0.0.2] - 2026-03-16
+
+### Added
+
+- Support for `@ContributesFeatureFlag`.
+- Support for `@ContributesService`.
+- Experimental support for `@DevelopmentAppComponent`.
+- A DSL to determine what release builds are to change the shape of generated code.
+
+### Fixed
+
+- Many bugfixes in existing generators.
+
+
 ## [0.0.1] - 2026-02-23
 
 - Initial release.
@@ -28,5 +42,6 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.1...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.2...HEAD
+[0.0.2]: https://github.com/square/metro-extensions/compare/0.0.2
 [0.0.1]: https://github.com/square/metro-extensions/compare/0.0.1
