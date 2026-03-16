@@ -80,7 +80,7 @@ FILE: module_main_featureScopeComponent.kt
 
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|), replaces = <implicitArrayOf>(<getClass>(Q|com/squareup/development/shell/login/screen/ContributedDevelopmentLoginScreenComponent|))) public abstract interface NoopLoginScreenComponent : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|), replaces = <collectionLiteralCall>(<getClass>(Q|com/squareup/development/shell/login/screen/ContributedDevelopmentLoginScreenComponent|))) public abstract interface NoopLoginScreenComponent : R|kotlin/Any| {
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/ActivityScope|)) public abstract interface MetroContributionToComsquareupdaggeractivityScopeUexyOBc : R|com/test/MyApp.NoopLoginScreenComponent| {
             }
 
