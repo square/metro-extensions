@@ -12,16 +12,8 @@ FILE: contributesFeatureFlag.kt
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroContributionToComsquareupdaggerappScopegan-ZFI : R|com/test/MyFeatureFlag.FeatureFlagContribution| {
             }
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(providesMyFeatureFlag), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(providesMyFeatureFlag)) public final class ProvidesMyFeatureFlagMetroFactory : R|dev/zacsweers/metro/internal/Factory<com/squareup/featureflags/FeatureFlag>| {
-                private constructor(instance: R|com/test/MyFeatureFlag.FeatureFlagContribution|): R|com/test/MyFeatureFlag.FeatureFlagContribution.ProvidesMyFeatureFlagMetroFactory| {
-                    super<R|kotlin/Any|>()
-                }
-
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(providesMyFeatureFlag), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(providesMyFeatureFlag)) public final class ProvidesMyFeatureFlagMetroFactory : R|kotlin/Any| {
                 public final companion object Companion : R|kotlin/Any| {
-                    public final fun create(instance: R|com/test/MyFeatureFlag.FeatureFlagContribution|): R|dev/zacsweers/metro/internal/Factory<com/squareup/featureflags/FeatureFlag>|
-
-                    public final fun providesMyFeatureFlag(instance: R|com/test/MyFeatureFlag.FeatureFlagContribution|): R|com/squareup/featureflags/FeatureFlag|
-
                     private constructor(): R|com/test/MyFeatureFlag.FeatureFlagContribution.ProvidesMyFeatureFlagMetroFactory.Companion| {
                         super<R|kotlin/Any|>()
                     }
