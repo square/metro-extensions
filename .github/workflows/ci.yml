@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/actions/kotlin-versions
         with:
           # preview-versions: 2.3.20-RC, 2.4.0-Beta1
-          preview-versions: 2.3.20-RC3
+          preview-versions: 2.3.20
 
   test:
     needs: configure-kotlin-versions
