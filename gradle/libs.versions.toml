@@ -6,7 +6,7 @@ jdk = "21"
 kotlin = "2.3.20"
 ktfmt = "0.25.0"
 maven-publish = "0.36.0"
-metro = "0.11.3"
+metro = "0.11.4"
 
 [libraries]
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
