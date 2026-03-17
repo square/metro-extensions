@@ -17,6 +17,13 @@
 ### Other Notes & Contributions
 
 
+## [0.0.3] - 2026-03-16
+
+### Changed
+
+- Upgraded Kotlin to `2.3.20`.
+
+
 ## [0.0.2] - 2026-03-16
 
 ### Added
@@ -42,6 +49,7 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.2...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.3...HEAD
+[0.0.3]: https://github.com/square/metro-extensions/compare/0.0.3
 [0.0.2]: https://github.com/square/metro-extensions/compare/0.0.2
 [0.0.1]: https://github.com/square/metro-extensions/compare/0.0.1
