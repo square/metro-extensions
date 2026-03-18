@@ -115,19 +115,18 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
 
     val irBuilder = irBuilderFor(declaration)
 
-    declaration.body =
-      irBuilder.irBlockBody {
-        // if (isFakeMode) error("No fake service provided for MyService.")
-        val serviceName = serviceClassSymbol.owner.name.asString()
-        val errorCall =
-          irCall(errorFun).apply {
-            arguments[0] = irString("No fake service provided for $serviceName.")
-          }
-        +irIfThen(pluginContext.irBuiltIns.unitType, irGet(isFakeModeParam), errorCall)
+    declaration.body = irBuilder.irBlockBody {
+      // if (isFakeMode) error("No fake service provided for MyService.")
+      val serviceName = serviceClassSymbol.owner.name.asString()
+      val errorCall =
+        irCall(errorFun).apply {
+          arguments[0] = irString("No fake service provided for $serviceName.")
+        }
+      +irIfThen(pluginContext.irBuiltIns.unitType, irGet(isFakeModeParam), errorCall)
 
-        // return serviceCreator.create(MyService::class.java)
-        +irReturn(createCall)
-      }
+      // return serviceCreator.create(MyService::class.java)
+      +irReturn(createCall)
+    }
   }
 
   /**
@@ -161,17 +160,16 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
 
     val irBuilder = irBuilderFor(declaration)
 
-    declaration.body =
-      irBuilder.irBlockBody {
-        +irReturn(
-          irIfThenElse(
-            declaration.returnType,
-            irGet(isFakeModeParam),
-            irGet(fakeServiceParam),
-            irGet(realServiceParam),
-          )
+    declaration.body = irBuilder.irBlockBody {
+      +irReturn(
+        irIfThenElse(
+          declaration.returnType,
+          irGet(isFakeModeParam),
+          irGet(fakeServiceParam),
+          irGet(realServiceParam),
         )
-      }
+      )
+    }
   }
 
   // -- Helpers --
