@@ -505,36 +505,34 @@ public class ContributesServiceFir(session: FirSession) :
     val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
 
     // Build resolved class references for [ReplacedClass.ServiceContribution::class, ...]
-    val getClassCalls =
-      replacedClassIds.map { outerClassId ->
-        val replacedId =
-          outerClassId.createNestedClassId(ContributesServiceIds.NESTED_INTERFACE_NAME)
-        val replacedType =
-          ConeClassLikeTypeImpl(
-            ConeClassLikeLookupTagImpl(replacedId),
-            emptyArray(),
-            isMarkedNullable = false,
-          )
-        val kClassType =
-          ConeClassLikeTypeImpl(
-            ConeClassLikeLookupTagImpl(kClassClassId),
-            arrayOf(replacedType),
-            isMarkedNullable = false,
-          )
-        val resolvedSymbol = session.symbolProvider.getClassLikeSymbolByClassId(replacedId)
-        buildGetClassCall {
-          coneTypeOrNull = kClassType
-          argumentList = buildArgumentList {
-            arguments += buildResolvedQualifier {
-              packageFqName = replacedId.packageFqName
-              relativeClassFqName = replacedId.relativeClassName
-              coneTypeOrNull = replacedType
-              symbol = resolvedSymbol
-              resolvedToCompanionObject = false
-            }
+    val getClassCalls = replacedClassIds.map { outerClassId ->
+      val replacedId = outerClassId.createNestedClassId(ContributesServiceIds.NESTED_INTERFACE_NAME)
+      val replacedType =
+        ConeClassLikeTypeImpl(
+          ConeClassLikeLookupTagImpl(replacedId),
+          emptyArray(),
+          isMarkedNullable = false,
+        )
+      val kClassType =
+        ConeClassLikeTypeImpl(
+          ConeClassLikeLookupTagImpl(kClassClassId),
+          arrayOf(replacedType),
+          isMarkedNullable = false,
+        )
+      val resolvedSymbol = session.symbolProvider.getClassLikeSymbolByClassId(replacedId)
+      buildGetClassCall {
+        coneTypeOrNull = kClassType
+        argumentList = buildArgumentList {
+          arguments += buildResolvedQualifier {
+            packageFqName = replacedId.packageFqName
+            relativeClassFqName = replacedId.relativeClassName
+            coneTypeOrNull = replacedType
+            symbol = resolvedSymbol
+            resolvedToCompanionObject = false
           }
         }
       }
+    }
 
     val arrayLiteral = buildFirArrayLiteral {
       coneTypeOrNull = session.builtinTypes.anyType.coneType

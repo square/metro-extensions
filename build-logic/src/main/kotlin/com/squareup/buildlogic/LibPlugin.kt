@@ -10,14 +10,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("unused")
 class LibPlugin : Plugin<Project> {
-  override fun apply(target: Project): Unit =
-    target.run {
-      configureReleaseTask()
-      configureKotlin()
-      configureKtfmt()
-      configureDependencySubstitution()
-      configureTestTask()
-    }
+  override fun apply(target: Project): Unit = target.run {
+    configureReleaseTask()
+    configureKotlin()
+    configureKtfmt()
+    configureDependencySubstitution()
+    configureTestTask()
+  }
 
   private fun Project.configureReleaseTask() {
     val release = tasks.register("release")

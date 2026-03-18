@@ -26,9 +26,8 @@ internal object ContributesFeatureFlagIds {
 
   val NESTED_INTERFACE_NAME = Name.identifier("FeatureFlagContribution")
 
-  val PREDICATE =
-    LookupPredicate.create {
-      annotated(CONTRIBUTES_FEATURE_FLAG_FQ_NAME) or
-        annotated(CONTRIBUTES_DYNAMIC_CONFIGURATION_FLAG_FQ_NAME)
-    }
+  val PREDICATE = LookupPredicate.create {
+    annotated(CONTRIBUTES_FEATURE_FLAG_FQ_NAME) or
+      annotated(CONTRIBUTES_DYNAMIC_CONFIGURATION_FLAG_FQ_NAME)
+  }
 }

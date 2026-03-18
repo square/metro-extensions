@@ -736,8 +736,9 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     // Only include excludes for classes that are actually on the classpath.
     val excludeClassIds =
       listOf(ClassIds.LOGIN_SCREEN_MODULE, ClassIds.DEVELOPMENT_LOGGED_IN_COMPONENT)
-    val resolvableExcludes =
-      excludeClassIds.filter { session.symbolProvider.getClassLikeSymbolByClassId(it) != null }
+    val resolvableExcludes = excludeClassIds.filter {
+      session.symbolProvider.getClassLikeSymbolByClassId(it) != null
+    }
 
     if (resolvableExcludes.isEmpty()) {
       // No excluded classes found on classpath — emit scope-only annotation
@@ -814,36 +815,35 @@ public class DevelopmentAppComponentFir(session: FirSession) :
   private fun buildExcludesArrayLiteral(classIds: List<ClassId>): FirExpression {
     val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
 
-    val getClassCalls =
-      classIds.mapNotNull { classId ->
-        val classType =
-          ConeClassLikeTypeImpl(
-            ConeClassLikeLookupTagImpl(classId),
-            emptyArray(),
-            isMarkedNullable = false,
-          )
-        val kClassType =
-          ConeClassLikeTypeImpl(
-            ConeClassLikeLookupTagImpl(kClassClassId),
-            arrayOf(classType),
-            isMarkedNullable = false,
-          )
-        val resolvedSymbol =
-          session.symbolProvider.getClassLikeSymbolByClassId(classId) ?: return@mapNotNull null
+    val getClassCalls = classIds.mapNotNull { classId ->
+      val classType =
+        ConeClassLikeTypeImpl(
+          ConeClassLikeLookupTagImpl(classId),
+          emptyArray(),
+          isMarkedNullable = false,
+        )
+      val kClassType =
+        ConeClassLikeTypeImpl(
+          ConeClassLikeLookupTagImpl(kClassClassId),
+          arrayOf(classType),
+          isMarkedNullable = false,
+        )
+      val resolvedSymbol =
+        session.symbolProvider.getClassLikeSymbolByClassId(classId) ?: return@mapNotNull null
 
-        buildGetClassCall {
-          coneTypeOrNull = kClassType
-          argumentList = buildArgumentList {
-            arguments += buildResolvedQualifier {
-              packageFqName = classId.packageFqName
-              relativeClassFqName = classId.relativeClassName
-              coneTypeOrNull = classType
-              symbol = resolvedSymbol
-              resolvedToCompanionObject = false
-            }
+      buildGetClassCall {
+        coneTypeOrNull = kClassType
+        argumentList = buildArgumentList {
+          arguments += buildResolvedQualifier {
+            packageFqName = classId.packageFqName
+            relativeClassFqName = classId.relativeClassName
+            coneTypeOrNull = classType
+            symbol = resolvedSymbol
+            resolvedToCompanionObject = false
           }
         }
       }
+    }
 
     return buildFirArrayLiteral {
       coneTypeOrNull = session.builtinTypes.anyType.coneType
