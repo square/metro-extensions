@@ -219,6 +219,11 @@ internal fun extractScopeClassId(
           ?: session.symbolProvider
             .getClassLikeSymbolByClassId(ClassId(FqName("kotlin"), name))
             ?.classId
+          // Same-package classes don't require explicit imports in Kotlin, so they won't
+          // appear in the file's import list. Fall back to the annotated class's own package.
+          ?: session.symbolProvider
+            .getClassLikeSymbolByClassId(ClassId(classSymbol.classId.packageFqName, name))
+            ?.classId
       }
     }
     else -> null

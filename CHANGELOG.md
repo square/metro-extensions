@@ -12,6 +12,8 @@
 
 ### Fixed
 
+- Fix scope resolution failing when the scope class is in the same package as the annotated class but a different module.
+
 ### Security
 
 ### Other Notes & Contributions
