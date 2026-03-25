@@ -12,12 +12,20 @@
 
 ### Fixed
 
-- Fixed `@ContributesService` fake replacements so the generated fake/real switcher keeps both branches lazy and does not instantiate the fake service when `@FakeMode` is false.
-
 ### Security
 
 ### Other Notes & Contributions
 
+
+## [0.0.5] - 2026-03-25
+
+### Changed
+
+- Upgrade Metro to 0.12.0.
+
+### Fixed
+
+- Fixed `@ContributesService` fake replacements so the generated fake/real switcher keeps both branches lazy and does not instantiate the fake service when `@FakeMode` is false.
 
 ## [0.0.4] - 2026-03-18
 
@@ -58,7 +66,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.4...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.5...HEAD
+[0.0.5]: https://github.com/square/metro-extensions/compare/0.0.5
 [0.0.4]: https://github.com/square/metro-extensions/compare/0.0.4
 [0.0.3]: https://github.com/square/metro-extensions/compare/0.0.3
 [0.0.2]: https://github.com/square/metro-extensions/compare/0.0.2
