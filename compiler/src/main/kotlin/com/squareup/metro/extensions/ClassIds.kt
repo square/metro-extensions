@@ -44,6 +44,8 @@ internal object ClassIds {
 
   val SINGLE_IN = ClassId(FqName("com.squareup.dagger"), Name.identifier("SingleIn"))
 
+  val PROVIDER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provider"))
+
   val SERVICE_CREATOR = ClassId(FqName("com.squareup.api"), Name.identifier("ServiceCreator"))
 
   val REAL_SERVICE = ClassId(FqName("com.squareup.api"), Name.identifier("RealService"))

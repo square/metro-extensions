@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.name.Name
  * 2. **Real service under @RealService qualifier** (params: `serviceCreator` only): `return
  *    serviceCreator.create(ReplacedService::class.java)`
  * 3. **Fake/real switcher** (params: `realService`, `fakeService`, `isFakeMode`): `return if
- *    (isFakeMode) fakeService else realService`
+ *    (isFakeMode) fakeService() else realService()`
  */
 @Suppress("DEPRECATION")
 internal class ContributesServiceIrExtension : IrGenerationExtension {
@@ -150,13 +150,17 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
    * Switcher — returns fake or real based on `@FakeMode` (generated for fake service
    * contributions).
    *
-   * Generates: `return if (isFakeMode) fakeService else realService`
+   * Generates: `return if (isFakeMode) fakeService() else realService()`
    */
   private fun generateSwitcherBody(declaration: IrSimpleFunction) {
     val allParams = declaration.parameters
     val realServiceParam = allParams.first { it.name.asString() == PARAM_REAL_SERVICE }
     val fakeServiceParam = allParams.first { it.name.asString() == PARAM_FAKE_SERVICE }
     val isFakeModeParam = allParams.first { it.name.asString() == PARAM_IS_FAKE_MODE }
+    val realServiceCall =
+      buildProviderInvokeCall(declaration, realServiceParam, declaration.returnType) ?: return
+    val fakeServiceCall =
+      buildProviderInvokeCall(declaration, fakeServiceParam, declaration.returnType) ?: return
 
     val irBuilder = irBuilderFor(declaration)
 
@@ -165,8 +169,8 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
         irIfThenElse(
           declaration.returnType,
           irGet(isFakeModeParam),
-          irGet(fakeServiceParam),
-          irGet(realServiceParam),
+          fakeServiceCall,
+          realServiceCall,
         )
       )
     }
@@ -227,6 +231,24 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
       arguments[0] = irBuilder.irGet(serviceCreatorParam)
       typeArguments[0] = serviceType
       arguments[1] = javaClassExpr
+    }
+  }
+
+  private fun buildProviderInvokeCall(
+    declaration: IrSimpleFunction,
+    providerParam: org.jetbrains.kotlin.ir.declarations.IrValueParameter,
+    providedType: org.jetbrains.kotlin.ir.types.IrType,
+  ): org.jetbrains.kotlin.ir.expressions.IrExpression? {
+    val providerClassSymbol = pluginContext.referenceClass(ClassIds.PROVIDER) ?: return null
+    val invokeFun =
+      providerClassSymbol.owner.declarations.filterIsInstance<IrSimpleFunction>().singleOrNull {
+        it.name.asString() == "invoke"
+      } ?: return null
+
+    val irBuilder = irBuilderFor(declaration)
+
+    return irBuilder.irCall(invokeFun.symbol, type = providedType).apply {
+      arguments[0] = irBuilder.irGet(providerParam)
     }
   }
 

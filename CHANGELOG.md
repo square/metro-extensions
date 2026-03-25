@@ -12,6 +12,8 @@
 
 ### Fixed
 
+- Fixed `@ContributesService` fake replacements so the generated fake/real switcher keeps both branches lazy and does not instantiate the fake service when `@FakeMode` is false.
+
 ### Security
 
 ### Other Notes & Contributions
