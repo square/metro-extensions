@@ -199,6 +199,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("replacedServiceDoesNotInstantiateFakeInRealMode.kt")
+    public void testReplacedServiceDoesNotInstantiateFakeInRealMode() {
+      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceDoesNotInstantiateFakeInRealMode.kt");
+    }
+
+    @Test
     @TestMetadata("replacedServiceOneCompilation.kt")
     public void testReplacedServiceOneCompilation() {
       runTest("compiler/src/test/resources/box/contributesservice/replacedServiceOneCompilation.kt");

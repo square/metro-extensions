@@ -44,7 +44,7 @@ class FakeMyService : MyService {
           return ProvideMyServiceMetroFactory(instance = instance, realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
-        fun provideMyService(instance: ServiceContribution, @RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+        fun provideMyService(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
           return instance.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
@@ -57,10 +57,10 @@ class FakeMyService : MyService {
       }
 
       override operator fun invoke(): MyService {
-        return Companion.provideMyService(instance = <this>.#instance, realService = <this>.#realService.invoke(), fakeService = <this>.#fakeService.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
+        return Companion.provideMyService(instance = <this>.#instance, realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
       }
 
-      fun mirrorFunction(@RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+      fun mirrorFunction(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
       }
 
@@ -107,10 +107,10 @@ class FakeMyService : MyService {
     }
 
     @Provides
-    fun provideMyService(@RealService realService: MyService, fakeService: FakeMyService, @FakeMode isFakeMode: Boolean): MyService {
+    fun provideMyService(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
       return when {
-        isFakeMode -> fakeService
-        else -> realService
+        isFakeMode -> fakeService.invoke()
+        else -> realService.invoke()
       }
     }
 

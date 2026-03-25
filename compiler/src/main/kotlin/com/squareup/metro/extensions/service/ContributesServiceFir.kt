@@ -58,6 +58,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -116,8 +117,8 @@ import org.jetbrains.kotlin.name.Name
  *
  *   @Provides
  *   fun provideMyService(
- *     @RealService realService: MyService,
- *     fakeService: FakeMyService,
+ *     @RealService realService: Provider<MyService>,
+ *     fakeService: Provider<FakeMyService>,
  *     @FakeMode isFakeMode: Boolean,
  *   ): MyService
  * }
@@ -351,8 +352,9 @@ public class ContributesServiceFir(session: FirSession) :
    *    `@Provides @SingleIn(scope) @RealService fun provideRealXxx(@Qualifier serviceCreator):
    *    ReplacedType`
    * 2. Switcher that picks real or fake based on `@FakeMode`: `@Provides fun
-   *    provideXxx(@RealService real: ReplacedType, fake: FakeType, @FakeMode isFakeMode: Boolean):
-   *    ReplacedType`
+   *    provideXxx(@RealService real: Provider<ReplacedType>, fake: Provider<FakeType>,
+   *
+   *     @FakeMode isFakeMode: Boolean): ReplacedType`
    */
   private fun buildFakeServiceFunctions(
     nestedClassId: ClassId,
@@ -367,6 +369,8 @@ public class ContributesServiceFir(session: FirSession) :
 
     val replacedType = replacedSymbol.defaultType()
     val fakeType = fakeOwner.defaultType()
+    val replacedProviderType = providerTypeOf(replacedType)
+    val fakeProviderType = providerTypeOf(fakeType)
     val serviceCreatorType =
       ConeClassLikeTypeImpl(
         ConeClassLikeLookupTagImpl(ClassIds.SERVICE_CREATOR),
@@ -449,24 +453,24 @@ public class ContributesServiceFir(session: FirSession) :
           Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
         )
 
-      // Parameter: @RealService realService: ReplacedType
+      // Parameter: @RealService realService: Provider<ReplacedType>
       this.valueParameters += buildValueParameter {
         resolvePhase = FirResolvePhase.BODY_RESOLVE
         moduleData = session.moduleData
         origin = ContributesServiceGeneratorKey.origin
-        returnTypeRef = replacedType.toFirResolvedTypeRef()
+        returnTypeRef = replacedProviderType.toFirResolvedTypeRef()
         this.name = Name.identifier("realService")
         symbol = FirValueParameterSymbol()
         containingDeclarationSymbol = switcherFnSymbol
         annotations += buildSimpleAnnotation(ClassIds.REAL_SERVICE)
       }
 
-      // Parameter: fakeService: FakeMyService
+      // Parameter: fakeService: Provider<FakeMyService>
       this.valueParameters += buildValueParameter {
         resolvePhase = FirResolvePhase.BODY_RESOLVE
         moduleData = session.moduleData
         origin = ContributesServiceGeneratorKey.origin
-        returnTypeRef = fakeType.toFirResolvedTypeRef()
+        returnTypeRef = fakeProviderType.toFirResolvedTypeRef()
         this.name = Name.identifier("fakeService")
         symbol = FirValueParameterSymbol()
         containingDeclarationSymbol = switcherFnSymbol
@@ -489,6 +493,13 @@ public class ContributesServiceFir(session: FirSession) :
 
     return listOf(realFn, switcherFn)
   }
+
+  private fun providerTypeOf(providedType: ConeKotlinType) =
+    ConeClassLikeTypeImpl(
+      ConeClassLikeLookupTagImpl(ClassIds.PROVIDER),
+      arrayOf(providedType),
+      isMarkedNullable = false,
+    )
 
   /**
    * Build `@ContributesTo(scope, replaces = [ReplacedClass.ServiceContribution::class])` as a
