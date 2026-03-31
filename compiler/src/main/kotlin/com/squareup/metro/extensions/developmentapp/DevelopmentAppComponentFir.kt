@@ -5,8 +5,6 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.DevelopmentAppComponentGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
-import com.squareup.metro.extensions.fir.buildFirArrayLiteral
-import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
 import com.squareup.metro.extensions.squareMetroExtensionsConfig
@@ -18,6 +16,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
@@ -30,6 +29,7 @@ import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
+import org.jetbrains.kotlin.fir.expressions.builder.buildCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
@@ -303,7 +303,8 @@ public class DevelopmentAppComponentFir(session: FirSession) :
         isMarkedNullable = false,
       )
 
-    return buildFirFunction {
+    return buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = DevelopmentAppComponentGeneratorKey.origin
@@ -585,7 +586,8 @@ public class DevelopmentAppComponentFir(session: FirSession) :
         isMarkedNullable = false,
       )
 
-    return buildFirFunction {
+    return buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = DevelopmentAppComponentGeneratorKey.origin
@@ -845,7 +847,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
       }
     }
 
-    return buildFirArrayLiteral {
+    return buildCollectionLiteral {
       coneTypeOrNull = session.builtinTypes.anyType.coneType
       argumentList = buildArgumentList {
         for (call in getClassCalls) {
