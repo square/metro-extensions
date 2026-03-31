@@ -6,7 +6,6 @@ import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesFeatureFlagGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
-import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
@@ -17,6 +16,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.origin
@@ -222,7 +222,8 @@ public class ContributesFeatureFlagFir(session: FirSession) :
 
     val functionSymbol = FirNamedFunctionSymbol(callableId)
 
-    return buildFirFunction {
+    return buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesFeatureFlagGeneratorKey.origin

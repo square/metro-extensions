@@ -6,8 +6,6 @@ import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
-import com.squareup.metro.extensions.fir.buildFirArrayLiteral
-import com.squareup.metro.extensions.fir.buildFirFunction
 import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
@@ -23,6 +21,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
@@ -37,6 +36,7 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
+import org.jetbrains.kotlin.fir.expressions.builder.buildCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
@@ -291,7 +291,8 @@ public class ContributesServiceFir(session: FirSession) :
 
     val functionSymbol = FirNamedFunctionSymbol(callableId)
 
-    return buildFirFunction {
+    return buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesServiceGeneratorKey.origin
@@ -392,7 +393,8 @@ public class ContributesServiceFir(session: FirSession) :
     val realCallableId = CallableId(nestedClassId, Name.identifier(realFnName))
     val realFnSymbol = FirNamedFunctionSymbol(realCallableId)
 
-    val realFn = buildFirFunction {
+    val realFn = buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesServiceGeneratorKey.origin
@@ -438,7 +440,8 @@ public class ContributesServiceFir(session: FirSession) :
     val switcherCallableId = CallableId(nestedClassId, Name.identifier(switcherFnName))
     val switcherFnSymbol = FirNamedFunctionSymbol(switcherCallableId)
 
-    val switcherFn = buildFirFunction {
+    val switcherFn = buildNamedFunction {
+      isLocal = false
       resolvePhase = FirResolvePhase.BODY_RESOLVE
       moduleData = session.moduleData
       origin = ContributesServiceGeneratorKey.origin
@@ -545,7 +548,7 @@ public class ContributesServiceFir(session: FirSession) :
       }
     }
 
-    val arrayLiteral = buildFirArrayLiteral {
+    val arrayLiteral = buildCollectionLiteral {
       coneTypeOrNull = session.builtinTypes.anyType.coneType
       argumentList = buildArgumentList {
         for (call in getClassCalls) {
