@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.developmentapp
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.findAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -148,7 +147,6 @@ public class DevelopmentAppComponentMetroExtension(private val session: FirSessi
     return classId
   }
 
-  @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
     override fun create(
       session: FirSession,

@@ -1,6 +1,5 @@
 plugins {
   id 'com.squareup.lib'
-  alias libs.plugins.autoservice
   alias libs.plugins.binary.compat.validator
   alias libs.plugins.maven.publish
 }
@@ -15,6 +14,12 @@ if (!kotlinVersionMatch.find()) {
   throw new GradleException("Unable to find kotlin version in ${libsVersionsToml}")
 }
 def catalogKotlinVersion = kotlinVersionMatch.group(1)
+def configuredKotlinVersion = libs.versions.kotlin.get()
+def kotlinVersionCore = configuredKotlinVersion.replaceFirst(/[-+].*$/, '')
+def kotlinVersionParts = kotlinVersionCore.tokenize('.').collect { it as int }
+def isKotlin24OrNewer =
+  kotlinVersionParts.size() >= 2 &&
+    (kotlinVersionParts[0] > 2 || (kotlinVersionParts[0] == 2 && kotlinVersionParts[1] >= 4))
 
 configurations {
   annotationsRuntimeClasspath {
@@ -51,7 +56,9 @@ dependencies {
 //noinspection UnnecessaryQualifiedReference
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
   compilerOptions {
-    freeCompilerArgs.add('-Xcontext-parameters')
+    if (!isKotlin24OrNewer) {
+      freeCompilerArgs.add('-Xcontext-parameters')
+    }
     optIn.addAll([
       'org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi',
       'org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI',
@@ -125,8 +132,7 @@ tasks.withType(Test).configureEach { testTask ->
 
   // Dump test golden files are version-sensitive and only match the version from
   // gradle/libs.versions.toml. Skip them whenever Kotlin is overridden to a different version.
-  def effectiveKotlinVersion = libs.versions.kotlin.get()
-  if (effectiveKotlinVersion != catalogKotlinVersion) {
+  if (configuredKotlinVersion != catalogKotlinVersion) {
     systemProperty('squareMetroExtensions.previewKotlinBuild', 'true')
   }
 }

@@ -45,6 +45,14 @@ private class ExtensionRegistrarConfigurator(testServices: TestServices) :
       metroCliProcessor.processOption(option, "true", configuration)
     }
 
+    val compilerVersionAliasesOption =
+      metroCliProcessor.pluginOptions.first { it.optionName == "compiler-version-aliases" }
+    metroCliProcessor.processOption(
+      compilerVersionAliasesOption,
+      "2.4.0-Beta1=2.4.0-dev-2124",
+      configuration,
+    )
+
     // Configure isReleaseBuild from directive (defaults to false)
     if (MetroDirectives.IS_RELEASE_BUILD in module.directives) {
       configuration.put(SquareMetroExtensionsConfig.IS_RELEASE_BUILD_KEY, true)

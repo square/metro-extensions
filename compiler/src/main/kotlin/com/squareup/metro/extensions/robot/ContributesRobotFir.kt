@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.robot
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesRobotGeneratorKey
@@ -222,7 +221,6 @@ public class ContributesRobotFir(session: FirSession) :
     return "get$generatedPackage$fileName"
   }
 
-  @AutoService(MetroFirDeclarationGenerationExtension.Factory::class)
   public class Factory : MetroFirDeclarationGenerationExtension.Factory {
     override fun create(
       session: FirSession,
