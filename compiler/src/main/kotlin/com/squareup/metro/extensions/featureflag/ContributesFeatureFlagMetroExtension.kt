@@ -5,6 +5,8 @@ import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
+import dev.zacsweers.metro.compiler.compat.CompatContext
+import dev.zacsweers.metro.compiler.fir.MetroFirTypeResolver
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
@@ -44,7 +46,8 @@ public class ContributesFeatureFlagMetroExtension(private val session: FirSessio
   }
 
   override fun getContributions(
-    scopeClassId: ClassId
+    scopeClassId: ClassId,
+    typeResolverFactory: MetroFirTypeResolver.Factory,
   ): List<MetroContributionExtension.Contribution> {
     // Feature flags are always contributed to AppScope.
     if (scopeClassId != ClassIds.APP_SCOPE) return emptyList()
@@ -88,7 +91,11 @@ public class ContributesFeatureFlagMetroExtension(private val session: FirSessio
 
   @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
-    override fun create(session: FirSession, options: MetroOptions): MetroContributionExtension {
+    override fun create(
+      session: FirSession,
+      options: MetroOptions,
+      compatContext: CompatContext,
+    ): MetroContributionExtension {
       return ContributesFeatureFlagMetroExtension(session)
     }
   }

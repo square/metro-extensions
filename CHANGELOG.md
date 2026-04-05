@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Upgrade Metro to `0.13.0` and adapt to Metro's updated compiler extension SPI.
+
 ### Deprecated
 
 ### Removed

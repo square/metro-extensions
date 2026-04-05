@@ -7,6 +7,8 @@ import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.findAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
+import dev.zacsweers.metro.compiler.compat.CompatContext
+import dev.zacsweers.metro.compiler.fir.MetroFirTypeResolver
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
@@ -47,7 +49,8 @@ public class ContributesServiceMetroExtension(private val session: FirSession) :
   }
 
   override fun getContributions(
-    scopeClassId: ClassId
+    scopeClassId: ClassId,
+    typeResolverFactory: MetroFirTypeResolver.Factory,
   ): List<MetroContributionExtension.Contribution> {
     return annotatedClasses.mapNotNull { parentSymbol ->
       val annotationScopeClassId =
@@ -117,7 +120,11 @@ public class ContributesServiceMetroExtension(private val session: FirSession) :
 
   @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
-    override fun create(session: FirSession, options: MetroOptions): MetroContributionExtension {
+    override fun create(
+      session: FirSession,
+      options: MetroOptions,
+      compatContext: CompatContext,
+    ): MetroContributionExtension {
       return ContributesServiceMetroExtension(session)
     }
   }

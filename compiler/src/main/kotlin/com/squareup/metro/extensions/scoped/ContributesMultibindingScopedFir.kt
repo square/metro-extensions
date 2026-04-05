@@ -11,6 +11,7 @@ import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
+import dev.zacsweers.metro.compiler.compat.CompatContext
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -301,6 +302,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     override fun create(
       session: FirSession,
       options: MetroOptions,
+      compatContext: CompatContext,
     ): MetroFirDeclarationGenerationExtension = ContributesMultibindingScopedFir(session)
   }
 }
