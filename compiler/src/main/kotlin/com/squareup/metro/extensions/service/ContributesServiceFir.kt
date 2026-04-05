@@ -14,6 +14,7 @@ import com.squareup.metro.extensions.fir.hasAnnotation
 import com.squareup.metro.extensions.squareMetroExtensionsConfig
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
+import dev.zacsweers.metro.compiler.compat.CompatContext
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
@@ -661,6 +662,7 @@ public class ContributesServiceFir(session: FirSession) :
     override fun create(
       session: FirSession,
       options: MetroOptions,
+      compatContext: CompatContext,
     ): MetroFirDeclarationGenerationExtension = ContributesServiceFir(session)
   }
 }

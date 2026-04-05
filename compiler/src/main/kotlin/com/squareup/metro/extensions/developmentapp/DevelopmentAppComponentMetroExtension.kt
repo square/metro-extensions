@@ -5,6 +5,8 @@ import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.findAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
+import dev.zacsweers.metro.compiler.compat.CompatContext
+import dev.zacsweers.metro.compiler.fir.MetroFirTypeResolver
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirGetClassCall
@@ -46,7 +48,8 @@ public class DevelopmentAppComponentMetroExtension(private val session: FirSessi
   }
 
   override fun getContributions(
-    scopeClassId: ClassId
+    scopeClassId: ClassId,
+    typeResolverFactory: MetroFirTypeResolver.Factory,
   ): List<MetroContributionExtension.Contribution> {
     return annotatedClasses.flatMap { classSymbol ->
       val featureScopeId =
@@ -147,7 +150,10 @@ public class DevelopmentAppComponentMetroExtension(private val session: FirSessi
 
   @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
-    override fun create(session: FirSession, options: MetroOptions): MetroContributionExtension =
-      DevelopmentAppComponentMetroExtension(session)
+    override fun create(
+      session: FirSession,
+      options: MetroOptions,
+      compatContext: CompatContext,
+    ): MetroContributionExtension = DevelopmentAppComponentMetroExtension(session)
   }
 }
