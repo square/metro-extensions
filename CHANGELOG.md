@@ -6,8 +6,6 @@
 
 ### Changed
 
-- Upgrade Metro to `0.13.0` and adapt to Metro's updated compiler extension SPI.
-
 ### Deprecated
 
 ### Removed
@@ -18,6 +16,12 @@
 
 ### Other Notes & Contributions
 
+
+## [0.0.6] - 2026-04-05
+
+### Changed
+
+- Upgrade Metro to `0.13.0` and adapt to Metro's updated compiler extension SPI.
 
 ## [0.0.5] - 2026-03-25
 
@@ -68,7 +72,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.5...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.6...HEAD
+[0.0.6]: https://github.com/square/metro-extensions/compare/0.0.6
 [0.0.5]: https://github.com/square/metro-extensions/compare/0.0.5
 [0.0.4]: https://github.com/square/metro-extensions/compare/0.0.4
 [0.0.3]: https://github.com/square/metro-extensions/compare/0.0.3
