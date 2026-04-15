@@ -29,27 +29,32 @@ object MyFeatureFlag : BooleanFeatureFlag {
 
         }
 
+        @HiddenFromObjC
         fun create(instance: FeatureFlagContribution): Factory<FeatureFlag> {
           return ProvidesMyFeatureFlagMetroFactory(instance = instance)
         }
 
+        @HiddenFromObjC
         fun providesMyFeatureFlag(instance: FeatureFlagContribution): FeatureFlag {
           return instance.providesMyFeatureFlag()
         }
 
       }
 
+      @HiddenFromObjC
       private constructor(instance: FeatureFlagContribution) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
       }
 
+      @HiddenFromObjC
       override operator fun invoke(): FeatureFlag {
         return Companion.providesMyFeatureFlag(instance = <this>.#instance)
       }
 
       @IntoSet
+      @HiddenFromObjC
       fun mirrorFunction(): FeatureFlag {
         return error(message = "Never called")
       }

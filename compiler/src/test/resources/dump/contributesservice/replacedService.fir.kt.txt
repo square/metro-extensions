@@ -40,26 +40,31 @@ class FakeMyService : MyService {
 
         }
 
+        @HiddenFromObjC
         fun create(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
           return ProvideMyServiceMetroFactory(instance = instance, realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
+        @HiddenFromObjC
         fun provideMyService(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
           return instance.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
       }
 
+      @HiddenFromObjC
       private constructor(instance: ServiceContribution, realService: Provider<MyService>, fakeService: Provider<FakeMyService>, isFakeMode: Provider<Boolean>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
       }
 
+      @HiddenFromObjC
       override operator fun invoke(): MyService {
         return Companion.provideMyService(instance = <this>.#instance, realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
       }
 
+      @HiddenFromObjC
       fun mirrorFunction(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
       }
@@ -78,28 +83,33 @@ class FakeMyService : MyService {
 
         }
 
+        @HiddenFromObjC
         fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
           return ProvideRealMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
         }
 
+        @HiddenFromObjC
         fun provideRealMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
           return instance.provideRealMyService(serviceCreator = serviceCreator)
         }
 
       }
 
+      @HiddenFromObjC
       private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
       }
 
+      @HiddenFromObjC
       override operator fun invoke(): MyService {
         return Companion.provideRealMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
       }
 
       @SingleIn(value = Unit::class)
       @RealService
+      @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
       }
@@ -131,18 +141,22 @@ class FakeMyService : MyService {
 
     }
 
+    @HiddenFromObjC
     fun create(): Factory<FakeMyService> {
       return MetroFactory
     }
 
+    @HiddenFromObjC
     fun newInstance(): FakeMyService {
       return FakeMyService()
     }
 
+    @HiddenFromObjC
     override operator fun invoke(): FakeMyService {
       return MetroFactory.newInstance()
     }
 
+    @HiddenFromObjC
     fun mirrorFunction(): FakeMyService {
       return error(message = "Never called")
     }
@@ -181,27 +195,32 @@ interface MyService {
 
         }
 
+        @HiddenFromObjC
         fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
           return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
+        @HiddenFromObjC
         fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
           return instance.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
       }
 
+      @HiddenFromObjC
       private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>, isFakeMode: Provider<Boolean>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
       }
 
+      @HiddenFromObjC
       override operator fun invoke(): MyService {
         return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
       @SingleIn(value = Unit::class)
+      @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
       }
