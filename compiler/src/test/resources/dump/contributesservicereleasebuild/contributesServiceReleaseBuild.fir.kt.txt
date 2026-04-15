@@ -31,27 +31,32 @@ interface MyService {
 
         }
 
+        @HiddenFromObjC
         fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
           return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
         }
 
+        @HiddenFromObjC
         fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
           return instance.provideMyService(serviceCreator = serviceCreator)
         }
 
       }
 
+      @HiddenFromObjC
       private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
       }
 
+      @HiddenFromObjC
       override operator fun invoke(): MyService {
         return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
       }
 
       @SingleIn(value = Unit::class)
+      @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
       }
