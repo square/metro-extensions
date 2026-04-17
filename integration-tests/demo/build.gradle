@@ -5,6 +5,7 @@ plugins {
 }
 
 metro {
+  compilerVersionAliases.put('2.4.0-Beta1', '2.4.0-dev-2124')
   // The generated MetroComponent factory takes an Application parameter (@Provides) that may not
   // be consumed in this demo app. Suppress the warning since this is expected.
   unusedGraphInputsSeverity = dev.zacsweers.metro.gradle.DiagnosticSeverity.NONE

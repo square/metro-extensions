@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.featureflag
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -89,7 +88,6 @@ public class ContributesFeatureFlagMetroExtension(private val session: FirSessio
     return null
   }
 
-  @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
     override fun create(
       session: FirSession,

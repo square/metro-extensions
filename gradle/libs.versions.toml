@@ -1,5 +1,4 @@
 [versions]
-autoservice = "0.1.4"
 binary-compat-validator = "0.18.1"
 buildconfig = "6.0.9"
 jdk = "21"
@@ -24,7 +23,6 @@ metro-compiler = { module = "dev.zacsweers.metro:compiler", version.ref = "metro
 metro-runtime = { module = "dev.zacsweers.metro:runtime", version.ref = "metro" }
 
 [plugins]
-autoservice = { id = "com.fueledbycaffeine.autoservice", version.ref = "autoservice" }
 binary-compat-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binary-compat-validator" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

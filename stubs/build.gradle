@@ -2,3 +2,7 @@ plugins {
   id 'com.squareup.lib'
   alias libs.plugins.metro
 }
+
+metro {
+  compilerVersionAliases.put('2.4.0-Beta1', '2.4.0-dev-2124')
+}

@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.scoped
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesMultibindingScopedGeneratorKey
@@ -297,7 +296,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     }
   }
 
-  @AutoService(MetroFirDeclarationGenerationExtension.Factory::class)
   public class Factory : MetroFirDeclarationGenerationExtension.Factory {
     override fun create(
       session: FirSession,

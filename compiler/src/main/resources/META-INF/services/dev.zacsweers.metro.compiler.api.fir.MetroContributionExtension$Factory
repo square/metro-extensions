@@ -1,0 +1,5 @@
+com.squareup.metro.extensions.developmentapp.DevelopmentAppComponentMetroExtension$Factory
+com.squareup.metro.extensions.featureflag.ContributesFeatureFlagMetroExtension$Factory
+com.squareup.metro.extensions.robot.ContributesRobotMetroExtension$Factory
+com.squareup.metro.extensions.scoped.ContributesMultibindingScopedMetroExtension$Factory
+com.squareup.metro.extensions.service.ContributesServiceMetroExtension$Factory

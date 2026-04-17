@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.robot
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
@@ -77,7 +76,6 @@ public class ContributesRobotMetroExtension(private val session: FirSession) :
     }
   }
 
-  @AutoService(MetroContributionExtension.Factory::class)
   public class Factory : MetroContributionExtension.Factory {
     override fun create(
       session: FirSession,

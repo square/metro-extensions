@@ -1,6 +1,5 @@
 package com.squareup.metro.extensions.service
 
-import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesServiceGeneratorKey
@@ -657,7 +656,6 @@ public class ContributesServiceFir(session: FirSession) :
     }
   }
 
-  @AutoService(MetroFirDeclarationGenerationExtension.Factory::class)
   public class Factory : MetroFirDeclarationGenerationExtension.Factory {
     override fun create(
       session: FirSession,
