@@ -41,11 +41,15 @@ class FakeMyService : MyService {
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun create(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
           return ProvideMyServiceMetroFactory(instance = instance, realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun provideMyService(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
           return instance.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
@@ -84,11 +88,15 @@ class FakeMyService : MyService {
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
           return ProvideRealMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun provideRealMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
           return instance.provideRealMyService(serviceCreator = serviceCreator)
         }
@@ -142,11 +150,15 @@ class FakeMyService : MyService {
     }
 
     @HiddenFromObjC
+    @JvmStatic
+    @JsStatic
     fun create(): Factory<FakeMyService> {
       return MetroFactory
     }
 
     @HiddenFromObjC
+    @JvmStatic
+    @JsStatic
     fun newInstance(): FakeMyService {
       return FakeMyService()
     }
@@ -196,11 +208,15 @@ interface MyService {
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
           return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
           return instance.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }

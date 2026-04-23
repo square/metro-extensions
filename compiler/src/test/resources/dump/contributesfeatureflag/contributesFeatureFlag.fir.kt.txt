@@ -30,11 +30,15 @@ object MyFeatureFlag : BooleanFeatureFlag {
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun create(instance: FeatureFlagContribution): Factory<FeatureFlag> {
           return ProvidesMyFeatureFlagMetroFactory(instance = instance)
         }
 
         @HiddenFromObjC
+        @JvmStatic
+        @JsStatic
         fun providesMyFeatureFlag(instance: FeatureFlagContribution): FeatureFlag {
           return instance.providesMyFeatureFlag()
         }
