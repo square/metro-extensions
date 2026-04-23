@@ -50,7 +50,7 @@ FILE: module_main_excludeLoggedInComponent.kt
             }
 
             public final companion object Companion : R|kotlin/Any| {
-                public final fun factory(): R|com/test/MyApp.MetroComponent.Factory|
+                @R|kotlin/jvm/JvmStatic|() @R|kotlin/js/JsStatic|() public final fun factory(): R|com/test/MyApp.MetroComponent.Factory|
 
                 private constructor(): R|com/test/MyApp.MetroComponent.Companion| {
                     super<R|kotlin/Any|>()
