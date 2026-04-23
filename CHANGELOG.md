@@ -17,6 +17,13 @@
 ### Other Notes & Contributions
 
 
+## [0.0.7] - 2026-04-23
+
+### Changed
+
+- Upgrade Metro to `1.0.0-RC3` .
+- Upgrade Kotlin to `2.3.21` .
+
 ## [0.0.6] - 2026-04-05
 
 ### Changed
@@ -72,7 +79,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.6...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.7...HEAD
+[0.0.7]: https://github.com/square/metro-extensions/compare/0.0.7
 [0.0.6]: https://github.com/square/metro-extensions/compare/0.0.6
 [0.0.5]: https://github.com/square/metro-extensions/compare/0.0.5
 [0.0.4]: https://github.com/square/metro-extensions/compare/0.0.4
