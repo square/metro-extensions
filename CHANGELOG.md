@@ -17,6 +17,12 @@
 ### Other Notes & Contributions
 
 
+## [0.0.8] - 2026-05-02
+
+### Changed
+
+- Use Metro's built-in `AppScope`, `ForScope`, and `SingleIn` annotations instead of local stubs.
+
 ## [0.0.7] - 2026-04-23
 
 ### Changed
@@ -79,7 +85,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.7...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.8...HEAD
+[0.0.8]: https://github.com/square/metro-extensions/compare/0.0.8
 [0.0.7]: https://github.com/square/metro-extensions/compare/0.0.7
 [0.0.6]: https://github.com/square/metro-extensions/compare/0.0.6
 [0.0.5]: https://github.com/square/metro-extensions/compare/0.0.5
