@@ -1,6 +1,6 @@
 package com.test
 
-import com.squareup.dagger.AppScope
+import dev.zacsweers.metro.AppScope
 import com.squareup.featureflags.BooleanFeatureFlag
 import com.squareup.featureflags.FeatureFlag
 import com.squareup.featureflags.anvil.ContributesFeatureFlag

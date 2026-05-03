@@ -48,7 +48,7 @@ annotation class DevelopmentFeatureScopeComponent
 package com.test
 
 import android.app.Application
-import com.squareup.dagger.AppScope
+import dev.zacsweers.metro.AppScope
 import com.squareup.development.shell.DevelopmentAppComponent
 import com.squareup.development.shell.DevelopmentApplication
 import com.squareup.development.shell.login.screen.FeatureProvider

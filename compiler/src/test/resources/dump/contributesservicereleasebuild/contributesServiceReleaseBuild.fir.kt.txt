@@ -59,7 +59,7 @@ interface MyService {
         return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
       }
 
-      @SingleIn(value = Unit::class)
+      @SingleIn(scope = Unit::class)
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
@@ -68,7 +68,7 @@ interface MyService {
     }
 
     @Provides
-    @SingleIn(value = Unit::class)
+    @SingleIn(scope = Unit::class)
     fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
       return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
     }

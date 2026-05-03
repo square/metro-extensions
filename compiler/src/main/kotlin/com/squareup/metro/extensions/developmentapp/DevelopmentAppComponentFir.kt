@@ -205,7 +205,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.SINGLE_IN,
-          ArgNames.VALUE,
+          ArgNames.SCOPE,
           buildAppScopeClassExpression()!!,
           classSymbol,
           session,

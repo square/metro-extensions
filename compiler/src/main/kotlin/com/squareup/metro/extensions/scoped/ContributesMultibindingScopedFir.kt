@@ -256,7 +256,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.FOR_SCOPE,
-          ArgNames.VALUE,
+          ArgNames.SCOPE,
           scopeArg,
           functionSymbol,
           session,

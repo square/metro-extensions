@@ -24,10 +24,7 @@ internal object ClassIds {
 
   val INTO_SET = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("IntoSet"))
 
-  // Use com.squareup.dagger.ForScope (the project's custom qualifier), NOT
-  // dev.zacsweers.metro.ForScope. The graph accessor methods use @com.squareup.dagger.ForScope
-  // to qualify Set<Scoped> multibindings, so the @Binds function must use the same annotation.
-  val FOR_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("ForScope"))
+  val FOR_SCOPE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("ForScope"))
 
   val SCREEN_ROBOT =
     ClassId(FqName("com.squareup.instrumentation.robots"), Name.identifier("ScreenRobot"))
@@ -42,7 +39,7 @@ internal object ClassIds {
 
   val PROVIDES = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provides"))
 
-  val SINGLE_IN = ClassId(FqName("com.squareup.dagger"), Name.identifier("SingleIn"))
+  val SINGLE_IN = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("SingleIn"))
 
   val PROVIDER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provider"))
 
@@ -54,7 +51,7 @@ internal object ClassIds {
 
   val FEATURE_FLAG = ClassId(FqName("com.squareup.featureflags"), Name.identifier("FeatureFlag"))
 
-  val APP_SCOPE = ClassId(FqName("com.squareup.dagger"), Name.identifier("AppScope"))
+  val APP_SCOPE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("AppScope"))
 
   val DEVELOPMENT_APP_COMPONENT =
     ClassId(FqName("com.squareup.development.shell"), Name.identifier("DevelopmentAppComponent"))

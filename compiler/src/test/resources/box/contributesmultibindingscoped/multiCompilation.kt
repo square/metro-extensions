@@ -10,7 +10,7 @@ class MyTestClass : Scoped
 
 // MODULE: main(lib)
 import mortar.Scoped
-import com.squareup.dagger.ForScope
+import dev.zacsweers.metro.ForScope
 
 @DependencyGraph(Unit::class)
 interface MyGraph {

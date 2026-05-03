@@ -340,7 +340,7 @@ public class ContributesServiceFir(session: FirSession) :
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.SINGLE_IN,
-          ArgNames.VALUE,
+          ArgNames.SCOPE,
           scopeArg,
           functionSymbol,
           session,
@@ -428,7 +428,7 @@ public class ContributesServiceFir(session: FirSession) :
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.SINGLE_IN,
-          ArgNames.VALUE,
+          ArgNames.SCOPE,
           scopeArg,
           realFnSymbol,
           session,

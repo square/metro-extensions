@@ -6,10 +6,10 @@ FILE: contributesFeatureFlag.kt
             super<R|com/squareup/featureflags/BooleanFeatureFlag|>(String(my-flag-key))
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|com/squareup/dagger/AppScope|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|)) public abstract interface FeatureFlagContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|)) public abstract interface FeatureFlagContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/IntoSet|() public open fun providesMyFeatureFlag(): R|com/squareup/featureflags/FeatureFlag|
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroContributionToComsquareupdaggerappScopegan-ZFI : R|com/test/MyFeatureFlag.FeatureFlagContribution| {
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) public abstract interface MetroContributionToDevzacsweersmetroappScopeoxd1AHI : R|com/test/MyFeatureFlag.FeatureFlagContribution| {
             }
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(providesMyFeatureFlag), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(providesMyFeatureFlag)) public final class ProvidesMyFeatureFlagMetroFactory : R|kotlin/Any| {

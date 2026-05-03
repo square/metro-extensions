@@ -8,7 +8,7 @@
 package com.test
 
 import com.squareup.dagger.ContributesMultibindingScoped
-import com.squareup.dagger.ForScope
+import dev.zacsweers.metro.ForScope
 import mortar.Scoped
 
 @GraphExtension(String::class)
@@ -37,7 +37,7 @@ class Service1 : Scoped, MyService
 class Service3 : Scoped
 
 // MODULE: main(lib)
-import com.squareup.dagger.ForScope
+import dev.zacsweers.metro.ForScope
 import com.test.ExtendedGraph
 import com.test.MyService
 import com.test.Service1

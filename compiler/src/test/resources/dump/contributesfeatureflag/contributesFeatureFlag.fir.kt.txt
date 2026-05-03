@@ -15,7 +15,7 @@ object MyFeatureFlag : BooleanFeatureFlag {
   interface FeatureFlagContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @MetroContribution(scope = AppScope::class)
-    interface MetroContributionToComsquareupdaggerappScopegan-ZFI : FeatureFlagContribution {
+    interface MetroContributionToDevzacsweersmetroappScopeoxd1AHI : FeatureFlagContribution {
     }
 
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)

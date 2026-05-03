@@ -1,7 +1,7 @@
 package com.test
 
 import com.squareup.dagger.ContributesMultibindingScoped
-import com.squareup.dagger.ForScope
+import dev.zacsweers.metro.ForScope
 import mortar.Scoped
 
 interface MyService
