@@ -115,7 +115,7 @@ class FakeMyService : MyService {
         return Companion.provideRealMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
       }
 
-      @SingleIn(value = Unit::class)
+      @SingleIn(scope = Unit::class)
       @RealService
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
@@ -133,7 +133,7 @@ class FakeMyService : MyService {
     }
 
     @Provides
-    @SingleIn(value = Unit::class)
+    @SingleIn(scope = Unit::class)
     @RealService
     fun provideRealMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
       return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
@@ -235,7 +235,7 @@ interface MyService {
         return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
-      @SingleIn(value = Unit::class)
+      @SingleIn(scope = Unit::class)
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
@@ -244,7 +244,7 @@ interface MyService {
     }
 
     @Provides
-    @SingleIn(value = Unit::class)
+    @SingleIn(scope = Unit::class)
     fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
       when {
         isFakeMode -> error(message = "No fake service provided for MyService.")

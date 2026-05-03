@@ -10,7 +10,7 @@ import com.squareup.featureflags.anvil.Month.April
 object LibFeatureFlag : BooleanFeatureFlag("lib-flag-key")
 
 // MODULE: main(lib)
-import com.squareup.dagger.AppScope
+import dev.zacsweers.metro.AppScope
 import com.squareup.featureflags.FeatureFlag
 
 @DependencyGraph(AppScope::class)

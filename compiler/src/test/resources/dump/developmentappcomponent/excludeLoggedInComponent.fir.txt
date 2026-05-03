@@ -27,7 +27,7 @@ FILE: module_main_excludeLoggedInComponent.kt
             super<R|com/squareup/development/shell/DevelopmentApplication|>()
         }
 
-        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|com/squareup/dagger/AppScope|), excludes = <collectionLiteralCall>(<getClass>(Q|com/squareup/development/shell/login/screen/LoginScreenModule|), <getClass>(Q|com/squareup/development/shell/component/DevelopmentLoggedInComponent|))) @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|), excludes = <collectionLiteralCall>(<getClass>(Q|com/squareup/development/shell/login/screen/LoginScreenModule|), <getClass>(Q|com/squareup/development/shell/component/DevelopmentLoggedInComponent|))) @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
             @R|dev/zacsweers/metro/DependencyGraph.Factory|() public abstract interface Factory : R|kotlin/Any|, R|com/squareup/development/shell/DevelopmentAppComponent.Factory| {
                 public abstract fun create(@R|dev/zacsweers/metro/Provides|() application: R|android/app/Application|): R|com/test/MyApp.MetroComponent|
 

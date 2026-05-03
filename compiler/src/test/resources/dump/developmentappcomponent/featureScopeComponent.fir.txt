@@ -41,7 +41,7 @@ FILE: module_main_featureScopeComponent.kt
             super<R|com/squareup/development/shell/DevelopmentApplication|>()
         }
 
-        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|com/squareup/dagger/AppScope|)) @R|com/squareup/dagger/SingleIn|(value = <getClass>(Q|com/squareup/dagger/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/DependencyGraph|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) public abstract interface MetroComponent : R|kotlin/Any| {
             @R|dev/zacsweers/metro/DependencyGraph.Factory|() public abstract interface Factory : R|kotlin/Any|, R|com/squareup/development/shell/DevelopmentAppComponent.Factory| {
                 public abstract fun create(@R|dev/zacsweers/metro/Provides|() application: R|android/app/Application|): R|com/test/MyApp.MetroComponent|
 

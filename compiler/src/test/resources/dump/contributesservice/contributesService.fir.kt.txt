@@ -60,7 +60,7 @@ interface MyService {
         return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
-      @SingleIn(value = Unit::class)
+      @SingleIn(scope = Unit::class)
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
@@ -69,7 +69,7 @@ interface MyService {
     }
 
     @Provides
-    @SingleIn(value = Unit::class)
+    @SingleIn(scope = Unit::class)
     fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
       when {
         isFakeMode -> error(message = "No fake service provided for MyService.")

@@ -13,7 +13,7 @@ package com.test
 
 import com.squareup.api.RetrofitAuthenticated
 import com.squareup.api.ServiceCreator
-import com.squareup.dagger.SingleIn
+import dev.zacsweers.metro.SingleIn
 import com.squareup.development.FakeMode
 
 @DependencyGraph(Unit::class)
