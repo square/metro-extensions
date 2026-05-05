@@ -239,7 +239,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
       )
 
     // Build the create(@Provides application: Application): MetroComponent method
-    val createFunction = buildCreateFunction(factoryClassId, owner, factorySymbol)
+    val createFunction = buildCreateFunction(factoryClassId, owner)
 
     val klass = buildRegularClass {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -276,7 +276,6 @@ public class DevelopmentAppComponentFir(session: FirSession) :
   private fun buildCreateFunction(
     factoryClassId: ClassId,
     metroComponentSymbol: FirClassSymbol<*>,
-    factorySymbol: FirRegularClassSymbol,
   ): org.jetbrains.kotlin.fir.declarations.FirFunction {
     val callableId = CallableId(factoryClassId, Name.identifier("create"))
     val functionSymbol = FirNamedFunctionSymbol(callableId)
@@ -372,10 +371,9 @@ public class DevelopmentAppComponentFir(session: FirSession) :
           val ref = innerArg.calleeReference
           if (
             ref is org.jetbrains.kotlin.fir.references.FirResolvedNamedReference &&
-              ref.resolvedSymbol is org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>
+              ref.resolvedSymbol is FirClassLikeSymbol<*>
           ) {
-            (ref.resolvedSymbol as org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol<*>)
-              .classId
+            (ref.resolvedSymbol as FirClassLikeSymbol<*>).classId
           } else {
             // Scan the containing file's imports for a matching simple name
             val simpleName = ref.name
@@ -496,125 +494,6 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     }
 
     return classSymbol
-  }
-
-  /**
-   * Generate `@ContributesTo(ActivityScope, replaces=[DefaultFeatureModule]) @Module` object
-   * providing the feature component class. This is an object with a @Provides method.
-   */
-  private fun generateFeatureModule(owner: FirClassSymbol<*>, name: Name): FirClassLikeSymbol<*>? {
-    if (!hasFeatureScope(owner)) return null
-    val featureComponentId = readClassArgument(owner, "featureComponent") ?: return null
-    // Only generate if all needed types are on the classpath
-    if (session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.ACTIVITY_SCOPE) == null)
-      return null
-    if (session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.DEFAULT_FEATURE_MODULE) == null)
-      return null
-    val nestedClassId = owner.classId.createNestedClassId(name)
-    val classSymbol = FirRegularClassSymbol(nestedClassId)
-
-    buildRegularClass {
-      resolvePhase = FirResolvePhase.BODY_RESOLVE
-      moduleData = session.moduleData
-      origin = DevelopmentAppComponentGeneratorKey.origin
-      source = owner.source
-      classKind = ClassKind.INTERFACE
-      scopeProvider = session.kotlinScopeProvider
-      this.name = nestedClassId.shortClassName
-      symbol = classSymbol
-      status =
-        FirResolvedDeclarationStatusImpl(
-          Visibilities.Public,
-          Modality.ABSTRACT,
-          Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
-        )
-      superTypeRefs += session.builtinTypes.anyType
-
-      // @ContributesTo(scope = ActivityScope::class, replaces = [DefaultFeatureModule::class])
-      val scopeExpr = buildScopeClassExpression(ClassIds.ACTIVITY_SCOPE) ?: return null
-      val replacesArray = buildExcludesArrayLiteral(listOf(ClassIds.DEFAULT_FEATURE_MODULE))
-      annotations +=
-        buildContributesToWithReplaces(scopeExpr, replacesArray, classSymbol) ?: return null
-
-      // @Module (Dagger annotation — only if on classpath)
-      session.symbolProvider.getClassLikeSymbolByClassId(ClassIds.DAGGER_MODULE)?.let {
-        annotations += buildSimpleAnnotationCall(ClassIds.DAGGER_MODULE, classSymbol)
-      }
-
-      // @Provides @DevelopmentFeatureScopeComponent fun provideFeatureScopeComponent(): KClass<*>?
-      declarations +=
-        buildProvideFeatureScopeComponentFunction(nestedClassId, classSymbol, featureComponentId)
-    }
-
-    return classSymbol
-  }
-
-  /**
-   * Build `@Provides @DevelopmentFeatureScopeComponent fun provideFeatureScopeComponent():
-   * KClass<*>?` that returns the feature component class. The body is not needed — Metro treats
-   * this as an abstract @Provides in a binding container (interface), so the graph implementation
-   * provides it. However, since we want it to return a constant, we make it a default method in the
-   * interface. For FIR, we just declare the signature; the IR extension would need to fill in the
-   * body.
-   *
-   * Actually, Metro's binding containers with @Provides are handled as abstract declarations whose
-   * return value is provided by the graph. We just need the signature with the right annotations
-   * and return type.
-   */
-  private fun buildProvideFeatureScopeComponentFunction(
-    featureModuleClassId: ClassId,
-    featureModuleSymbol: FirRegularClassSymbol,
-    featureComponentId: ClassId,
-  ): org.jetbrains.kotlin.fir.declarations.FirFunction {
-    val callableId =
-      CallableId(featureModuleClassId, Name.identifier("provideFeatureScopeComponent"))
-    val functionSymbol = FirNamedFunctionSymbol(callableId)
-
-    // Return type: KClass<*>? (nullable)
-    val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
-    val starProjection = org.jetbrains.kotlin.fir.types.ConeStarProjection
-    val kClassStarType =
-      ConeClassLikeTypeImpl(
-        ConeClassLikeLookupTagImpl(kClassClassId),
-        arrayOf(starProjection),
-        isMarkedNullable = true,
-      )
-
-    val dispatchType =
-      ConeClassLikeTypeImpl(
-        ConeClassLikeLookupTagImpl(featureModuleClassId),
-        emptyArray(),
-        isMarkedNullable = false,
-      )
-
-    return buildNamedFunction {
-      isLocal = false
-      resolvePhase = FirResolvePhase.BODY_RESOLVE
-      moduleData = session.moduleData
-      origin = DevelopmentAppComponentGeneratorKey.origin
-      symbol = functionSymbol
-      name = callableId.callableName
-      returnTypeRef = kClassStarType.toFirResolvedTypeRef()
-      dispatchReceiverType = dispatchType
-      status =
-        FirResolvedDeclarationStatusImpl(
-          Visibilities.Public,
-          Modality.ABSTRACT,
-          Visibilities.Public.toEffectiveVisibility(featureModuleSymbol, forClass = true),
-        )
-
-      // @Provides
-      this.annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
-      // @DevelopmentFeatureScopeComponent (qualifier)
-      if (
-        session.symbolProvider.getClassLikeSymbolByClassId(
-          ClassIds.DEVELOPMENT_FEATURE_SCOPE_COMPONENT
-        ) != null
-      ) {
-        this.annotations +=
-          buildSimpleAnnotationCall(ClassIds.DEVELOPMENT_FEATURE_SCOPE_COMPONENT, functionSymbol)
-      }
-    }
   }
 
   /** Build a `ScopeClass::class` expression from a ClassId. */
