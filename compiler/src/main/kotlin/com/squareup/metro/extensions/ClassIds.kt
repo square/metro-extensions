@@ -101,8 +101,6 @@ internal object ClassIds {
       Name.identifier("DevelopmentFeatureScopeComponent"),
     )
 
-  val DAGGER_MODULE = ClassId(FqName("dagger"), Name.identifier("Module"))
-
   val BINDS_INSTANCE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provides"))
 
   val JAVAX_QUALIFIER = ClassId(FqName("javax.inject"), Name.identifier("Qualifier"))
