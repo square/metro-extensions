@@ -57,14 +57,14 @@ private class ContributesFeatureFlagIrTransformer(private val pluginContext: IrP
   /**
    * Generates: `return MyFlag`
    *
-   * The generated `FeatureFlagContribution` interface is nested inside the annotated object. We
-   * navigate up the IR tree: function → FeatureFlagContribution → annotated object, then emit
-   * `irGetObject` to reference the singleton instance.
+   * The generated `FeatureFlagContribution` binding container is nested inside the annotated
+   * object. We navigate up the IR tree: function → FeatureFlagContribution → annotated object, then
+   * emit `irGetObject` to reference the singleton instance.
    */
   private fun generateProvidesBody(declaration: IrSimpleFunction) {
-    // function → FeatureFlagContribution interface → annotated object
-    val contributionInterface = declaration.parent as? IrClass ?: return
-    val flagObjectClass = contributionInterface.parent as? IrClass ?: return
+    // function → FeatureFlagContribution binding container → annotated object
+    val contributionContainer = declaration.parent as? IrClass ?: return
+    val flagObjectClass = contributionContainer.parent as? IrClass ?: return
     if (flagObjectClass.kind != ClassKind.OBJECT) return
 
     val irBuilder =

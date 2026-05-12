@@ -24,7 +24,7 @@ internal object ContributesFeatureFlagIds {
   private val CONTRIBUTES_DYNAMIC_CONFIGURATION_FLAG_FQ_NAME =
     FqName("com.squareup.featureflags.anvil.ContributesDynamicConfigurationFlag")
 
-  val NESTED_INTERFACE_NAME = Name.identifier("FeatureFlagContribution")
+  val NESTED_CONTAINER_NAME = Name.identifier("FeatureFlagContribution")
 
   val PREDICATE = LookupPredicate.create {
     annotated(CONTRIBUTES_FEATURE_FLAG_FQ_NAME) or

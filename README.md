@@ -43,7 +43,9 @@ constructor Metro should use.
 Contributes a `FeatureFlag` object into `Set<FeatureFlag>` via `@IntoSet`. Always scoped to
 `AppScope`. The annotated type must be a Kotlin `object` implementing `FeatureFlag`. The
 `description` and `removeBy` parameters are metadata for linters and tooling, not used by the
-generated binding. `@ContributesDynamicConfigurationFlag` is identical but for permanent flags.
+generated binding. At compile time, the plugin generates a nested `@ContributesTo(AppScope::class)`
+`@BindingContainer` object with a `@Provides @IntoSet` function.
+`@ContributesDynamicConfigurationFlag` is identical but for permanent flags.
 
 #### `@DevelopmentAppComponent`
 

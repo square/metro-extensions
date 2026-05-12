@@ -6,18 +6,16 @@ FILE: contributesFeatureFlag.kt
             super<R|com/squareup/featureflags/BooleanFeatureFlag|>(String(my-flag-key))
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|)) public abstract interface FeatureFlagContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/IntoSet|() public open fun providesMyFeatureFlag(): R|com/squareup/featureflags/FeatureFlag|
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|)) public final object FeatureFlagContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/IntoSet|() public final fun providesMyFeatureFlag(): R|com/squareup/featureflags/FeatureFlag|
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) public abstract interface MetroContributionToDevzacsweersmetroappScopeoxd1AHI : R|com/test/MyFeatureFlag.FeatureFlagContribution| {
+            private constructor(): R|com/test/MyFeatureFlag.FeatureFlagContribution| {
+                super<R|kotlin/Any|>()
             }
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(providesMyFeatureFlag), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(providesMyFeatureFlag)) public final class ProvidesMyFeatureFlagMetroFactory : R|kotlin/Any| {
-                public final companion object Companion : R|kotlin/Any| {
-                    private constructor(): R|com/test/MyFeatureFlag.FeatureFlagContribution.ProvidesMyFeatureFlagMetroFactory.Companion| {
-                        super<R|kotlin/Any|>()
-                    }
-
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(providesMyFeatureFlag), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(providesMyFeatureFlag)) public final object ProvidesMyFeatureFlagMetroFactory : R|kotlin/Any| {
+                private constructor(): R|com/test/MyFeatureFlag.FeatureFlagContribution.ProvidesMyFeatureFlagMetroFactory| {
+                    super<R|kotlin/Any|>()
                 }
 
             }
