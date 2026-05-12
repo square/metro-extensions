@@ -32,9 +32,11 @@ import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
+import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
+import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
 import org.jetbrains.kotlin.fir.resolve.SupertypeSupplier
@@ -62,6 +64,7 @@ import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 private const val SCOPED_PROVIDER_FUNCTION_NAME = "provideContributedMultibindingScoped"
 
@@ -78,9 +81,12 @@ private const val SCOPED_PROVIDER_FUNCTION_NAME = "provideContributedMultibindin
  * This generator produces:
  * ```
  * @ContributesTo(SomeScope::class)
+ * @BindingContainer
  * interface MultibindingScopedContribution {
- *   @Provides
- *   fun provideContributedMultibindingScoped(dependency: Dependency): MyService
+ *   companion object {
+ *     @Provides
+ *     fun provideContributedMultibindingScoped(dependency: Dependency): MyService
+ *   }
  *
  *   @Binds @IntoSet @ForScope(SomeScope::class)
  *   fun bindsMyService(myService: MyService): Scoped
@@ -114,6 +120,9 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     classSymbol: FirClassSymbol<*>,
     context: NestedClassGenerationContext,
   ): Set<Name> {
+    if (needsGeneratedProvidesCompanion(classSymbol)) {
+      return setOf(SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT)
+    }
     if (
       hasAnnotation(
         classSymbol,
@@ -131,6 +140,14 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     name: Name,
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
+    if (name == SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT) {
+      val scopedSymbol = scopedSymbolForGeneratedContribution(owner) ?: return null
+      if (!needsProvidesFunction(scopedSymbol)) return null
+      val companionClassId = owner.classId.createNestedClassId(name)
+      val providesFunction = buildProvidesFunction(companionClassId, scopedSymbol) ?: return null
+      return buildProvidesCompanionObject(companionClassId, owner, providesFunction)
+    }
+
     if (name != ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME) return null
     if (
       !hasAnnotation(
@@ -140,7 +157,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
       )
     )
       return null
-    val ownerSymbol = owner as? FirRegularClassSymbol ?: return null
     val scopeArg =
       extractScopeArgument(
         owner,
@@ -155,12 +171,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     // This makes it visible to Metro's getNestedClassifiersNames (which checks for @Binds
     // functions to decide whether to generate BindsMirror).
     val bindsFunction = buildBindsFunction(nestedClassId, owner, scopeArg)
-    val providesFunction =
-      if (hasInjectAnnotation(ownerSymbol) || hasContributesBindingAnnotation(ownerSymbol)) {
-        null
-      } else {
-        buildProvidesFunction(nestedClassId, ownerSymbol)
-      }
 
     val klass = buildRegularClass {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -186,6 +196,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           owner,
           session,
         )
+      annotations += buildSimpleAnnotationCall(ClassIds.BINDING_CONTAINER, classSymbol)
       // @Origin(OwnerClass::class) so Metro can trace this contribution back to the
       // outer class for replaces/excludes in multi-compilation scenarios.
       annotations +=
@@ -198,9 +209,6 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
         )
       // Add the function directly to the class declarations
       declarations += bindsFunction
-      if (providesFunction != null) {
-        declarations += providesFunction
-      }
     }
 
     return klass.symbol
@@ -223,6 +231,28 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           )
         ContributionHint(contributingClassId = nestedInterfaceClassId, scope = scopeClassId)
       }
+  }
+
+  override fun getCallableNamesForClass(
+    classSymbol: FirClassSymbol<*>,
+    context: MemberGenerationContext,
+  ): Set<Name> {
+    return if (isGeneratedProvidesCompanion(classSymbol)) {
+      setOf(SpecialNames.INIT)
+    } else {
+      emptySet()
+    }
+  }
+
+  override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
+    return if (isGeneratedProvidesCompanion(context.owner)) {
+      listOf(
+        createDefaultPrivateConstructor(context.owner, ContributesMultibindingScopedGeneratorKey)
+          .symbol
+      )
+    } else {
+      emptyList()
+    }
   }
 
   private fun buildBindsFunction(
@@ -287,6 +317,35 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           session,
         )
     }
+  }
+
+  @OptIn(DirectDeclarationsAccess::class)
+  private fun buildProvidesCompanionObject(
+    classId: ClassId,
+    outerOwner: FirClassSymbol<*>,
+    providesFunction: FirDeclaration,
+  ): FirClassLikeSymbol<*> {
+    val classSymbol = FirRegularClassSymbol(classId)
+    buildRegularClass {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = ContributesMultibindingScopedGeneratorKey.origin
+      source = outerOwner.source
+      classKind = ClassKind.OBJECT
+      scopeProvider = session.kotlinScopeProvider
+      name = SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT
+      symbol = classSymbol
+      status =
+        FirResolvedDeclarationStatusImpl(
+            Visibilities.Public,
+            Modality.FINAL,
+            Visibilities.Public.toEffectiveVisibility(outerOwner, forClass = true),
+          )
+          .apply { isCompanion = true }
+      superTypeRefs += session.builtinTypes.anyType
+      declarations += providesFunction
+    }
+    return classSymbol
   }
 
   /**
@@ -360,6 +419,37 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
 
   private fun hasContributesBindingAnnotation(scopedSymbol: FirRegularClassSymbol): Boolean {
     return hasAnnotation(scopedSymbol, ClassIds.CONTRIBUTES_BINDING, session)
+  }
+
+  private fun isGeneratedProvidesCompanion(classSymbol: FirClassSymbol<*>): Boolean {
+    val parentClassId = classSymbol.classId.outerClassId ?: return false
+    return classSymbol.origin == ContributesMultibindingScopedGeneratorKey.origin &&
+      classSymbol.classKind == ClassKind.OBJECT &&
+      classSymbol.classId.shortClassName == SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT &&
+      parentClassId.shortClassName == ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
+  }
+
+  private fun needsGeneratedProvidesCompanion(classSymbol: FirClassSymbol<*>): Boolean {
+    val scopedSymbol = scopedSymbolForGeneratedContribution(classSymbol) ?: return false
+    return needsProvidesFunction(scopedSymbol)
+  }
+
+  private fun scopedSymbolForGeneratedContribution(
+    classSymbol: FirClassSymbol<*>
+  ): FirRegularClassSymbol? {
+    if (
+      classSymbol.origin != ContributesMultibindingScopedGeneratorKey.origin ||
+        classSymbol.classId.shortClassName != ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
+    ) {
+      return null
+    }
+    val scopedClassId = classSymbol.classId.outerClassId ?: return null
+    return session.symbolProvider.getClassLikeSymbolByClassId(scopedClassId)
+      as? FirRegularClassSymbol
+  }
+
+  private fun needsProvidesFunction(scopedSymbol: FirRegularClassSymbol): Boolean {
+    return !hasInjectAnnotation(scopedSymbol) && !hasContributesBindingAnnotation(scopedSymbol)
   }
 
   private fun resolveParameterTypeRef(

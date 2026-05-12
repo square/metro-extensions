@@ -1,6 +1,7 @@
 package com.test
 
 import com.squareup.dagger.ContributesMultibindingScoped
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ForScope
 import mortar.Scoped
 
@@ -23,11 +24,18 @@ fun box(): String {
     MyScoped::class.java.declaredClasses.first {
       it.simpleName == "MultibindingScopedContribution"
     }
+  assertNotNull(contributionClass.getAnnotation(BindingContainer::class.java))
   val providerMethod =
     contributionClass.declaredMethods.firstOrNull {
       it.name == "provideContributedMultibindingScoped"
     }
-  assertNotNull(providerMethod)
+  assertNull(providerMethod)
+  val companionClass = contributionClass.declaredClasses.first { it.simpleName == "Companion" }
+  val companionProviderMethod =
+    companionClass.declaredMethods.firstOrNull {
+      it.name == "provideContributedMultibindingScoped"
+    }
+  assertNotNull(companionProviderMethod)
 
   val graph = createGraph<MyGraph>()
   val scoped = graph.scoped.singleOrNull()

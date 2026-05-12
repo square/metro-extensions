@@ -11,6 +11,7 @@
 - `@ContributesService` now generates `@BindingContainer` objects instead of interfaces for its service provider bindings.
 - `@ContributesService` fake services no longer require `@Inject`; non-injectable fake services now get a generated `@Provides` constructor provider, while `@Inject` fake services keep using Metro's normal injection path.
 - `@ContributesMultibindingScoped` no longer requires `@Inject`; non-injectable scoped classes now get a generated `@Provides` constructor provider, while `@Inject` or `@ContributesBinding` scoped classes keep using Metro's normal binding paths.
+- `@ContributesMultibindingScoped` now annotates its generated contribution interface with `@BindingContainer` and emits constructor `@Provides` functions in the generated companion object.
 
 ### Deprecated
 

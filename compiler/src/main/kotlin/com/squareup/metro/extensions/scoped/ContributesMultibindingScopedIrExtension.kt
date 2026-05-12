@@ -53,7 +53,8 @@ private class ContributesMultibindingScopedIrTransformer(
   }
 
   private fun generateProvidesBody(declaration: IrSimpleFunction) {
-    val contributionInterface = declaration.parent as? IrClass ?: return
+    val companionObject = declaration.parent as? IrClass ?: return
+    val contributionInterface = companionObject.parent as? IrClass ?: return
     val scopedClass = contributionInterface.parent as? IrClass ?: return
     val constructor =
       scopedClass.declarations.filterIsInstance<IrConstructor>().firstOrNull() ?: return

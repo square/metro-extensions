@@ -323,10 +323,13 @@ class AppLifecycleLogger(
 
 ```kotlin
 @ContributesTo(AppScope::class)
+@BindingContainer
 interface MultibindingScopedContribution {
-  @Provides
-  fun provideContributedMultibindingScoped(logger: Logger): AppLifecycleLogger {
-    return AppLifecycleLogger(logger)
+  companion object {
+    @Provides
+    fun provideContributedMultibindingScoped(logger: Logger): AppLifecycleLogger {
+      return AppLifecycleLogger(logger)
+    }
   }
 
   @Binds @IntoSet @ForScope(AppScope::class)
