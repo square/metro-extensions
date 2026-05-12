@@ -23,9 +23,9 @@ interface MyGraph {
 
 fun box(): String {
   val contributionClass =
-    MyScoped::class.java.declaredClasses.first {
-      it.simpleName == "MultibindingScopedContribution"
-    }
+    Class.forName(
+      "com.test.MyScopedMultibindingScopedContributions\$MultibindingScopedContribution"
+    )
   assertNotNull(contributionClass.getAnnotation(BindingContainer::class.java))
   val providerMethod =
     (listOf(contributionClass) + contributionClass.declaredClasses.toList())

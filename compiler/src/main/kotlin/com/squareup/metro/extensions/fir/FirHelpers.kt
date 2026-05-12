@@ -3,6 +3,7 @@ package com.squareup.metro.extensions.fir
 import com.squareup.metro.extensions.ArgNames
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
+import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
@@ -39,6 +40,15 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.ConeStarProjection
+import org.jetbrains.kotlin.fir.types.ConeTypeProjection
+import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirStarProjection
+import org.jetbrains.kotlin.fir.types.FirTypeProjection
+import org.jetbrains.kotlin.fir.types.FirTypeProjectionWithVariance
+import org.jetbrains.kotlin.fir.types.FirTypeRef
+import org.jetbrains.kotlin.fir.types.FirUserTypeRef
+import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -228,6 +238,175 @@ internal fun extractScopeClassId(
     }
     else -> null
   }
+}
+
+internal fun resolveValueParameterTypeRef(
+  parameter: FirValueParameter,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): FirTypeRef {
+  val returnTypeRef = parameter.returnTypeRef
+  if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
+
+  val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
+  val scopes =
+    if (file != null) {
+      createImportingScopes(file, session, ScopeSession())
+    } else {
+      emptyList()
+    }
+
+  val resolutionFailure =
+    runCatching {
+        session.typeResolver
+          .resolveType(
+            typeRef = returnTypeRef,
+            configuration =
+              TypeResolutionConfiguration(
+                scopes = scopes,
+                containingClassDeclarations = emptyList(),
+                useSiteFile = file,
+              ),
+            areBareTypesAllowed = true,
+            isOperandOfIsOperator = false,
+            resolveDeprecations = false,
+            supertypeSupplier = SupertypeSupplier.Default,
+            expandTypeAliases = false,
+          )
+          .type
+          .toFirResolvedTypeRef()
+      }
+      .fold(
+        onSuccess = {
+          return it
+        },
+        onFailure = { it },
+      )
+
+  resolvedUserTypeRefByClassId(returnTypeRef, ownerSymbol, session)?.let {
+    return it.toFirResolvedTypeRef()
+  }
+
+  throw resolutionFailure
+}
+
+private fun resolvedUserTypeRefByClassId(
+  typeRef: FirTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): ConeKotlinType? {
+  val userTypeRef = typeRef as? FirUserTypeRef ?: return null
+  val classId = resolveClassIdFromUserTypeRef(userTypeRef, ownerSymbol, session) ?: return null
+  val typeArguments =
+    userTypeRef.qualifier
+      .lastOrNull()
+      ?.typeArgumentList
+      ?.typeArguments
+      .orEmpty()
+      .map { projection -> resolveTypeProjection(projection, ownerSymbol, session) ?: return null }
+      .toTypedArray()
+  return ConeClassLikeTypeImpl(
+    ConeClassLikeLookupTagImpl(classId),
+    typeArguments,
+    isMarkedNullable = userTypeRef.isMarkedNullable,
+  )
+}
+
+private fun resolveTypeProjection(
+  projection: FirTypeProjection,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): ConeTypeProjection? {
+  return when (projection) {
+    is FirStarProjection -> ConeStarProjection
+    is FirTypeProjectionWithVariance ->
+      resolveTypeRefToConeType(projection.typeRef, ownerSymbol, session)
+    else -> null
+  }
+}
+
+private fun resolveTypeRefToConeType(
+  typeRef: FirTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): ConeKotlinType? {
+  if (typeRef is FirResolvedTypeRef) return typeRef.coneType
+
+  val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
+  val scopes =
+    if (file != null) {
+      createImportingScopes(file, session, ScopeSession())
+    } else {
+      emptyList()
+    }
+
+  return runCatching {
+      session.typeResolver
+        .resolveType(
+          typeRef = typeRef,
+          configuration =
+            TypeResolutionConfiguration(
+              scopes = scopes,
+              containingClassDeclarations = emptyList(),
+              useSiteFile = file,
+            ),
+          areBareTypesAllowed = true,
+          isOperandOfIsOperator = false,
+          resolveDeprecations = false,
+          supertypeSupplier = SupertypeSupplier.Default,
+          expandTypeAliases = false,
+        )
+        .type
+    }
+    .getOrNull() ?: resolvedUserTypeRefByClassId(typeRef, ownerSymbol, session)
+}
+
+private fun resolveClassIdFromUserTypeRef(
+  typeRef: FirUserTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): ClassId? {
+  val names = typeRef.qualifier.map { it.name }
+  if (names.isEmpty()) return null
+
+  val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
+  val firstName = names.first()
+  val explicitImport =
+    file?.imports?.firstNotNullOfOrNull { import ->
+      if (import.isAllUnder) return@firstNotNullOfOrNull null
+      val importedFqName = import.importedFqName ?: return@firstNotNullOfOrNull null
+      if (importedFqName.shortName() == firstName) {
+        ClassId(importedFqName.parent(), names.toFqName(), false)
+      } else {
+        null
+      }
+    }
+  if (explicitImport != null) return explicitImport
+
+  if (names.size > 1 && firstName.asString().firstOrNull()?.isLowerCase() == true) {
+    return ClassId(names.dropLast(1).toFqName(), names.takeLast(1).toFqName(), false)
+  }
+
+  val candidates = buildList {
+    add(ClassId(ownerSymbol.classId.packageFqName, names.toFqName(), false))
+    add(ClassId(FqName("kotlin.collections"), names.toFqName(), false))
+
+    file?.imports?.forEach { import ->
+      if (!import.isAllUnder) return@forEach
+      val importedFqName = import.importedFqName ?: return@forEach
+      add(ClassId(importedFqName, names.toFqName(), false))
+    }
+
+    add(ClassId(FqName("kotlin"), names.toFqName(), false))
+  }
+
+  return candidates.firstOrNull { candidate ->
+    session.symbolProvider.getClassLikeSymbolByClassId(candidate) != null
+  } ?: candidates.first()
+}
+
+private fun List<Name>.toFqName(): FqName {
+  return if (isEmpty()) FqName.ROOT else FqName(joinToString(".") { it.asString() })
 }
 
 /**

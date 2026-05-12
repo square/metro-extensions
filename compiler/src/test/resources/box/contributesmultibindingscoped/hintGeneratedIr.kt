@@ -15,9 +15,11 @@ fun box(): String {
   // Verify that the scope hint function was generated for the @ContributesTo interface.
   // Metro uses these hints to discover cross-module contributions.
   val hintClass = try {
-    Class.forName("metro.hints.ComTestMyTestClassMultibindingScopedContributionUnitKt")
+    Class.forName(
+      "metro.hints.ComTestMyTestClassMultibindingScopedContributionsMultibindingScopedContributionUnitKt"
+    )
   } catch (e: ClassNotFoundException) {
-    return "FAIL: Scope hint not generated for MyTestClass.MultibindingScopedContribution"
+    return "FAIL: Scope hint not generated for MyTestClassMultibindingScopedContributions.MultibindingScopedContribution"
   }
 
   val hintFunction = hintClass.methods.find { it.name == "Unit" }

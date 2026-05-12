@@ -46,6 +46,12 @@ internal object ClassIds {
 
   val SINGLE_IN = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("SingleIn"))
 
+  val METRO_SCOPE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Scope"))
+
+  val JAVAX_SCOPE = ClassId(FqName("javax.inject"), Name.identifier("Scope"))
+
+  val SCOPE_CLASS_IDS = setOf(METRO_SCOPE, JAVAX_SCOPE)
+
   val PROVIDER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provider"))
 
   val SERVICE_CREATOR = ClassId(FqName("com.squareup.api"), Name.identifier("ServiceCreator"))

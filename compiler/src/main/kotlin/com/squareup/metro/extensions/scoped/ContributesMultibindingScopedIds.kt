@@ -20,8 +20,40 @@ internal object ContributesMultibindingScopedIds {
   val CONTRIBUTES_MULTIBINDING_SCOPED_FQ_NAME =
     FqName("com.squareup.dagger.ContributesMultibindingScoped")
 
-  val NESTED_INTERFACE_NAME = Name.identifier("MultibindingScopedContribution")
+  val HOLDER_CLASS_SUFFIX = "MultibindingScopedContributions"
+  val CONTRIBUTION_CLASS_SUFFIX = "MultibindingScopedContribution"
+
+  val NESTED_INTERFACE_NAME = Name.identifier(CONTRIBUTION_CLASS_SUFFIX)
 
   /** Predicate matching classes annotated with `@ContributesMultibindingScoped`. */
   val PREDICATE = LookupPredicate.create { annotated(CONTRIBUTES_MULTIBINDING_SCOPED_FQ_NAME) }
+
+  fun holderClassId(contributedClassId: ClassId): ClassId {
+    val contributedName =
+      contributedClassId.relativeClassName.pathSegments().joinToString(separator = "") {
+        it.asString()
+      }
+    return ClassId(
+      contributedClassId.packageFqName,
+      Name.identifier("$contributedName$HOLDER_CLASS_SUFFIX"),
+    )
+  }
+
+  fun contributionClassId(contributedClassId: ClassId): ClassId {
+    return holderClassId(contributedClassId).createNestedClassId(NESTED_INTERFACE_NAME)
+  }
+
+  fun legacyScopedProvidersClassId(contributedClassId: ClassId): ClassId {
+    val contributedPackage = contributedClassId.packageFqName.asString()
+    val packageName =
+      if (contributedPackage.isEmpty()) {
+        "anvil.register.scoped"
+      } else {
+        "anvil.register.scoped.$contributedPackage"
+      }
+    return ClassId(
+      FqName(packageName),
+      Name.identifier("${contributedClassId.shortClassName.asString()}ScopedProviders"),
+    )
+  }
 }

@@ -3,6 +3,7 @@ package com.test
 import com.squareup.dagger.ContributesMultibindingScoped
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ForScope
+import dev.zacsweers.metro.SingleIn
 import mortar.Scoped
 
 interface MyService {
@@ -13,6 +14,7 @@ class Dependency(val value: String)
 
 @ContributesBinding(Unit::class, binding = binding<MyService>())
 @ContributesMultibindingScoped(Unit::class)
+@SingleIn(Unit::class)
 class MyScopedService(dependency: Dependency) : MyService, Scoped {
   override val value: String = dependency.value
 }
@@ -27,16 +29,25 @@ interface MyGraph {
 }
 
 fun box(): String {
+  val holderClass =
+    Class.forName("com.test.MyScopedServiceMultibindingScopedContributions")
   val contributionClass =
-    MyScopedService::class.java.declaredClasses.first {
-      it.simpleName == "MultibindingScopedContribution"
-    }
+    Class.forName(
+      "com.test.MyScopedServiceMultibindingScopedContributions\$MultibindingScopedContribution"
+    )
   assertNotNull(contributionClass.getAnnotation(BindingContainer::class.java))
   val providerMethod =
-    (listOf(contributionClass) + contributionClass.declaredClasses.toList())
-      .flatMap { it.declaredMethods.toList() }
-      .firstOrNull { it.name == "provideContributedMultibindingScoped" }
+    contributionClass.declaredMethods.firstOrNull {
+      it.name == "provideContributedMultibindingScoped"
+    }
   assertNull(providerMethod)
+  val companionClass = holderClass.declaredClasses.first { it.simpleName == "Companion" }
+  val companionProviderMethod =
+    companionClass.declaredMethods.firstOrNull {
+      it.name == "provideContributedMultibindingScoped"
+    }
+  assertNotNull(companionProviderMethod)
+  assertNotNull(companionProviderMethod?.getAnnotation(SingleIn::class.java))
 
   val graph = createGraph<MyGraph>()
   assertTrue(graph.myService is MyScopedService)
