@@ -63,7 +63,9 @@ exactly one `@Qualifier` annotation (e.g., `@RetrofitAuthenticated`) which deter
 `ServiceCreator` is injected. At compile time, the plugin generates a nested
 `@ContributesTo(scope)` `@BindingContainer` object with a `@Provides` function that calls
 `serviceCreator.create(Service::class.java)`, with a `@FakeMode` safety check to catch missing fake
-services in debug builds.
+services in debug builds. Fake services may use Metro `@Inject`; otherwise the plugin generates a
+`@Provides` constructor provider. Fake services with multiple constructors must mark the service
+class or the constructor Metro should use with `@Inject`.
 
 ## Usage
 

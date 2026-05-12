@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
@@ -47,8 +48,14 @@ import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.SupertypeSupplier
+import org.jetbrains.kotlin.fir.resolve.TypeResolutionConfiguration
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
+import org.jetbrains.kotlin.fir.resolve.typeResolver
+import org.jetbrains.kotlin.fir.scopes.createImportingScopes
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -62,12 +69,16 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+
+private const val FAKE_SERVICE_PROVIDER_FUNCTION_NAME = "provideContributedServiceReplacement"
 
 /**
  * Generates a nested `ServiceContribution` binding container object for classes annotated with
@@ -108,8 +119,7 @@ import org.jetbrains.kotlin.name.SpecialNames
  * Given a **fake service**:
  * ```
  * @ContributesService(SomeScope::class, replaces = [MyService::class])
- * @Inject
- * class FakeMyService : MyService
+ * class FakeMyService(dependency: Dependency) : MyService
  * ```
  *
  * This generates:
@@ -131,6 +141,9 @@ import org.jetbrains.kotlin.name.SpecialNames
  *     fakeService: Provider<FakeMyService>,
  *     @FakeMode isFakeMode: Boolean,
  *   ): MyService
+ *
+ *   @Provides
+ *   fun provideContributedServiceReplacement(dependency: Dependency): FakeMyService
  * }
  * ```
  *
@@ -185,6 +198,7 @@ public class ContributesServiceFir(session: FirSession) :
     if (name != ContributesServiceIds.NESTED_CONTAINER_NAME) return null
     if (!hasAnnotation(owner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session))
       return null
+    val ownerSymbol = owner as? FirRegularClassSymbol ?: return null
     val scopeArg =
       extractScopeArgument(owner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)
         ?: return null
@@ -200,9 +214,16 @@ public class ContributesServiceFir(session: FirSession) :
     // functions to decide whether to generate ProvidesFactory).
     val providesFunctions =
       if (replacesClassIds.isNotEmpty()) {
-        replacesClassIds.flatMap { replacedClassId ->
-          buildFakeServiceFunctions(nestedClassId, owner, scopeArg, replacedClassId)
+        val serviceFunctions = replacesClassIds.flatMap { replacedClassId ->
+          buildFakeServiceFunctions(nestedClassId, ownerSymbol, scopeArg, replacedClassId)
         }
+        val fakeServiceProviderFunction =
+          if (hasInjectAnnotation(ownerSymbol)) {
+            null
+          } else {
+            buildFakeServiceProvidesFunction(nestedClassId, ownerSymbol)
+          }
+        serviceFunctions + listOfNotNull(fakeServiceProviderFunction)
       } else {
         val qualifierClassId = findQualifierClassId(owner)
         listOf(buildRealServiceProvidesFunction(nestedClassId, owner, scopeArg, qualifierClassId))
@@ -389,7 +410,7 @@ public class ContributesServiceFir(session: FirSession) :
    */
   private fun buildFakeServiceFunctions(
     nestedClassId: ClassId,
-    fakeOwner: FirClassSymbol<*>,
+    fakeOwner: FirRegularClassSymbol,
     scopeArg: FirExpression,
     replacedClassId: ClassId,
   ): List<FirFunction> {
@@ -527,6 +548,66 @@ public class ContributesServiceFir(session: FirSession) :
     return listOf(realFn, switcherFn)
   }
 
+  /**
+   * Build the `@Provides` function that constructs a fake service when it is not already
+   * injectable.
+   *
+   * Generates: `@Provides fun provideContributedServiceReplacement(dependency: Dependency):
+   * FakeService`
+   */
+  @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+  private fun buildFakeServiceProvidesFunction(
+    classId: ClassId,
+    fakeOwner: FirRegularClassSymbol,
+  ): FirFunction? {
+    val callableId = CallableId(classId, Name.identifier(FAKE_SERVICE_PROVIDER_FUNCTION_NAME))
+    val constructorSymbol =
+      fakeOwner.declarationSymbols.filterIsInstance<FirConstructorSymbol>().firstOrNull()
+        ?: return null
+
+    val fakeType = fakeOwner.defaultType()
+    val dispatchType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(classId),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+
+    val functionSymbol = FirNamedFunctionSymbol(callableId)
+
+    return buildNamedFunction {
+      isLocal = false
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = ContributesServiceGeneratorKey.origin
+      symbol = functionSymbol
+      name = callableId.callableName
+      returnTypeRef = fakeType.toFirResolvedTypeRef()
+      dispatchReceiverType = dispatchType
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.FINAL,
+          Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
+        )
+
+      for (parameter in constructorSymbol.fir.valueParameters) {
+        valueParameters += buildValueParameter {
+          resolvePhase = FirResolvePhase.BODY_RESOLVE
+          moduleData = session.moduleData
+          origin = ContributesServiceGeneratorKey.origin
+          returnTypeRef = resolveParameterTypeRef(parameter, fakeOwner)
+          this.name = parameter.name
+          symbol = FirValueParameterSymbol()
+          containingDeclarationSymbol = functionSymbol
+          annotations += parameter.annotations
+        }
+      }
+
+      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+    }
+  }
+
   private fun providerTypeOf(providedType: ConeKotlinType) =
     ConeClassLikeTypeImpl(
       ConeClassLikeLookupTagImpl(ClassIds.PROVIDER),
@@ -646,6 +727,50 @@ public class ContributesServiceFir(session: FirSession) :
   private fun isGeneratedContributionContainer(classSymbol: FirClassSymbol<*>): Boolean {
     return classSymbol.origin == ContributesServiceGeneratorKey.origin &&
       classSymbol.name == ContributesServiceIds.NESTED_CONTAINER_NAME
+  }
+
+  @OptIn(DirectDeclarationsAccess::class)
+  private fun hasInjectAnnotation(serviceSymbol: FirRegularClassSymbol): Boolean {
+    return hasAnnotation(serviceSymbol, ClassIds.INJECT, session) ||
+      serviceSymbol.declarationSymbols.filterIsInstance<FirConstructorSymbol>().any {
+        it.resolvedCompilerAnnotationsWithClassIds.any { annotation ->
+          annotation.toAnnotationClassIdSafe(session) == ClassIds.INJECT
+        }
+      }
+  }
+
+  private fun resolveParameterTypeRef(
+    parameter: FirValueParameter,
+    ownerSymbol: FirRegularClassSymbol,
+  ): FirTypeRef {
+    val returnTypeRef = parameter.returnTypeRef
+    if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
+
+    val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
+    val scopes =
+      if (file != null) {
+        createImportingScopes(file, session, ScopeSession())
+      } else {
+        emptyList()
+      }
+
+    return session.typeResolver
+      .resolveType(
+        typeRef = returnTypeRef,
+        configuration =
+          TypeResolutionConfiguration(
+            scopes = scopes,
+            containingClassDeclarations = emptyList(),
+            useSiteFile = file,
+          ),
+        areBareTypesAllowed = true,
+        isOperandOfIsOperator = false,
+        resolveDeprecations = false,
+        supertypeSupplier = SupertypeSupplier.Default,
+        expandTypeAliases = false,
+      )
+      .type
+      .toFirResolvedTypeRef()
   }
 
   private fun buildSimpleAnnotation(classId: ClassId): FirAnnotation {

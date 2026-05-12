@@ -16,7 +16,6 @@ fun Unit(contributed: ServiceContribution) {
 package com.test
 
 @ContributesService(scope = Unit::class, replaces = [MyService::class])
-@Inject
 class FakeMyService : MyService {
   @ContributesTo(scope = Unit::class, replaces = [MyService::class, ServiceContribution::class])
   @BindingContainer
@@ -118,10 +117,50 @@ class FakeMyService : MyService {
 
     }
 
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideContributedServiceReplacement", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideContributedServiceReplacement")
+    object ProvideContributedServiceReplacementMetroFactory : Factory<FakeMyService> {
+      private constructor() /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      @HiddenFromObjC
+      @JvmStatic
+      @JsStatic
+      fun create(): Factory<FakeMyService> {
+        return ProvideContributedServiceReplacementMetroFactory
+      }
+
+      @HiddenFromObjC
+      @JvmStatic
+      @JsStatic
+      fun provideContributedServiceReplacement(): FakeMyService {
+        return ServiceContribution.provideContributedServiceReplacement()
+      }
+
+      @HiddenFromObjC
+      override operator fun invoke(): FakeMyService {
+        return ProvideContributedServiceReplacementMetroFactory.provideContributedServiceReplacement()
+      }
+
+      @HiddenFromObjC
+      fun mirrorFunction(): FakeMyService {
+        return error(message = "Never called")
+      }
+
+    }
+
     private constructor() /* primary */ {
       super/*Any*/()
       /* <init>() */
 
+    }
+
+    @Provides
+    fun provideContributedServiceReplacement(): FakeMyService {
+      return FakeMyService()
     }
 
     @Provides
@@ -137,40 +176,6 @@ class FakeMyService : MyService {
     @RealService
     fun provideRealMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
       return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
-    }
-
-  }
-
-  @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-  object MetroFactory : Factory<FakeMyService> {
-    private constructor() /* primary */ {
-      super/*Any*/()
-      /* <init>() */
-
-    }
-
-    @HiddenFromObjC
-    @JvmStatic
-    @JsStatic
-    fun create(): Factory<FakeMyService> {
-      return MetroFactory
-    }
-
-    @HiddenFromObjC
-    @JvmStatic
-    @JsStatic
-    fun newInstance(): FakeMyService {
-      return FakeMyService()
-    }
-
-    @HiddenFromObjC
-    override operator fun invoke(): FakeMyService {
-      return MetroFactory.newInstance()
-    }
-
-    @HiddenFromObjC
-    fun mirrorFunction(): FakeMyService {
-      return error(message = "Never called")
     }
 
   }

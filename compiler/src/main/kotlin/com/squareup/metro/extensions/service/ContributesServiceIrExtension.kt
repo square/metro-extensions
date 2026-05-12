@@ -14,6 +14,8 @@ import org.jetbrains.kotlin.ir.builders.irIfThen
 import org.jetbrains.kotlin.ir.builders.irIfThenElse
 import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.builders.irString
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrConstructor
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -41,6 +43,7 @@ import org.jetbrains.kotlin.name.Name
  *    serviceCreator.create(ReplacedService::class.java)`
  * 3. **Fake/real switcher** (params: `realService`, `fakeService`, `isFakeMode`): `return if
  *    (isFakeMode) fakeService() else realService()`
+ * 4. **Fake service constructor provider**: `return FakeService(arg1, arg2, ...)`
  */
 @Suppress("DEPRECATION")
 internal class ContributesServiceIrExtension : IrGenerationExtension {
@@ -77,6 +80,8 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     val hasIsFakeMode = allParams.any { it.name.asString() == PARAM_IS_FAKE_MODE }
 
     when {
+      declaration.name.asString() == FAKE_SERVICE_PROVIDER_FUNCTION_NAME ->
+        generateFakeServiceProviderBody(declaration)
       hasRealService -> generateSwitcherBody(declaration)
       hasServiceCreator && hasIsFakeMode -> generateRealServiceWithCheckBody(declaration)
       // In release builds, no @FakeMode param — just return serviceCreator.create(...)
@@ -176,6 +181,35 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     }
   }
 
+  /**
+   * Fake service constructor provider generated when the fake service does not already use
+   * `@Inject`.
+   *
+   * Generates: `return FakeService(arg1, arg2, ...)`
+   */
+  private fun generateFakeServiceProviderBody(declaration: IrSimpleFunction) {
+    val contributionContainer = declaration.parent as? IrClass ?: return
+    val fakeServiceClass = contributionContainer.parent as? IrClass ?: return
+    val constructor =
+      fakeServiceClass.declarations.filterIsInstance<IrConstructor>().firstOrNull() ?: return
+
+    val irBuilder = irBuilderFor(declaration)
+
+    val constructorParameters = constructor.parameters
+    val providerParameters = constructorParameters.map { constructorParameter ->
+      declaration.parameters.firstOrNull { it.name == constructorParameter.name } ?: return
+    }
+
+    val constructorCall =
+      irBuilder.irCall(constructor.symbol, type = declaration.returnType).apply {
+        for ((index, parameter) in providerParameters.withIndex()) {
+          arguments[index] = irBuilder.irGet(parameter)
+        }
+      }
+
+    declaration.body = irBuilder.irBlockBody { +irReturn(constructorCall) }
+  }
+
   // -- Helpers --
 
   private fun irBuilderFor(declaration: IrSimpleFunction) =
@@ -258,5 +292,6 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
     private const val PARAM_IS_FAKE_MODE = "isFakeMode"
     private const val PARAM_REAL_SERVICE = "realService"
     private const val PARAM_FAKE_SERVICE = "fakeService"
+    private const val FAKE_SERVICE_PROVIDER_FUNCTION_NAME = "provideContributedServiceReplacement"
   }
 }

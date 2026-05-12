@@ -12,9 +12,11 @@ import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirClassChecker
 import org.jetbrains.kotlin.fir.declarations.FirClass
+import org.jetbrains.kotlin.fir.declarations.constructors
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassId
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.declarations.utils.classId
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 
@@ -25,8 +27,9 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
  * - Must be an interface
  * - Must have exactly one qualifier annotation (e.g., `@RetrofitAuthenticated`)
  *
- * **Fake services** (has `replaces`): no additional validation (they are classes, not interfaces,
- * and the qualifier comes from the replaced service).
+ * **Fake services** (has `replaces`):
+ * - Multiple constructors require `@Inject` on the service class or constructor Metro should use
+ * - Qualifiers come from the replaced service
  */
 internal object ContributesServiceChecker : FirClassChecker(MppCheckerKind.Common) {
 
@@ -44,9 +47,10 @@ internal object ContributesServiceChecker : FirClassChecker(MppCheckerKind.Commo
     val hasReplaces =
       extractClassIdsFromArrayArg(annotation, ArgNames.REPLACES, session).isNotEmpty()
 
-    // Fake services skip all validation — they are classes (not interfaces) and inherit
-    // their qualifier from the replaced service.
-    if (hasReplaces) return
+    if (hasReplaces) {
+      validateFakeServiceConstructors(declaration, annotation)
+      return
+    }
 
     // Real services must be interfaces (Retrofit service definitions).
     if (declaration.classKind != ClassKind.INTERFACE) {
@@ -77,6 +81,33 @@ internal object ContributesServiceChecker : FirClassChecker(MppCheckerKind.Commo
           "No more than one qualifier is allowed.",
         )
       }
+    }
+  }
+
+  context(context: CheckerContext, reporter: DiagnosticReporter)
+  private fun validateFakeServiceConstructors(declaration: FirClass, annotation: FirAnnotation) {
+    val constructors = declaration.constructors(context.session)
+    if (constructors.size <= 1) return
+
+    val hasInjectAnnotation =
+      declaration.annotations.any {
+        it.toAnnotationClassIdSafe(context.session) == ClassIds.INJECT
+      } ||
+        constructors.any { constructor ->
+          constructor.resolvedCompilerAnnotationsWithClassIds.any {
+            it.toAnnotationClassIdSafe(context.session) == ClassIds.INJECT
+          }
+        }
+
+    if (!hasInjectAnnotation) {
+      val fqName = declaration.classId.asSingleFqName()
+      reporter.reportOn(
+        annotation.source,
+        SquareMetroExtensionsDiagnostics.CONTRIBUTES_SERVICE_ERROR,
+        "$fqName contributes a service replacement to the Metro graph and has multiple " +
+          "constructors. Annotate the service class or the constructor Metro should use with " +
+          "@Inject.",
+      )
     }
   }
 

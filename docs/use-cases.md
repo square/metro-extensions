@@ -170,8 +170,11 @@ annotation class ContributesService(
 ### Target
 
 - **Real services:** Retrofit service interfaces with a qualifier annotation.
-- **Fake services:** `@Inject` classes in debug source sets that implement a real service
-  interface, using `replaces` to specify which service they replace.
+- **Fake services:** Classes in debug source sets that implement a real service interface, using
+  `replaces` to specify which service they replace. `@Inject` is optional; if it is absent, the
+  generated binding container includes a `@Provides` constructor provider. Fake services with
+  multiple constructors must annotate the service class or the constructor Metro should use with
+  `@Inject`.
 
 ### Usage — Real service
 
@@ -225,7 +228,6 @@ object ServiceContribution {
 // In src/debug
 @SingleIn(AppScope::class)
 @ContributesService(AppScope::class, replaces = [RemoteDeviceApiService::class])
-@Inject
 class FakeRemoteDeviceApiService(
   factory: MockServiceHelper.Factory,
 ) : RemoteDeviceApiService {
@@ -240,7 +242,8 @@ class FakeRemoteDeviceApiService(
 
 The generated fake service binding container replaces the real service contribution. It re-creates
 the real service binding under a `@RealService` qualifier, then adds a switcher that picks real or
-fake based on the `@FakeMode` boolean:
+fake based on the `@FakeMode` boolean. If the fake service is not already injectable with `@Inject`,
+the container also provides the fake service by calling its constructor:
 
 ```kotlin
 @ContributesTo(
@@ -268,6 +271,13 @@ object ServiceContribution {
     @FakeMode isFakeMode: Boolean,
   ): RemoteDeviceApiService {
     return if (isFakeMode) fakeService.get() else realService.get()
+  }
+
+  @Provides
+  fun provideContributedServiceReplacement(
+    factory: MockServiceHelper.Factory,
+  ): FakeRemoteDeviceApiService {
+    return FakeRemoteDeviceApiService(factory)
   }
 }
 ```
