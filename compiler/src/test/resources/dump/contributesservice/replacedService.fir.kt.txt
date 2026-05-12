@@ -18,18 +18,13 @@ package com.test
 @ContributesService(scope = Unit::class, replaces = [MyService::class])
 @Inject
 class FakeMyService : MyService {
-  @ContributesTo(scope = Unit::class, replaces = [ServiceContribution::class])
+  @ContributesTo(scope = Unit::class, replaces = [MyService::class, ServiceContribution::class])
+  @BindingContainer
   @Origin(value = FakeMyService::class)
-  interface ServiceContribution {
-    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-    @MetroContribution(scope = Unit::class)
-    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
-    }
-
+  object ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
     class ProvideMyServiceMetroFactory : Factory<MyService> {
-      private /* final field */ val instance: ServiceContribution = instance
       private /* final field */ val realService: Provider<MyService> = realService
       private /* final field */ val fakeService: Provider<FakeMyService> = fakeService
       private /* final field */ val isFakeMode: Provider<Boolean> = isFakeMode
@@ -43,21 +38,21 @@ class FakeMyService : MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
-          return ProvideMyServiceMetroFactory(instance = instance, realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
+        fun create(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun provideMyService(instance: ServiceContribution, @RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
-          return instance.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
+        fun provideMyService(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
+          return ServiceContribution.provideMyService(realService = realService, fakeService = fakeService, isFakeMode = isFakeMode)
         }
 
       }
 
       @HiddenFromObjC
-      private constructor(instance: ServiceContribution, realService: Provider<MyService>, fakeService: Provider<FakeMyService>, isFakeMode: Provider<Boolean>) /* primary */ {
+      private constructor(realService: Provider<MyService>, fakeService: Provider<FakeMyService>, isFakeMode: Provider<Boolean>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
@@ -65,7 +60,7 @@ class FakeMyService : MyService {
 
       @HiddenFromObjC
       override operator fun invoke(): MyService {
-        return Companion.provideMyService(instance = <this>.#instance, realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
+        return Companion.provideMyService(realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
       }
 
       @HiddenFromObjC
@@ -78,7 +73,6 @@ class FakeMyService : MyService {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @CallableMetadata(callableName = "provideRealMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideRealMyService")
     class ProvideRealMyServiceMetroFactory : Factory<MyService> {
-      private /* final field */ val instance: ServiceContribution = instance
       private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
       companion object Companion {
         private constructor() /* primary */ {
@@ -90,21 +84,21 @@ class FakeMyService : MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
-          return ProvideRealMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
+          return ProvideRealMyServiceMetroFactory(serviceCreator = serviceCreator)
         }
 
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun provideRealMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
-          return instance.provideRealMyService(serviceCreator = serviceCreator)
+        fun provideRealMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+          return ServiceContribution.provideRealMyService(serviceCreator = serviceCreator)
         }
 
       }
 
       @HiddenFromObjC
-      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
+      private constructor(serviceCreator: Provider<ServiceCreator>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
@@ -112,7 +106,7 @@ class FakeMyService : MyService {
 
       @HiddenFromObjC
       override operator fun invoke(): MyService {
-        return Companion.provideRealMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
+        return Companion.provideRealMyService(serviceCreator = <this>.#serviceCreator.invoke())
       }
 
       @SingleIn(scope = Unit::class)
@@ -121,6 +115,12 @@ class FakeMyService : MyService {
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
       }
+
+    }
+
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
 
     }
 
@@ -187,17 +187,12 @@ class FakeMyService : MyService {
 @RetrofitAuthenticated
 interface MyService {
   @ContributesTo(scope = Unit::class)
+  @BindingContainer
   @Origin(value = MyService::class)
-  interface ServiceContribution {
-    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-    @MetroContribution(scope = Unit::class)
-    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
-    }
-
+  object ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
     class ProvideMyServiceMetroFactory : Factory<MyService> {
-      private /* final field */ val instance: ServiceContribution = instance
       private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
       private /* final field */ val isFakeMode: Provider<Boolean> = isFakeMode
       companion object Companion {
@@ -210,21 +205,21 @@ interface MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
-          return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator, isFakeMode = isFakeMode)
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
-          return instance.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
+        fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+          return ServiceContribution.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
       }
 
       @HiddenFromObjC
-      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>, isFakeMode: Provider<Boolean>) /* primary */ {
+      private constructor(serviceCreator: Provider<ServiceCreator>, isFakeMode: Provider<Boolean>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
@@ -232,7 +227,7 @@ interface MyService {
 
       @HiddenFromObjC
       override operator fun invoke(): MyService {
-        return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
+        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
       @SingleIn(scope = Unit::class)
@@ -240,6 +235,12 @@ interface MyService {
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
       }
+
+    }
+
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
 
     }
 

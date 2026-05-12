@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.name.Name
  * Shared identifiers for the `@ContributesService` compiler plugin support.
  *
  * Used by:
- * - [ContributesServiceFir] (FIR generator that creates the ServiceContribution interface)
- * - [ContributesServiceMetroExtension] (Metro extension that bridges predicate gap)
+ * - [ContributesServiceFir] (FIR generator that creates the ServiceContribution container)
+ * - [ContributesServiceMetroExtension] (Metro extension that registers the service predicate)
  * - [ContributesServiceChecker] (FIR checker for validation)
  */
 internal object ContributesServiceIds {
@@ -20,7 +20,7 @@ internal object ContributesServiceIds {
 
   val CONTRIBUTES_SERVICE_FQ_NAME = FqName("com.squareup.services.anvil.ContributesService")
 
-  val NESTED_INTERFACE_NAME = Name.identifier("ServiceContribution")
+  val NESTED_CONTAINER_NAME = Name.identifier("ServiceContribution")
 
   /** Predicate matching classes annotated with `@ContributesService`. */
   val PREDICATE = LookupPredicate.create { annotated(CONTRIBUTES_SERVICE_FQ_NAME) }
