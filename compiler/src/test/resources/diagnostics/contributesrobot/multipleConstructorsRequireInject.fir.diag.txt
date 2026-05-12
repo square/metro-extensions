@@ -1,0 +1,1 @@
+/multipleConstructorsRequireInject.kt:(188,218): error: com.test.AbcRobot contributes a robot to the Metro graph and has multiple constructors. Annotate the robot class or the constructor Metro should use with @Inject.

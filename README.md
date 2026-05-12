@@ -32,8 +32,11 @@ provider scoped with `@SingleIn` for the given scope, so the class is automatica
 
 Contributes a UI test robot class to a Metro dependency graph. The annotated class must extend
 `ScreenRobot` or `ComposeScreenRobot`. At compile time, the plugin generates a nested
-`@ContributesTo` interface with an accessor function (`get{ClassName}()`), so the robot is
-automatically available on the `@DependencyGraph` without manually writing a component interface.
+`@ContributesTo` interface with an accessor function (`get{ClassName}()`). If the robot is not
+already injectable with `@Inject`, the plugin also generates a `@Provides` constructor provider, so
+the robot is automatically available on the `@DependencyGraph` without manually writing a component
+interface. Robots with multiple constructors must use `@Inject` on the robot class or on the
+constructor Metro should use.
 
 #### `@ContributesFeatureFlag(description: String, removeBy: Date, ...)` / `@ContributesDynamicConfigurationFlag(description: String, ...)`
 

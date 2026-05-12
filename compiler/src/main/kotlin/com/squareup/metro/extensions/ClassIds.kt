@@ -39,6 +39,8 @@ internal object ClassIds {
 
   val PROVIDES = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provides"))
 
+  val INJECT = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Inject"))
+
   val SINGLE_IN = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("SingleIn"))
 
   val PROVIDER = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Provider"))

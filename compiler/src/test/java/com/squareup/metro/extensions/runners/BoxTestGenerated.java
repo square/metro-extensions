@@ -141,6 +141,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("constructorArguments.kt")
+    public void testConstructorArguments() {
+      runTest("compiler/src/test/resources/box/contributesrobot/constructorArguments.kt");
+    }
+
+    @Test
     @TestMetadata("hintGeneratedFir.kt")
     public void testHintGeneratedFir() {
       runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedFir.kt");
@@ -150,6 +156,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @TestMetadata("hintGeneratedIr.kt")
     public void testHintGeneratedIr() {
       runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedIr.kt");
+    }
+
+    @Test
+    @TestMetadata("injectAnnotationSkipsProvider.kt")
+    public void testInjectAnnotationSkipsProvider() {
+      runTest("compiler/src/test/resources/box/contributesrobot/injectAnnotationSkipsProvider.kt");
     }
 
     @Test
@@ -174,6 +186,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @TestMetadata("screenRobot.kt")
     public void testScreenRobot() {
       runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
+    }
+
+    @Test
+    @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
+    public void testSecondaryInjectConstructorSkipsProvider() {
+      runTest("compiler/src/test/resources/box/contributesrobot/secondaryInjectConstructorSkipsProvider.kt");
     }
   }
 
