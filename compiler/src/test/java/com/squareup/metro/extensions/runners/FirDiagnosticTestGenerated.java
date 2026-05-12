@@ -91,6 +91,12 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     public void testClassMustExtendScreenRobot() {
       runTest("compiler/src/test/resources/diagnostics/contributesrobot/classMustExtendScreenRobot.kt");
     }
+
+    @Test
+    @TestMetadata("multipleConstructorsRequireInject.kt")
+    public void testMultipleConstructorsRequireInject() {
+      runTest("compiler/src/test/resources/diagnostics/contributesrobot/multipleConstructorsRequireInject.kt");
+    }
   }
 
   @Nested

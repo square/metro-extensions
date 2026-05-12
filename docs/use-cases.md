@@ -93,8 +93,10 @@ object SyncRetryConfigBindingContainer {
 
 ## @ContributesRobot
 
-Generates a contributed interface with an abstract accessor method that exposes the
-robot class on the dependency graph. The target must extend `ScreenRobot` or
+Generates a contributed interface with an accessor method that exposes the robot
+class on the dependency graph. If the robot is not already injectable with
+`@Inject`, the generated interface also includes a `@Provides` method that
+constructs the robot. The target must extend `ScreenRobot` or
 `ComposeScreenRobot`.
 
 ### Annotation definition
@@ -107,14 +109,19 @@ annotation class ContributesRobot(
 
 ### Target
 
-`@Inject` classes extending `ScreenRobot` or `ComposeScreenRobot`.
+Classes extending `ScreenRobot` or `ComposeScreenRobot`. The robot constructor
+does not need `@Inject`; when `@Inject` is absent, constructor parameters are
+injected through the generated `@Provides` function. If a robot declares multiple
+constructors, annotate the robot class or the constructor Metro should use with
+`@Inject`.
 
 ### Usage
 
 ```kotlin
 @ContributesRobot(AppScope::class)
-@Inject
-class LoginScreenRobot : ComposeScreenRobot<LoginScreenRobot>() {
+class LoginScreenRobot(
+  private val authRobot: AuthRobot,
+) : ComposeScreenRobot<LoginScreenRobot>() {
   fun tapSignIn() { clickView(R.id.sign_in) }
   fun seeWelcomeMessage() { seeView(R.id.welcome) }
 }
@@ -126,13 +133,19 @@ class LoginScreenRobot : ComposeScreenRobot<LoginScreenRobot>() {
 @ContributesTo(AppScope::class)
 interface LoginScreenRobotComponent {
   fun getcom_squareup_example_LoginScreenRobotComponent(): LoginScreenRobot
+
+  @Provides
+  fun provideLoginScreenRobotComponent(
+    authRobot: AuthRobot,
+  ): LoginScreenRobot = LoginScreenRobot(authRobot)
 }
 ```
 
 This exposes the robot as an accessor on the merged graph, making it injectable at
-the test site. Each robot gets its own contributed interface with a package-qualified
-accessor method name derived from the robot fqcn, avoiding collisions when different
-packages contribute robots with the same class name.
+the test site. The generated provider supplies the robot binding only when Metro
+cannot already use `@Inject`. Each robot gets its own contributed interface with a
+package-qualified accessor method name derived from the robot fqcn, avoiding
+collisions when different packages contribute robots with the same class name.
 
 ---
 

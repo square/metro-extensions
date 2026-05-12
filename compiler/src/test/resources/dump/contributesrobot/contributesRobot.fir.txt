@@ -1,10 +1,26 @@
 FILE: contributesRobot.kt
     package com.test
 
+    public final class Dependency : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/Inject|() public constructor(): R|com/test/Dependency| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|kotlin/Any| {
+            private constructor(): R|com/test/Dependency.MetroFactory| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+    }
     @R|dev/zacsweers/metro/Inject|() @R|com/squareup/anvil/extension/ContributesRobot|(scope = <getClass>(Q|kotlin/Unit|)) public final class AbcRobot : R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>| {
-        public constructor(): R|com/test/AbcRobot| {
+        public constructor(dependency: R|com/test/Dependency|): R|com/test/AbcRobot| {
             super<R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>|>()
         }
+
+        public final val dependency: R|com/test/Dependency| = R|<local>/dependency|
+            public get(): R|com/test/Dependency|
 
         @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/AbcRobot|)) public abstract interface RobotContribution : R|kotlin/Any| {
             public abstract fun getcom_test_AbcRobotComponent(): R|com/test/AbcRobot|
@@ -14,9 +30,12 @@ FILE: contributesRobot.kt
 
         }
 
-        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|kotlin/Any| {
-            private constructor(): R|com/test/AbcRobot.MetroFactory| {
-                super<R|kotlin/Any|>()
+        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final class MetroFactory : R|kotlin/Any| {
+            public final companion object Companion : R|kotlin/Any| {
+                private constructor(): R|com/test/AbcRobot.MetroFactory.Companion| {
+                    super<R|kotlin/Any|>()
+                }
+
             }
 
         }
