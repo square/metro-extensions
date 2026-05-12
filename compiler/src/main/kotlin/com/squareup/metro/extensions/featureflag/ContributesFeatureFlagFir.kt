@@ -30,9 +30,11 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
+import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
+import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
@@ -50,9 +52,10 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 /**
- * Generates a nested `FeatureFlagContribution` interface for classes annotated with
+ * Generates a nested `FeatureFlagContribution` binding container object for classes annotated with
  * `@ContributesFeatureFlag` or `@ContributesDynamicConfigurationFlag`.
  *
  * Given:
@@ -64,7 +67,8 @@ import org.jetbrains.kotlin.name.Name
  * This generates:
  * ```
  * @ContributesTo(AppScope::class)
- * interface FeatureFlagContribution {
+ * @BindingContainer
+ * object FeatureFlagContribution {
  *   @Provides @IntoSet
  *   fun providesMyFlag(): FeatureFlag
  * }
@@ -93,9 +97,9 @@ public class ContributesFeatureFlagFir(session: FirSession) :
       .filterIsInstance<FirRegularClassSymbol>()
       .mapNotNull { classSymbol ->
         if (findMatchingAnnotationClassId(classSymbol) == null) return@mapNotNull null
-        val nestedInterfaceClassId =
-          classSymbol.classId.createNestedClassId(ContributesFeatureFlagIds.NESTED_INTERFACE_NAME)
-        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = ClassIds.APP_SCOPE)
+        val nestedContainerClassId =
+          classSymbol.classId.createNestedClassId(ContributesFeatureFlagIds.NESTED_CONTAINER_NAME)
+        ContributionHint(contributingClassId = nestedContainerClassId, scope = ClassIds.APP_SCOPE)
       }
   }
 
@@ -104,7 +108,7 @@ public class ContributesFeatureFlagFir(session: FirSession) :
     context: NestedClassGenerationContext,
   ): Set<Name> {
     if (findMatchingAnnotationClassId(classSymbol) != null) {
-      return setOf(ContributesFeatureFlagIds.NESTED_INTERFACE_NAME)
+      return setOf(ContributesFeatureFlagIds.NESTED_CONTAINER_NAME)
     }
     return emptySet()
   }
@@ -114,7 +118,7 @@ public class ContributesFeatureFlagFir(session: FirSession) :
     name: Name,
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
-    if (name != ContributesFeatureFlagIds.NESTED_INTERFACE_NAME) return null
+    if (name != ContributesFeatureFlagIds.NESTED_CONTAINER_NAME) return null
     if (findMatchingAnnotationClassId(owner) == null) return null
 
     val scopeArg = buildAppScopeClassExpression() ?: return null
@@ -129,14 +133,14 @@ public class ContributesFeatureFlagFir(session: FirSession) :
       moduleData = session.moduleData
       origin = ContributesFeatureFlagGeneratorKey.origin
       source = owner.source
-      classKind = ClassKind.INTERFACE
+      classKind = ClassKind.OBJECT
       scopeProvider = session.kotlinScopeProvider
       this.name = nestedClassId.shortClassName
       symbol = classSymbol
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.ABSTRACT,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
         )
       superTypeRefs += session.builtinTypes.anyType
@@ -148,6 +152,7 @@ public class ContributesFeatureFlagFir(session: FirSession) :
           owner,
           session,
         )
+      annotations += buildSimpleAnnotationCall(ClassIds.BINDING_CONTAINER, classSymbol)
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.ORIGIN,
@@ -160,6 +165,27 @@ public class ContributesFeatureFlagFir(session: FirSession) :
     }
 
     return klass.symbol
+  }
+
+  override fun getCallableNamesForClass(
+    classSymbol: FirClassSymbol<*>,
+    context: MemberGenerationContext,
+  ): Set<Name> {
+    return if (isGeneratedContributionContainer(classSymbol)) {
+      setOf(SpecialNames.INIT)
+    } else {
+      emptySet()
+    }
+  }
+
+  override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
+    return if (isGeneratedContributionContainer(context.owner)) {
+      listOf(
+        createDefaultPrivateConstructor(context.owner, ContributesFeatureFlagGeneratorKey).symbol
+      )
+    } else {
+      emptyList()
+    }
   }
 
   /** Build a synthetic `AppScope::class` expression for the hardcoded scope. */
@@ -235,7 +261,7 @@ public class ContributesFeatureFlagFir(session: FirSession) :
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.OPEN,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(outerOwner, forClass = true),
         )
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
@@ -251,6 +277,11 @@ public class ContributesFeatureFlagFir(session: FirSession) :
       if (hasAnnotation(classSymbol, annotationClassId, session)) return annotationClassId
     }
     return null
+  }
+
+  private fun isGeneratedContributionContainer(classSymbol: FirClassSymbol<*>): Boolean {
+    return classSymbol.origin == ContributesFeatureFlagGeneratorKey.origin &&
+      classSymbol.name == ContributesFeatureFlagIds.NESTED_CONTAINER_NAME
   }
 
   /**

@@ -22,6 +22,9 @@ internal object ClassIds {
 
   val BINDS = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("Binds"))
 
+  val BINDING_CONTAINER =
+    ClassId(FqName("dev.zacsweers.metro"), Name.identifier("BindingContainer"))
+
   val INTO_SET = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("IntoSet"))
 
   val FOR_SCOPE = ClassId(FqName("dev.zacsweers.metro"), Name.identifier("ForScope"))
