@@ -22,7 +22,7 @@ FILE: replacedService.kt
         }
 
     }
-    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|), replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|))) @R|dev/zacsweers/metro/Inject|() public final class FakeMyService : R|com/test/MyService| {
+    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|), replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|))) public final class FakeMyService : R|com/test/MyService| {
         public constructor(): R|com/test/FakeMyService| {
             super<R|kotlin/Any|>()
         }
@@ -31,6 +31,8 @@ FILE: replacedService.kt
             @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RealService|() public final fun provideRealMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
 
             @R|dev/zacsweers/metro/Provides|() public final fun provideMyService(@R|com/squareup/api/RealService|() realService: R|dev/zacsweers/metro/Provider<com/test/MyService>|, fakeService: R|dev/zacsweers/metro/Provider<com/test/FakeMyService>|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
+
+            @R|dev/zacsweers/metro/Provides|() public final fun provideContributedServiceReplacement(): R|com/test/FakeMyService|
 
             private constructor(): R|com/test/FakeMyService.ServiceContribution| {
                 super<R|kotlin/Any|>()
@@ -56,11 +58,11 @@ FILE: replacedService.kt
 
             }
 
-        }
+            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(provideContributedServiceReplacement), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(provideContributedServiceReplacement)) public final object ProvideContributedServiceReplacementMetroFactory : R|kotlin/Any| {
+                private constructor(): R|com/test/FakeMyService.ServiceContribution.ProvideContributedServiceReplacementMetroFactory| {
+                    super<R|kotlin/Any|>()
+                }
 
-        @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final object MetroFactory : R|kotlin/Any| {
-            private constructor(): R|com/test/FakeMyService.MetroFactory| {
-                super<R|kotlin/Any|>()
             }
 
         }

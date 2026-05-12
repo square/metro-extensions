@@ -205,6 +205,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("fakeServiceWithoutInject.kt")
+    public void testFakeServiceWithoutInject() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithoutInject.kt");
+    }
+
+    @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
       runTest("compiler/src/test/resources/box/contributesservice/multiCompilation.kt");
@@ -244,6 +250,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @TestMetadata("replacedServiceTwoCompilations.kt")
     public void testReplacedServiceTwoCompilations() {
       runTest("compiler/src/test/resources/box/contributesservice/replacedServiceTwoCompilations.kt");
+    }
+
+    @Test
+    @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
+    public void testSecondaryInjectConstructorSkipsProvider() {
+      runTest("compiler/src/test/resources/box/contributesservice/secondaryInjectConstructorSkipsProvider.kt");
     }
 
     @Test

@@ -115,6 +115,12 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     }
 
     @Test
+    @TestMetadata("multipleConstructorsRequireInject.kt")
+    public void testMultipleConstructorsRequireInject() {
+      runTest("compiler/src/test/resources/diagnostics/contributesservice/multipleConstructorsRequireInject.kt");
+    }
+
+    @Test
     @TestMetadata("qualifierRequired.kt")
     public void testQualifierRequired() {
       runTest("compiler/src/test/resources/diagnostics/contributesservice/qualifierRequired.kt");

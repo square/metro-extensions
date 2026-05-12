@@ -10,5 +10,4 @@ import com.squareup.services.anvil.ContributesService
 interface MyService
 
 @ContributesService(Unit::class, replaces = [MyService::class])
-@Inject
 class FakeMyService : MyService
