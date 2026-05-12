@@ -77,6 +77,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("contributesBindingScopedMultiCompilation.kt")
+    public void testContributesBindingScopedMultiCompilation() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/contributesBindingScopedMultiCompilation.kt");
+    }
+
+    @Test
     @TestMetadata("excludedScopedBinding.kt")
     public void testExcludedScopedBinding() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/excludedScopedBinding.kt");

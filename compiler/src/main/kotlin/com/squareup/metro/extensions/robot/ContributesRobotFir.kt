@@ -9,6 +9,7 @@ import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.resolveValueParameterTypeRef
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import dev.zacsweers.metro.compiler.compat.CompatContext
@@ -19,7 +20,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
-import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
@@ -36,14 +36,8 @@ import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
-import org.jetbrains.kotlin.fir.resolve.ScopeSession
-import org.jetbrains.kotlin.fir.resolve.SupertypeSupplier
-import org.jetbrains.kotlin.fir.resolve.TypeResolutionConfiguration
 import org.jetbrains.kotlin.fir.resolve.defaultType
-import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
-import org.jetbrains.kotlin.fir.resolve.typeResolver
-import org.jetbrains.kotlin.fir.scopes.createImportingScopes
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -56,8 +50,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -205,7 +197,7 @@ public class ContributesRobotFir(session: FirSession) :
           resolvePhase = FirResolvePhase.BODY_RESOLVE
           moduleData = session.moduleData
           origin = ContributesRobotGeneratorKey.origin
-          returnTypeRef = resolveParameterTypeRef(parameter, robotSymbol)
+          returnTypeRef = resolveValueParameterTypeRef(parameter, robotSymbol, session)
           this.name = parameter.name
           symbol = FirValueParameterSymbol()
           containingDeclarationSymbol = functionSymbol
@@ -308,40 +300,6 @@ public class ContributesRobotFir(session: FirSession) :
   private fun robotProviderFunctionName(contributorClassId: ClassId): Name {
     val fileName = contributorClassId.relativeClassName.asString().replace('.', '_') + "Component"
     return Name.identifier("provide$fileName")
-  }
-
-  private fun resolveParameterTypeRef(
-    parameter: FirValueParameter,
-    ownerSymbol: FirRegularClassSymbol,
-  ): FirTypeRef {
-    val returnTypeRef = parameter.returnTypeRef
-    if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
-
-    val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
-    val scopes =
-      if (file != null) {
-        createImportingScopes(file, session, ScopeSession())
-      } else {
-        emptyList()
-      }
-
-    return session.typeResolver
-      .resolveType(
-        typeRef = returnTypeRef,
-        configuration =
-          TypeResolutionConfiguration(
-            scopes = scopes,
-            containingClassDeclarations = emptyList(),
-            useSiteFile = file,
-          ),
-        areBareTypesAllowed = true,
-        isOperandOfIsOperator = false,
-        resolveDeprecations = false,
-        supertypeSupplier = SupertypeSupplier.Default,
-        expandTypeAliases = false,
-      )
-      .type
-      .toFirResolvedTypeRef()
   }
 
   private fun fqcnBasedAccessorName(contributorClassId: ClassId): String {

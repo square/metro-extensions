@@ -20,17 +20,18 @@ interface MyGraph {
 }
 
 fun box(): String {
+  val holderClass = Class.forName("com.test.MyScopedMultibindingScopedContributions")
   val contributionClass =
-    MyScoped::class.java.declaredClasses.first {
-      it.simpleName == "MultibindingScopedContribution"
-    }
+    Class.forName(
+      "com.test.MyScopedMultibindingScopedContributions\$MultibindingScopedContribution"
+    )
   assertNotNull(contributionClass.getAnnotation(BindingContainer::class.java))
   val providerMethod =
     contributionClass.declaredMethods.firstOrNull {
       it.name == "provideContributedMultibindingScoped"
     }
   assertNull(providerMethod)
-  val companionClass = contributionClass.declaredClasses.first { it.simpleName == "Companion" }
+  val companionClass = holderClass.declaredClasses.first { it.simpleName == "Companion" }
   val companionProviderMethod =
     companionClass.declaredMethods.firstOrNull {
       it.name == "provideContributedMultibindingScoped"

@@ -11,8 +11,6 @@ import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
-import org.jetbrains.kotlin.fir.scopes.getSingleClassifier
-import org.jetbrains.kotlin.fir.scopes.impl.declaredMemberScope
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.name.ClassId
 
@@ -46,40 +44,46 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
     scopeClassId: ClassId,
     typeResolverFactory: MetroFirTypeResolver.Factory,
   ): List<MetroContributionExtension.Contribution> {
-    return annotatedClasses.mapNotNull { parentSymbol ->
+    return annotatedClasses.flatMap { parentSymbol ->
       val annotationScopeClassId =
         extractScopeClassId(
           parentSymbol,
           ContributesMultibindingScopedIds.CONTRIBUTES_MULTIBINDING_SCOPED_CLASS_ID,
           session,
-        ) ?: return@mapNotNull null
+        ) ?: return@flatMap emptyList()
 
-      if (annotationScopeClassId != scopeClassId) return@mapNotNull null
+      if (annotationScopeClassId != scopeClassId) return@flatMap emptyList()
 
       val contributionInterfaceClassId =
-        parentSymbol.classId.createNestedClassId(
-          ContributesMultibindingScopedIds.NESTED_INTERFACE_NAME
-        )
+        ContributesMultibindingScopedIds.contributionClassId(parentSymbol.classId)
+      val holderClassId = ContributesMultibindingScopedIds.holderClassId(parentSymbol.classId)
 
       val contributionSymbol =
         session.symbolProvider.getClassLikeSymbolByClassId(contributionInterfaceClassId)
-          as? FirRegularClassSymbol ?: return@mapNotNull null
+          as? FirRegularClassSymbol
+      val holderSymbol =
+        session.symbolProvider.getClassLikeSymbolByClassId(holderClassId) as? FirRegularClassSymbol
 
-      // Trigger Metro's FIR generator to create the MetroContribution nested class.
-      val scope = contributionSymbol.declaredMemberScope(session, memberRequiredPhase = null)
-      val metroContributionName =
-        scope.getClassifierNames().firstOrNull { it.identifier.startsWith("MetroContributionTo") }
-          ?: return@mapNotNull null
-
-      val metroContributionSymbol =
-        scope.getSingleClassifier(metroContributionName) as? FirRegularClassSymbol
-          ?: return@mapNotNull null
-
-      MetroContributionExtension.Contribution(
-        supertype = metroContributionSymbol.defaultType(),
-        replaces = emptyList(),
-        originClassId = contributionInterfaceClassId,
-      )
+      buildList {
+        if (holderSymbol != null) {
+          add(
+            MetroContributionExtension.Contribution(
+              supertype = holderSymbol.defaultType(),
+              replaces = emptyList(),
+              originClassId = holderClassId,
+            )
+          )
+        }
+        if (contributionSymbol != null) {
+          add(
+            MetroContributionExtension.Contribution(
+              supertype = contributionSymbol.defaultType(),
+              replaces = emptyList(),
+              originClassId = contributionInterfaceClassId,
+            )
+          )
+        }
+      }
     }
   }
 

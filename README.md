@@ -24,10 +24,9 @@ For detailed descriptions of all annotations including generated output examples
 #### `@ContributesMultibindingScoped(scope: KClass<*>)`
 
 Contributes a class as a scoped multibinding into a Metro dependency graph. The annotated class must
-implement `mortar.Scoped`. If the class is not already injectable with `@Inject` or
-`@ContributesBinding`, the plugin also generates a `@Provides` constructor provider in the generated
-companion object. Classes with multiple constructors must use `@Inject` on the class or on the
-constructor Metro should use.
+implement `mortar.Scoped`. If the class is not already injectable with `@Inject`, the plugin also
+generates a `@Provides` constructor provider in the generated companion object. Classes with
+multiple constructors must use `@Inject` on the class or on the constructor Metro should use.
 
 #### `@ContributesRobot(scope: KClass<*>)`
 
