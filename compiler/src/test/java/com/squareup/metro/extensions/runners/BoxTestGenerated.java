@@ -65,6 +65,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("constructorProvider.kt")
+    public void testConstructorProvider() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/constructorProvider.kt");
+    }
+
+    @Test
+    @TestMetadata("contributesBindingOnSameClass.kt")
+    public void testContributesBindingOnSameClass() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/contributesBindingOnSameClass.kt");
+    }
+
+    @Test
     @TestMetadata("excludedScopedBinding.kt")
     public void testExcludedScopedBinding() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/excludedScopedBinding.kt");
@@ -110,6 +122,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @TestMetadata("scopedInSuperTypes.kt")
     public void testScopedInSuperTypes() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/scopedInSuperTypes.kt");
+    }
+
+    @Test
+    @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
+    public void testSecondaryInjectConstructorSkipsProvider() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/secondaryInjectConstructorSkipsProvider.kt");
     }
 
     @Test

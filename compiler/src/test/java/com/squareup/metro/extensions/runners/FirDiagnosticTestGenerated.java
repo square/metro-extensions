@@ -71,6 +71,12 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     }
 
     @Test
+    @TestMetadata("multipleConstructorsRequireInject.kt")
+    public void testMultipleConstructorsRequireInject() {
+      runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/multipleConstructorsRequireInject.kt");
+    }
+
+    @Test
     @TestMetadata("replacedScopeMismatch.kt")
     public void testReplacedScopeMismatch() {
       runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/replacedScopeMismatch.kt");

@@ -3,6 +3,7 @@ package com.squareup.metro.extensions
 import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.featureflag.ContributesFeatureFlagIrExtension
 import com.squareup.metro.extensions.robot.ContributesRobotIrExtension
+import com.squareup.metro.extensions.scoped.ContributesMultibindingScopedIrExtension
 import com.squareup.metro.extensions.service.ContributesServiceIrExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
@@ -24,5 +25,6 @@ public class SquareMetroExtensionsPluginComponentRegistrar : CompilerPluginRegis
     IrGenerationExtension.registerExtension(ContributesRobotIrExtension())
     IrGenerationExtension.registerExtension(ContributesServiceIrExtension())
     IrGenerationExtension.registerExtension(ContributesFeatureFlagIrExtension())
+    IrGenerationExtension.registerExtension(ContributesMultibindingScopedIrExtension())
   }
 }
