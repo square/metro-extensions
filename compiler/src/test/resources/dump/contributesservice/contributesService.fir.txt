@@ -2,10 +2,11 @@ FILE: contributesService.kt
     package com.test
 
     @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|)) public abstract interface ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) public open fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|)) public final object ServiceContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) public final fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
-            @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunitdHiVAhs : R|com/test/MyService.ServiceContribution| {
+            private constructor(): R|com/test/MyService.ServiceContribution| {
+                super<R|kotlin/Any|>()
             }
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/CallableMetadata|(callableName = String(provideMyService), propertyName = String(), startOffset = Int(-1), endOffset = Int(-1), newInstanceName = String(provideMyService)) public final class ProvideMyServiceMetroFactory : R|kotlin/Any| {

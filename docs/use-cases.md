@@ -189,9 +189,9 @@ interface RemoteDeviceApiService {
 In release builds:
 
 ```kotlin
-@Module
 @ContributesTo(AppScope::class)
-object RemoteDeviceApiServiceModule {
+@BindingContainer
+object ServiceContribution {
   @Provides @SingleIn(AppScope::class)
   fun provideRemoteDeviceApiService(
     @RetrofitAuthenticated serviceCreator: ServiceCreator,
@@ -205,9 +205,9 @@ In debug builds, an additional `@FakeMode` safety check is generated to catch ca
 where fake mode is enabled but no fake service was provided:
 
 ```kotlin
-@Module
 @ContributesTo(AppScope::class)
-object RemoteDeviceApiServiceModule {
+@BindingContainer
+object ServiceContribution {
   @Provides @SingleIn(AppScope::class)
   fun provideRemoteDeviceApiService(
     @RetrofitAuthenticated serviceCreator: ServiceCreator,
@@ -238,17 +238,20 @@ class FakeRemoteDeviceApiService(
 
 ### Generated output — Fake service (pseudo)
 
-The generated module replaces the real service's module. It re-creates the real service
-binding under a `@RealService` qualifier, then adds a switcher that picks real or fake
-based on the `@FakeMode` boolean:
+The generated fake service binding container replaces the real service contribution. It re-creates
+the real service binding under a `@RealService` qualifier, then adds a switcher that picks real or
+fake based on the `@FakeMode` boolean:
 
 ```kotlin
-@Module
 @ContributesTo(
   scope = AppScope::class,
-  replaces = [RemoteDeviceApiServiceModule::class],
+  replaces = [
+    RemoteDeviceApiService::class,
+    RemoteDeviceApiService.ServiceContribution::class,
+  ],
 )
-object FakeRemoteDeviceApiServiceModule {
+@BindingContainer
+object ServiceContribution {
   // Real service still available under @RealService qualifier
   @Provides @SingleIn(AppScope::class) @RealService
   fun provideRemoteDeviceApiService(

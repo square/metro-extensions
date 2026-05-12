@@ -60,9 +60,10 @@ generated factory.
 
 Contributes a Retrofit service binding to a Metro dependency graph. The annotated interface must have
 exactly one `@Qualifier` annotation (e.g., `@RetrofitAuthenticated`) which determines which
-`ServiceCreator` is injected. At compile time, the plugin generates a `@Provides` function that
-calls `serviceCreator.create(Service::class.java)`, with a `@FakeMode` safety check to catch
-missing fake services in debug builds.
+`ServiceCreator` is injected. At compile time, the plugin generates a nested
+`@ContributesTo(scope)` `@BindingContainer` object with a `@Provides` function that calls
+`serviceCreator.create(Service::class.java)`, with a `@FakeMode` safety check to catch missing fake
+services in debug builds.
 
 ## Usage
 

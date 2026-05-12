@@ -8,6 +8,7 @@
 
 - `@ContributesRobot` no longer requires `@Inject`; non-injectable robot classes now get a generated `@Provides` constructor provider, while existing `@Inject` robots keep using Metro's normal injection path.
 - `@ContributesFeatureFlag` and `@ContributesDynamicConfigurationFlag` now generate `@BindingContainer` objects instead of interfaces for their `@Provides @IntoSet` bindings.
+- `@ContributesService` now generates `@BindingContainer` objects instead of interfaces for its service provider bindings.
 
 ### Deprecated
 

@@ -12,17 +12,12 @@ package com.test
 @RetrofitAuthenticated
 interface MyService {
   @ContributesTo(scope = Unit::class)
+  @BindingContainer
   @Origin(value = MyService::class)
-  interface ServiceContribution {
-    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-    @MetroContribution(scope = Unit::class)
-    interface MetroContributionToKotlinunitdHiVAhs : ServiceContribution {
-    }
-
+  object ServiceContribution {
     @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
     @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
     class ProvideMyServiceMetroFactory : Factory<MyService> {
-      private /* final field */ val instance: ServiceContribution = instance
       private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
       companion object Companion {
         private constructor() /* primary */ {
@@ -34,21 +29,21 @@ interface MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
-          return ProvideMyServiceMetroFactory(instance = instance, serviceCreator = serviceCreator)
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
+          return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator)
         }
 
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun provideMyService(instance: ServiceContribution, @RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
-          return instance.provideMyService(serviceCreator = serviceCreator)
+        fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+          return ServiceContribution.provideMyService(serviceCreator = serviceCreator)
         }
 
       }
 
       @HiddenFromObjC
-      private constructor(instance: ServiceContribution, serviceCreator: Provider<ServiceCreator>) /* primary */ {
+      private constructor(serviceCreator: Provider<ServiceCreator>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
@@ -56,7 +51,7 @@ interface MyService {
 
       @HiddenFromObjC
       override operator fun invoke(): MyService {
-        return Companion.provideMyService(instance = <this>.#instance, serviceCreator = <this>.#serviceCreator.invoke())
+        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke())
       }
 
       @SingleIn(scope = Unit::class)
@@ -64,6 +59,12 @@ interface MyService {
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
       }
+
+    }
+
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
 
     }
 

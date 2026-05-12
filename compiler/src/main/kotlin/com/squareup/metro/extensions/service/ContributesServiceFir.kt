@@ -41,9 +41,11 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
+import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
+import org.jetbrains.kotlin.fir.plugin.createDefaultPrivateConstructor
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
@@ -65,9 +67,10 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 /**
- * Generates a nested `ServiceContribution` interface for classes annotated with
+ * Generates a nested `ServiceContribution` binding container object for classes annotated with
  * `@ContributesService`.
  *
  * Given a **real service** in a non-release build:
@@ -80,7 +83,8 @@ import org.jetbrains.kotlin.name.Name
  * This generates:
  * ```
  * @ContributesTo(SomeScope::class)
- * interface ServiceContribution {
+ * @BindingContainer
+ * object ServiceContribution {
  *   @Provides @SingleIn(SomeScope::class)
  *   fun provideMyService(
  *     @SomeQualifier serviceCreator: ServiceCreator,
@@ -92,7 +96,8 @@ import org.jetbrains.kotlin.name.Name
  * In a **release build**, the `@FakeMode isFakeMode` parameter is omitted:
  * ```
  * @ContributesTo(SomeScope::class)
- * interface ServiceContribution {
+ * @BindingContainer
+ * object ServiceContribution {
  *   @Provides @SingleIn(SomeScope::class)
  *   fun provideMyService(
  *     @SomeQualifier serviceCreator: ServiceCreator,
@@ -109,8 +114,12 @@ import org.jetbrains.kotlin.name.Name
  *
  * This generates:
  * ```
- * @ContributesTo(SomeScope::class, replaces = [MyService.ServiceContribution::class])
- * interface ServiceContribution {
+ * @ContributesTo(
+ *   SomeScope::class,
+ *   replaces = [MyService::class, MyService.ServiceContribution::class],
+ * )
+ * @BindingContainer
+ * object ServiceContribution {
  *   @Provides @SingleIn(SomeScope::class) @RealService
  *   fun provideRealMyService(
  *     @SomeQualifier serviceCreator: ServiceCreator,
@@ -152,9 +161,9 @@ public class ContributesServiceFir(session: FirSession) :
             ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
             session,
           ) ?: return@mapNotNull null
-        val nestedInterfaceClassId =
-          classSymbol.classId.createNestedClassId(ContributesServiceIds.NESTED_INTERFACE_NAME)
-        ContributionHint(contributingClassId = nestedInterfaceClassId, scope = scopeClassId)
+        val nestedContainerClassId =
+          classSymbol.classId.createNestedClassId(ContributesServiceIds.NESTED_CONTAINER_NAME)
+        ContributionHint(contributingClassId = nestedContainerClassId, scope = scopeClassId)
       }
   }
 
@@ -163,7 +172,7 @@ public class ContributesServiceFir(session: FirSession) :
     context: NestedClassGenerationContext,
   ): Set<Name> {
     if (hasAnnotation(classSymbol, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)) {
-      return setOf(ContributesServiceIds.NESTED_INTERFACE_NAME)
+      return setOf(ContributesServiceIds.NESTED_CONTAINER_NAME)
     }
     return emptySet()
   }
@@ -173,7 +182,7 @@ public class ContributesServiceFir(session: FirSession) :
     name: Name,
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
-    if (name != ContributesServiceIds.NESTED_INTERFACE_NAME) return null
+    if (name != ContributesServiceIds.NESTED_CONTAINER_NAME) return null
     if (!hasAnnotation(owner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session))
       return null
     val scopeArg =
@@ -204,14 +213,14 @@ public class ContributesServiceFir(session: FirSession) :
       moduleData = session.moduleData
       origin = ContributesServiceGeneratorKey.origin
       source = owner.source
-      classKind = ClassKind.INTERFACE
+      classKind = ClassKind.OBJECT
       scopeProvider = session.kotlinScopeProvider
       this.name = nestedClassId.shortClassName
       symbol = classSymbol
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.ABSTRACT,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
         )
       superTypeRefs += session.builtinTypes.anyType
@@ -229,6 +238,7 @@ public class ContributesServiceFir(session: FirSession) :
             session,
           )
       }
+      annotations += buildSimpleAnnotationCall(ClassIds.BINDING_CONTAINER, classSymbol)
       annotations +=
         buildAnnotationCallWithScope(
           ClassIds.ORIGIN,
@@ -244,6 +254,25 @@ public class ContributesServiceFir(session: FirSession) :
     }
 
     return klass.symbol
+  }
+
+  override fun getCallableNamesForClass(
+    classSymbol: FirClassSymbol<*>,
+    context: MemberGenerationContext,
+  ): Set<Name> {
+    return if (isGeneratedContributionContainer(classSymbol)) {
+      setOf(SpecialNames.INIT)
+    } else {
+      emptySet()
+    }
+  }
+
+  override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
+    return if (isGeneratedContributionContainer(context.owner)) {
+      listOf(createDefaultPrivateConstructor(context.owner, ContributesServiceGeneratorKey).symbol)
+    } else {
+      emptyList()
+    }
   }
 
   /** Extract `replaces` ClassIds from the `@ContributesService` annotation. */
@@ -304,7 +333,7 @@ public class ContributesServiceFir(session: FirSession) :
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.OPEN,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(outerOwner, forClass = true),
         )
 
@@ -406,7 +435,7 @@ public class ContributesServiceFir(session: FirSession) :
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.OPEN,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
         )
 
@@ -453,7 +482,7 @@ public class ContributesServiceFir(session: FirSession) :
       status =
         FirResolvedDeclarationStatusImpl(
           Visibilities.Public,
-          Modality.OPEN,
+          Modality.FINAL,
           Visibilities.Public.toEffectiveVisibility(fakeOwner, forClass = true),
         )
 
@@ -506,10 +535,11 @@ public class ContributesServiceFir(session: FirSession) :
     )
 
   /**
-   * Build `@ContributesTo(scope, replaces = [ReplacedClass.ServiceContribution::class])` as a
-   * [FirAnnotationCall] with [buildResolvedArgumentList] so the FIR-to-IR converter properly
-   * serializes both the scope and replaces arguments. This enables Metro's IR merger to read the
-   * replaces argument for cross-module replacement.
+   * Build `@ContributesTo(scope, replaces =
+   * [ReplacedClass::class, ReplacedClass.ServiceContribution::class])` as a [FirAnnotationCall]
+   * with [buildResolvedArgumentList] so the FIR-to-IR converter properly serializes both the scope
+   * and replaces arguments. This enables Metro's IR merger to read the replaces argument for
+   * cross-module replacement.
    */
   @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
   private fun buildContributesToWithReplaces(
@@ -518,10 +548,12 @@ public class ContributesServiceFir(session: FirSession) :
     owner: FirClassSymbol<*>,
   ): FirAnnotationCall {
     val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+    val replacedContributionClassIds = replacedClassIds.flatMap {
+      listOf(it, it.createNestedClassId(ContributesServiceIds.NESTED_CONTAINER_NAME))
+    }
 
-    // Build resolved class references for [ReplacedClass.ServiceContribution::class, ...]
-    val getClassCalls = replacedClassIds.map { outerClassId ->
-      val replacedId = outerClassId.createNestedClassId(ContributesServiceIds.NESTED_INTERFACE_NAME)
+    // Build resolved class references for the raw and generated service contribution classes.
+    val getClassCalls = replacedContributionClassIds.map { replacedId ->
       val replacedType =
         ConeClassLikeTypeImpl(
           ConeClassLikeLookupTagImpl(replacedId),
@@ -609,6 +641,11 @@ public class ContributesServiceFir(session: FirSession) :
       if (isQualifier) return annotationClassId
     }
     return null
+  }
+
+  private fun isGeneratedContributionContainer(classSymbol: FirClassSymbol<*>): Boolean {
+    return classSymbol.origin == ContributesServiceGeneratorKey.origin &&
+      classSymbol.name == ContributesServiceIds.NESTED_CONTAINER_NAME
   }
 
   private fun buildSimpleAnnotation(classId: ClassId): FirAnnotation {
