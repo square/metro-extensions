@@ -19,11 +19,13 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.origin
+import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirExpression
@@ -34,10 +36,17 @@ import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
+import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.resolve.SupertypeSupplier
+import org.jetbrains.kotlin.fir.resolve.TypeResolutionConfiguration
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.providers.firProvider
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
+import org.jetbrains.kotlin.fir.resolve.typeResolver
+import org.jetbrains.kotlin.fir.scopes.createImportingScopes
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
@@ -47,10 +56,14 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.toEffectiveVisibility
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+
+private const val SCOPED_PROVIDER_FUNCTION_NAME = "provideContributedMultibindingScoped"
 
 /**
  * Generates a nested `MultibindingScopedContribution` interface for classes annotated with
@@ -58,15 +71,17 @@ import org.jetbrains.kotlin.name.Name
  *
  * For a class like:
  * ```
- * @Inject
  * @ContributesMultibindingScoped(SomeScope::class)
- * class MyService : Scoped
+ * class MyService(private val dependency: Dependency) : Scoped
  * ```
  *
  * This generator produces:
  * ```
  * @ContributesTo(SomeScope::class)
  * interface MultibindingScopedContribution {
+ *   @Provides
+ *   fun provideContributedMultibindingScoped(dependency: Dependency): MyService
+ *
  *   @Binds @IntoSet @ForScope(SomeScope::class)
  *   fun bindsMyService(myService: MyService): Scoped
  * }
@@ -125,6 +140,7 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
       )
     )
       return null
+    val ownerSymbol = owner as? FirRegularClassSymbol ?: return null
     val scopeArg =
       extractScopeArgument(
         owner,
@@ -139,6 +155,12 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
     // This makes it visible to Metro's getNestedClassifiersNames (which checks for @Binds
     // functions to decide whether to generate BindsMirror).
     val bindsFunction = buildBindsFunction(nestedClassId, owner, scopeArg)
+    val providesFunction =
+      if (hasInjectAnnotation(ownerSymbol) || hasContributesBindingAnnotation(ownerSymbol)) {
+        null
+      } else {
+        buildProvidesFunction(nestedClassId, ownerSymbol)
+      }
 
     val klass = buildRegularClass {
       resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -176,6 +198,9 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
         )
       // Add the function directly to the class declarations
       declarations += bindsFunction
+      if (providesFunction != null) {
+        declarations += providesFunction
+      }
     }
 
     return klass.symbol
@@ -262,6 +287,113 @@ public class ContributesMultibindingScopedFir(session: FirSession) :
           session,
         )
     }
+  }
+
+  /**
+   * Build the `@Provides` function that constructs the scoped class when it is not already
+   * injectable and no `@ContributesBinding` self-provider is expected from Metro.
+   *
+   * Generates: `@Provides fun provideContributedMultibindingScoped(dependency: Dependency):
+   * MyScoped`
+   */
+  @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+  private fun buildProvidesFunction(
+    classId: ClassId,
+    scopedSymbol: FirRegularClassSymbol,
+  ): FirDeclaration? {
+    val callableId = CallableId(classId, Name.identifier(SCOPED_PROVIDER_FUNCTION_NAME))
+    val constructorSymbol =
+      scopedSymbol.declarationSymbols.filterIsInstance<FirConstructorSymbol>().firstOrNull()
+        ?: return null
+    val scopedType = scopedSymbol.defaultType()
+    val dispatchType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(classId),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+
+    val functionSymbol = FirNamedFunctionSymbol(callableId)
+
+    return buildNamedFunction {
+      isLocal = false
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = ContributesMultibindingScopedGeneratorKey.origin
+      symbol = functionSymbol
+      name = callableId.callableName
+      returnTypeRef = scopedType.toFirResolvedTypeRef()
+      dispatchReceiverType = dispatchType
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.OPEN,
+          Visibilities.Public.toEffectiveVisibility(scopedSymbol, forClass = true),
+        )
+
+      for (parameter in constructorSymbol.fir.valueParameters) {
+        valueParameters += buildValueParameter {
+          resolvePhase = FirResolvePhase.BODY_RESOLVE
+          moduleData = session.moduleData
+          origin = ContributesMultibindingScopedGeneratorKey.origin
+          returnTypeRef = resolveParameterTypeRef(parameter, scopedSymbol)
+          this.name = parameter.name
+          symbol = FirValueParameterSymbol()
+          containingDeclarationSymbol = functionSymbol
+          annotations += parameter.annotations
+        }
+      }
+
+      annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+    }
+  }
+
+  @OptIn(DirectDeclarationsAccess::class)
+  private fun hasInjectAnnotation(scopedSymbol: FirRegularClassSymbol): Boolean {
+    return hasAnnotation(scopedSymbol, ClassIds.INJECT, session) ||
+      scopedSymbol.declarationSymbols.filterIsInstance<FirConstructorSymbol>().any {
+        it.resolvedCompilerAnnotationsWithClassIds.any { annotation ->
+          annotation.toAnnotationClassIdSafe(session) == ClassIds.INJECT
+        }
+      }
+  }
+
+  private fun hasContributesBindingAnnotation(scopedSymbol: FirRegularClassSymbol): Boolean {
+    return hasAnnotation(scopedSymbol, ClassIds.CONTRIBUTES_BINDING, session)
+  }
+
+  private fun resolveParameterTypeRef(
+    parameter: FirValueParameter,
+    ownerSymbol: FirRegularClassSymbol,
+  ): FirTypeRef {
+    val returnTypeRef = parameter.returnTypeRef
+    if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
+
+    val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
+    val scopes =
+      if (file != null) {
+        createImportingScopes(file, session, ScopeSession())
+      } else {
+        emptyList()
+      }
+
+    return session.typeResolver
+      .resolveType(
+        typeRef = returnTypeRef,
+        configuration =
+          TypeResolutionConfiguration(
+            scopes = scopes,
+            containingClassDeclarations = emptyList(),
+            useSiteFile = file,
+          ),
+        areBareTypesAllowed = true,
+        isOperandOfIsOperator = false,
+        resolveDeprecations = false,
+        supertypeSupplier = SupertypeSupplier.Default,
+        expandTypeAliases = false,
+      )
+      .type
+      .toFirResolvedTypeRef()
   }
 
   /**

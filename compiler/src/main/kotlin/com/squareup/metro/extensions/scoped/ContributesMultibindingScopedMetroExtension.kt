@@ -78,7 +78,7 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
       MetroContributionExtension.Contribution(
         supertype = metroContributionSymbol.defaultType(),
         replaces = emptyList(),
-        originClassId = parentSymbol.classId,
+        originClassId = contributionInterfaceClassId,
       )
     }
   }

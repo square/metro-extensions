@@ -290,9 +290,10 @@ real and fake must use the same scope.
 
 ## @ContributesMultibindingScoped
 
-Contributes an `@Inject` class implementing `Scoped` into a `Set<Scoped>` qualified with
-`@ForScope`. The scope value is used for both the contribution target and the `@ForScope`
-qualifier, since they are always the same.
+Contributes a class implementing `Scoped` into a `Set<Scoped>` qualified with `@ForScope`. The
+scope value is used for both the contribution target and the `@ForScope` qualifier, since they are
+always the same. If the class is not already injectable with `@Inject` or `@ContributesBinding`, the
+plugin also generates a `@Provides` function that calls the constructor.
 
 ### Annotation definition
 
@@ -304,16 +305,17 @@ annotation class ContributesMultibindingScoped(
 
 ### Target
 
-`@Inject` classes implementing `Scoped`.
+Classes implementing `Scoped`.
 
 ### Usage
 
 ```kotlin
 @ContributesMultibindingScoped(AppScope::class)
-@Inject
-class AppLifecycleLogger : Scoped {
-  override fun onEnterScope(scope: MortarScope) { log("entered") }
-  override fun onExitScope() { log("exited") }
+class AppLifecycleLogger(
+  private val logger: Logger,
+) : Scoped {
+  override fun onEnterScope(scope: MortarScope) { logger.log("entered") }
+  override fun onExitScope() { logger.log("exited") }
 }
 ```
 
@@ -321,15 +323,22 @@ class AppLifecycleLogger : Scoped {
 
 ```kotlin
 @ContributesTo(AppScope::class)
-@BindingContainer
-object AppLifecycleLoggerBindingContainer {
-  @Provides @IntoSet @ForScope(AppScope::class)
-  fun contributeScoped(target: AppLifecycleLogger): Scoped = target
+interface MultibindingScopedContribution {
+  @Provides
+  fun provideContributedMultibindingScoped(logger: Logger): AppLifecycleLogger {
+    return AppLifecycleLogger(logger)
+  }
+
+  @Binds @IntoSet @ForScope(AppScope::class)
+  fun bindsAppLifecycleLogger(target: AppLifecycleLogger): Scoped
 }
 ```
 
 Note: the scope from the annotation (`AppScope`) is used in two places -- as the
-`@ContributesTo` scope and as the `@ForScope` qualifier value.
+`@ContributesTo` scope and as the `@ForScope` qualifier value. If the class or selected constructor
+is annotated with `@Inject`, or the class also has `@ContributesBinding`, the constructor provider is
+not generated. Classes with multiple constructors must mark the class or selected constructor with
+`@Inject`.
 
 ---
 
