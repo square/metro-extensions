@@ -6,25 +6,27 @@
 
 ### Changed
 
-- `@ContributesRobot` no longer requires `@Inject`; non-injectable robot classes now get a generated `@Provides` constructor provider, while existing `@Inject` robots keep using Metro's normal injection path.
-- `@ContributesFeatureFlag` and `@ContributesDynamicConfigurationFlag` now generate `@BindingContainer` objects instead of interfaces for their `@Provides @IntoSet` bindings.
-- `@ContributesService` now generates `@BindingContainer` objects instead of interfaces for its service provider bindings.
-- `@ContributesService` fake services no longer require `@Inject`; non-injectable fake services now get a generated `@Provides` constructor provider, while `@Inject` fake services keep using Metro's normal injection path.
-- `@ContributesMultibindingScoped` no longer requires `@Inject`; non-injectable scoped classes now get a generated `@Provides` constructor provider, while `@Inject` scoped classes keep using Metro's normal injection path.
-- `@ContributesMultibindingScoped` now annotates its generated contribution interface with `@BindingContainer` and emits constructor `@Provides` functions in the generated companion object.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- `@ContributesMultibindingScoped` now generates its concrete constructor provider even when the scoped class also has `@ContributesBinding`, preserving the concrete binding needed by the generated `@Binds` multibinding.
-
 ### Security
 
 ### Other Notes & Contributions
 
+
+## [0.0.9] - 2026-05-12
+
+### Changed
+
+- `@ContributesRobot` no longer requires `@Inject`; non-injectable robot classes now get a generated `@Provides` constructor provider, while existing `@Inject` robots keep using Metro's normal injection path.
+- `@ContributesFeatureFlag` and `@ContributesDynamicConfigurationFlag` now generate `@BindingContainer` objects instead of interfaces for their `@Provides @IntoSet` bindings.
+- `@ContributesService` now generates `@BindingContainer` objects instead of interfaces for its service provider bindings.
+- `@ContributesService` fake services no longer require `@Inject`; non-injectable fake services now get a generated `@Provides` constructor provider, while `@Inject` fake services keep using Metro's normal injection path.
+- `@ContributesMultibindingScoped` no longer requires `@Inject`; non-injectable scoped classes now get a generated `@Provides` constructor provider, while `@Inject` scoped classes keep using Metro's normal injection path.
+- `@ContributesMultibindingScoped` now annotates its generated contribution interface with `@BindingContainer` and emits constructor `@Provides` functions in the generated companion object.
 
 ## [0.0.8] - 2026-05-02
 
@@ -94,7 +96,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.8...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.9...HEAD
+[0.0.9]: https://github.com/square/metro-extensions/compare/0.0.9
 [0.0.8]: https://github.com/square/metro-extensions/compare/0.0.8
 [0.0.7]: https://github.com/square/metro-extensions/compare/0.0.7
 [0.0.6]: https://github.com/square/metro-extensions/compare/0.0.6
