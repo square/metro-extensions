@@ -12,6 +12,8 @@
 
 ### Fixed
 
+- Fixed `@ContributesService` fake replacement providers failing to resolve constructor parameters whose types are function types or owner-nested classes.
+
 ### Security
 
 ### Other Notes & Contributions

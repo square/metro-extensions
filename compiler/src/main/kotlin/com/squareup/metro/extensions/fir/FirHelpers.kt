@@ -1,7 +1,9 @@
 package com.squareup.metro.extensions.fir
 
 import com.squareup.metro.extensions.ArgNames
+import org.jetbrains.kotlin.fir.FirFunctionTypeParameter
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.builder.buildFunctionTypeParameter
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.toAnnotationClassIdSafe
@@ -39,15 +41,18 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.toFirResolvedTypeRef
+import org.jetbrains.kotlin.fir.types.ConeErrorType
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.ConeStarProjection
 import org.jetbrains.kotlin.fir.types.ConeTypeProjection
+import org.jetbrains.kotlin.fir.types.FirFunctionTypeRef
 import org.jetbrains.kotlin.fir.types.FirResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.FirStarProjection
 import org.jetbrains.kotlin.fir.types.FirTypeProjection
 import org.jetbrains.kotlin.fir.types.FirTypeProjectionWithVariance
 import org.jetbrains.kotlin.fir.types.FirTypeRef
 import org.jetbrains.kotlin.fir.types.FirUserTypeRef
+import org.jetbrains.kotlin.fir.types.builder.buildFunctionTypeRefCopy
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
 import org.jetbrains.kotlin.name.ClassId
@@ -245,8 +250,15 @@ internal fun resolveValueParameterTypeRef(
   ownerSymbol: FirClassLikeSymbol<*>,
   session: FirSession,
 ): FirTypeRef {
-  val returnTypeRef = parameter.returnTypeRef
-  if (returnTypeRef is FirResolvedTypeRef) return returnTypeRef
+  val returnTypeRef =
+    runCatching { parameter.symbol.resolvedReturnTypeRef }.getOrElse { parameter.returnTypeRef }
+  if (returnTypeRef is FirResolvedTypeRef) {
+    if (returnTypeRef.coneType !is ConeErrorType) return returnTypeRef
+    returnTypeRef.recoveredErrorTypeRef()?.let {
+      return it
+    }
+  }
+  val resolvableReturnTypeRef = returnTypeRef.recoverableTypeRef()
 
   val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
   val scopes =
@@ -256,11 +268,12 @@ internal fun resolveValueParameterTypeRef(
       emptyList()
     }
 
-  val resolutionFailure =
+  var resolutionFailure: Throwable? = null
+  val resolvedTypeRef =
     runCatching {
         session.typeResolver
           .resolveType(
-            typeRef = returnTypeRef,
+            typeRef = resolvableTypeRef(resolvableReturnTypeRef, ownerSymbol, session),
             configuration =
               TypeResolutionConfiguration(
                 scopes = scopes,
@@ -276,18 +289,98 @@ internal fun resolveValueParameterTypeRef(
           .type
           .toFirResolvedTypeRef()
       }
-      .fold(
-        onSuccess = {
-          return it
-        },
-        onFailure = { it },
-      )
+      .getOrElse {
+        resolutionFailure = it
+        null
+      }
+  resolvedTypeRef?.let {
+    if (it.coneType !is ConeErrorType) return it
+    it.recoveredErrorTypeRef()?.let { recoveredTypeRef ->
+      return recoveredTypeRef
+    }
+  }
 
-  resolvedUserTypeRefByClassId(returnTypeRef, ownerSymbol, session)?.let {
+  resolvedUserTypeRefByClassId(resolvableReturnTypeRef, ownerSymbol, session)?.let {
     return it.toFirResolvedTypeRef()
   }
 
-  throw resolutionFailure
+  resolvedTypeRef?.let {
+    return it
+  }
+
+  throw resolutionFailure ?: error("Unable to resolve parameter type: $returnTypeRef")
+}
+
+private fun resolvableTypeRef(
+  typeRef: FirTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): FirTypeRef {
+  return if (typeRef is FirFunctionTypeRef) {
+    resolvedFunctionTypeRef(typeRef, ownerSymbol, session) ?: typeRef
+  } else {
+    typeRef
+  }
+}
+
+private fun resolvedFunctionTypeRef(
+  typeRef: FirFunctionTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): FirFunctionTypeRef? {
+  val receiverTypeRef =
+    typeRef.receiverTypeRef?.let { resolveNestedFunctionTypeRef(it, ownerSymbol, session) }
+  if (typeRef.receiverTypeRef != null && receiverTypeRef == null) return null
+
+  val parameters = mutableListOf<FirFunctionTypeParameter>()
+  for (parameter in typeRef.parameters) {
+    val returnTypeRef =
+      resolveNestedFunctionTypeRef(parameter.returnTypeRef, ownerSymbol, session) ?: return null
+    parameters += parameter.withReturnTypeRef(returnTypeRef)
+  }
+
+  val returnTypeRef =
+    resolveNestedFunctionTypeRef(typeRef.returnTypeRef, ownerSymbol, session) ?: return null
+
+  val contextParameterTypeRefs = mutableListOf<FirTypeRef>()
+  for (contextParameterTypeRef in typeRef.contextParameterTypeRefs) {
+    contextParameterTypeRefs +=
+      resolveNestedFunctionTypeRef(contextParameterTypeRef, ownerSymbol, session) ?: return null
+  }
+
+  return buildFunctionTypeRefCopy(typeRef) {
+    this.receiverTypeRef = receiverTypeRef
+    this.parameters.clear()
+    this.parameters += parameters
+    this.returnTypeRef = returnTypeRef
+    this.contextParameterTypeRefs.clear()
+    this.contextParameterTypeRefs += contextParameterTypeRefs
+  }
+}
+
+private fun resolveNestedFunctionTypeRef(
+  typeRef: FirTypeRef,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): FirTypeRef? {
+  if (typeRef is FirResolvedTypeRef) {
+    if (typeRef.coneType !is ConeErrorType) return typeRef
+    typeRef.recoveredErrorTypeRef()?.let {
+      return it
+    }
+  }
+  return resolveTypeRefToConeType(typeRef.recoverableTypeRef(), ownerSymbol, session)
+    ?.toFirResolvedTypeRef()
+}
+
+private fun FirFunctionTypeParameter.withReturnTypeRef(
+  returnTypeRef: FirTypeRef
+): FirFunctionTypeParameter {
+  return buildFunctionTypeParameter {
+    source = this@withReturnTypeRef.source
+    name = this@withReturnTypeRef.name
+    this.returnTypeRef = returnTypeRef
+  }
 }
 
 private fun resolvedUserTypeRefByClassId(
@@ -330,7 +423,13 @@ private fun resolveTypeRefToConeType(
   ownerSymbol: FirClassLikeSymbol<*>,
   session: FirSession,
 ): ConeKotlinType? {
-  if (typeRef is FirResolvedTypeRef) return typeRef.coneType
+  if (typeRef is FirResolvedTypeRef) {
+    if (typeRef.coneType !is ConeErrorType) return typeRef.coneType
+    (typeRef.coneType as ConeErrorType).delegatedType?.let {
+      return it
+    }
+  }
+  val resolvableTypeRef = typeRef.recoverableTypeRef()
 
   val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
   val scopes =
@@ -343,7 +442,7 @@ private fun resolveTypeRefToConeType(
   return runCatching {
       session.typeResolver
         .resolveType(
-          typeRef = typeRef,
+          typeRef = resolvableTypeRef(resolvableTypeRef, ownerSymbol, session),
           configuration =
             TypeResolutionConfiguration(
               scopes = scopes,
@@ -358,7 +457,28 @@ private fun resolveTypeRefToConeType(
         )
         .type
     }
-    .getOrNull() ?: resolvedUserTypeRefByClassId(typeRef, ownerSymbol, session)
+    .getOrNull()
+    ?.recoveredErrorType() ?: resolvedUserTypeRefByClassId(resolvableTypeRef, ownerSymbol, session)
+}
+
+private fun FirTypeRef.recoverableTypeRef(): FirTypeRef {
+  return if (this is FirResolvedTypeRef && coneType is ConeErrorType) {
+    delegatedTypeRef ?: this
+  } else {
+    this
+  }
+}
+
+private fun FirResolvedTypeRef.recoveredErrorTypeRef(): FirResolvedTypeRef? {
+  return coneType.recoveredErrorType()?.toFirResolvedTypeRef()
+}
+
+private fun ConeKotlinType.recoveredErrorType(): ConeKotlinType? {
+  return if (this is ConeErrorType) {
+    delegatedType
+  } else {
+    this
+  }
 }
 
 private fun resolveClassIdFromUserTypeRef(
@@ -368,6 +488,10 @@ private fun resolveClassIdFromUserTypeRef(
 ): ClassId? {
   val names = typeRef.qualifier.map { it.name }
   if (names.isEmpty()) return null
+
+  resolveNestedClassIdFromOwner(names, ownerSymbol)?.let {
+    return it
+  }
 
   val file = session.firProvider.getFirClassifierContainerFileIfAny(ownerSymbol)
   val firstName = names.first()
@@ -402,7 +526,34 @@ private fun resolveClassIdFromUserTypeRef(
 
   return candidates.firstOrNull { candidate ->
     session.symbolProvider.getClassLikeSymbolByClassId(candidate) != null
-  } ?: candidates.first()
+  }
+}
+
+@OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
+private fun resolveNestedClassIdFromOwner(
+  names: List<Name>,
+  ownerSymbol: FirClassLikeSymbol<*>,
+): ClassId? {
+  var currentSymbol = ownerSymbol as? FirRegularClassSymbol ?: return null
+  var currentClassId: ClassId? = null
+
+  for ((index, name) in names.withIndex()) {
+    val nestedSymbol =
+      currentSymbol.declarationSymbols.filterIsInstance<FirClassLikeSymbol<*>>().firstOrNull {
+        it.classId.shortClassName == name
+      } ?: return null
+
+    currentClassId = nestedSymbol.classId
+    currentSymbol =
+      nestedSymbol as? FirRegularClassSymbol
+        ?: if (index == names.lastIndex) {
+          continue
+        } else {
+          return null
+        }
+  }
+
+  return currentClassId
 }
 
 private fun List<Name>.toFqName(): FqName {

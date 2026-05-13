@@ -229,6 +229,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("fakeServiceWithFunctionParameter.kt")
+    public void testFakeServiceWithFunctionParameter() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithFunctionParameter.kt");
+    }
+
+    @Test
+    @TestMetadata("fakeServiceWithNestedParameter.kt")
+    public void testFakeServiceWithNestedParameter() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithNestedParameter.kt");
+    }
+
+    @Test
     @TestMetadata("fakeServiceWithoutInject.kt")
     public void testFakeServiceWithoutInject() {
       runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithoutInject.kt");
