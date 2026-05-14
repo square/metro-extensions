@@ -17,6 +17,16 @@
 ### Other Notes & Contributions
 
 
+## [0.0.11] - 2026-05-14
+
+### Changed
+
+- Upgraded Metro to `1.1.1`.
+
+### Fixed
+
+- Fixed several bugs from the previous releases.
+
 ## [0.0.10] - 2026-05-13
 
 ### Fixed
@@ -102,7 +112,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.10...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.11...HEAD
+[0.0.11]: https://github.com/square/metro-extensions/compare/0.0.11
 [0.0.10]: https://github.com/square/metro-extensions/compare/0.0.10
 [0.0.9]: https://github.com/square/metro-extensions/compare/0.0.9
 [0.0.8]: https://github.com/square/metro-extensions/compare/0.0.8
