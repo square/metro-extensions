@@ -127,40 +127,54 @@ internal fun buildAnnotationCallWithScope(
  * `resolvedAnnotationClassIds` which forces lazy resolution to the TYPES phase and can fail during
  * SUPERTYPES.
  */
+@OptIn(SymbolInternals::class)
 internal fun hasAnnotation(
   classSymbol: FirClassSymbol<*>,
   annotationClassId: ClassId,
   session: FirSession,
 ): Boolean {
-  return classSymbol.resolvedCompilerAnnotationsWithClassIds.any {
-    it.toAnnotationClassIdSafe(session) == annotationClassId
-  }
+  return classSymbol.resolvedCompilerAnnotationsWithClassIds.any { annotation ->
+    annotation.matchesAnnotationClassId(annotationClassId, classSymbol, session)
+  } ||
+    classSymbol.fir.annotations.any { annotation ->
+      annotation.matchesAnnotationClassId(annotationClassId, classSymbol, session)
+    }
 }
 
 /**
- * Finds the annotation on [classSymbol] with the given [annotationClassId], triggering argument
- * resolution via `resolvedAnnotationsWithArguments`.
+ * Finds the annotation on [classSymbol] with the given [annotationClassId], trying resolved
+ * annotations first and falling back to early-FIR annotation views.
  */
+@OptIn(SymbolInternals::class)
 internal fun findAnnotation(
   classSymbol: FirClassSymbol<*>,
   annotationClassId: ClassId,
   session: FirSession,
 ): FirAnnotation? {
   return classSymbol.resolvedAnnotationsWithArguments.firstOrNull { annotation ->
-    annotation.toAnnotationClassIdSafe(session) == annotationClassId
+    annotation.matchesAnnotationClassId(annotationClassId, classSymbol, session)
   }
+    ?: classSymbol.resolvedCompilerAnnotationsWithClassIds.firstOrNull { annotation ->
+      annotation.matchesAnnotationClassId(annotationClassId, classSymbol, session)
+    }
+    ?: classSymbol.fir.annotations.firstOrNull { annotation ->
+      annotation.matchesAnnotationClassId(annotationClassId, classSymbol, session)
+    }
 }
 
 /**
  * Extracts the first argument (the scope) from the annotation on [classSymbol].
  *
  * At the SUPERTYPES stage, `argumentMapping` is not yet populated, so this reads the raw
- * `argumentList` from the [FirAnnotationCall].
+ * `argumentList` from the [FirAnnotationCall]. Some annotations are only visible through
+ * `resolvedCompilerAnnotationsWithClassIds` or the raw FIR declaration during early FIR generation,
+ * so this falls back to those views before giving up.
  *
  * Unwraps [FirNamedArgumentExpression] to return the underlying expression, since named arguments
  * (e.g., `scope = AppScope::class`) wrap the actual [FirGetClassCall] in a named wrapper that
  * downstream consumers (like Metro's `scopeArgument()`) don't expect.
  */
+@OptIn(SymbolInternals::class)
 internal fun extractScopeArgument(
   classSymbol: FirClassSymbol<*>,
   annotationClassId: ClassId,
@@ -171,6 +185,16 @@ internal fun extractScopeArgument(
   val firstArg = annotationCall.argumentList.arguments.firstOrNull() ?: return null
   // Unwrap named arguments (e.g., `scope = AppScope::class`) to get the bare expression.
   return if (firstArg is FirNamedArgumentExpression) firstArg.expression else firstArg
+}
+
+private fun FirAnnotation.matchesAnnotationClassId(
+  annotationClassId: ClassId,
+  ownerSymbol: FirClassLikeSymbol<*>,
+  session: FirSession,
+): Boolean {
+  if (toAnnotationClassIdSafe(session) == annotationClassId) return true
+  val typeRef = annotationTypeRef as? FirUserTypeRef ?: return false
+  return resolveClassIdFromUserTypeRef(typeRef, ownerSymbol, session) == annotationClassId
 }
 
 /**

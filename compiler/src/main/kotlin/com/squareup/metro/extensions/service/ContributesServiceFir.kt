@@ -542,7 +542,9 @@ public class ContributesServiceFir(session: FirSession) :
 
   /**
    * Build the `@Provides` function that constructs a fake service when it is not already
-   * injectable.
+   * injectable. If the fake service is scoped in the same scope that it contributes to, the
+   * generated provider must keep that scope so concrete fake-service injections and fake-mode
+   * service injections share the same instance.
    *
    * Generates: `@Provides fun provideContributedServiceReplacement(dependency: Dependency):
    * FakeService`
@@ -556,6 +558,19 @@ public class ContributesServiceFir(session: FirSession) :
     val constructorSymbol =
       fakeOwner.declarationSymbols.filterIsInstance<FirConstructorSymbol>().firstOrNull()
         ?: return null
+    val singleInScopeArg =
+      if (
+        extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) ==
+          extractScopeClassId(
+            fakeOwner,
+            ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
+            session,
+          )
+      ) {
+        extractScopeArgument(fakeOwner, ClassIds.SINGLE_IN, session)
+      } else {
+        null
+      }
 
     val fakeType = fakeOwner.defaultType()
     val dispatchType =
@@ -597,6 +612,16 @@ public class ContributesServiceFir(session: FirSession) :
       }
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+      if (singleInScopeArg != null) {
+        annotations +=
+          buildAnnotationCallWithScope(
+            ClassIds.SINGLE_IN,
+            ArgNames.SCOPE,
+            singleInScopeArg,
+            functionSymbol,
+            session,
+          )
+      }
     }
   }
 
