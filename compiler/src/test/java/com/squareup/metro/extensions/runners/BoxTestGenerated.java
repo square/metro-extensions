@@ -229,6 +229,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     public void testSecondaryInjectConstructorSkipsProvider() {
       runTest("compiler/src/test/resources/box/contributesrobot/secondaryInjectConstructorSkipsProvider.kt");
     }
+
+    @Test
+    @TestMetadata("singleInAnnotationScopesProvider.kt")
+    public void testSingleInAnnotationScopesProvider() {
+      runTest("compiler/src/test/resources/box/contributesrobot/singleInAnnotationScopesProvider.kt");
+    }
   }
 
   @Nested
