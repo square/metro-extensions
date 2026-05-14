@@ -50,7 +50,7 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          java-version: '24'
+          java-version: '25'
 
       - name: Compiler tests
         run: ./gradlew :compiler:test -PuseLocalMetro -PlocalMetroPath=metro --stacktrace --show-version -Pkotlin.version=${{ matrix.kotlin-version }}

@@ -56,6 +56,7 @@ interface MyService {
       }
 
       @SingleIn(scope = Unit::class)
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")

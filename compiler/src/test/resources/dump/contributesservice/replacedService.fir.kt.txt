@@ -62,6 +62,7 @@ class FakeMyService : MyService {
         return Companion.provideMyService(realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
       }
 
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
@@ -110,6 +111,7 @@ class FakeMyService : MyService {
 
       @SingleIn(scope = Unit::class)
       @RealService
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
@@ -145,6 +147,7 @@ class FakeMyService : MyService {
         return ProvideContributedServiceReplacementMetroFactory.provideContributedServiceReplacement()
       }
 
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(): FakeMyService {
         return error(message = "Never called")
@@ -236,6 +239,7 @@ interface MyService {
       }
 
       @SingleIn(scope = Unit::class)
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")

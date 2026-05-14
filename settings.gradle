@@ -1,5 +1,7 @@
 pluginManagement {
-  includeBuild('build-logic')
+  includeBuild('build-logic') {
+    name = 'metro-extensions-build-logic'
+  }
   includeBuild('gradle-plugin')
   if (settings.hasProperty('useLocalMetro')) {
     includeBuild(settings.hasProperty('localMetroPath') ? localMetroPath : '../metro')
