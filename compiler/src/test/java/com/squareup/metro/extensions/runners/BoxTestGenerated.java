@@ -229,6 +229,18 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("fakeServiceProviderIgnoresMismatchedScope.kt")
+    public void testFakeServiceProviderIgnoresMismatchedScope() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderIgnoresMismatchedScope.kt");
+    }
+
+    @Test
+    @TestMetadata("fakeServiceProviderPreservesScope.kt")
+    public void testFakeServiceProviderPreservesScope() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderPreservesScope.kt");
+    }
+
+    @Test
     @TestMetadata("fakeServiceWithFunctionParameter.kt")
     public void testFakeServiceWithFunctionParameter() {
       runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithFunctionParameter.kt");
