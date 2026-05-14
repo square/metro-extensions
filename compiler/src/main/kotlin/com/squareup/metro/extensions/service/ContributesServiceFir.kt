@@ -172,7 +172,7 @@ public class ContributesServiceFir(session: FirSession) :
           classSymbol.classId.createNestedClassId(ContributesServiceIds.NESTED_CONTAINER_NAME)
         buildList {
           add(ContributionHint(contributingClassId = nestedContainerClassId, scope = scopeClassId))
-          separateFakeServiceProviderScopeClassId(classSymbol)?.let { fakeScopeClassId ->
+          fakeServiceProviderContributionScopeClassId(classSymbol)?.let { fakeScopeClassId ->
             add(
               ContributionHint(
                 contributingClassId =
@@ -194,7 +194,7 @@ public class ContributesServiceFir(session: FirSession) :
         add(ContributesServiceIds.NESTED_CONTAINER_NAME)
         if (
           classSymbol is FirRegularClassSymbol &&
-            separateFakeServiceProviderScopeClassId(classSymbol) != null
+            fakeServiceProviderContributionScopeClassId(classSymbol) != null
         ) {
           add(FAKE_SERVICE_PROVIDER_CONTAINER_NAME)
         }
@@ -306,8 +306,13 @@ public class ContributesServiceFir(session: FirSession) :
   ): FirClassLikeSymbol<*>? {
     if (name != FAKE_SERVICE_PROVIDER_CONTAINER_NAME) return null
     val ownerSymbol = owner as? FirRegularClassSymbol ?: return null
-    if (separateFakeServiceProviderScopeClassId(ownerSymbol) == null) return null
-    val fakeScopeArg = extractScopeArgument(owner, ClassIds.SINGLE_IN, session) ?: return null
+    val contributionScopeArg = fakeServiceProviderContributionScopeArg(ownerSymbol) ?: return null
+    val fakeScopeArg =
+      if (separateFakeServiceProviderScopeClassId(ownerSymbol) != null) {
+        contributionScopeArg
+      } else {
+        null
+      }
     val nestedClassId = owner.classId.createNestedClassId(name)
     val classSymbol = FirRegularClassSymbol(nestedClassId)
     val providerFunction =
@@ -333,7 +338,7 @@ public class ContributesServiceFir(session: FirSession) :
         buildAnnotationCallWithScope(
           ClassIds.CONTRIBUTES_TO,
           ArgNames.SCOPE,
-          fakeScopeArg,
+          contributionScopeArg,
           owner,
           session,
         )
@@ -388,11 +393,7 @@ public class ContributesServiceFir(session: FirSession) :
   private fun matchingSingleInScopeArg(fakeOwner: FirRegularClassSymbol): FirExpression? {
     if (
       extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) !=
-        extractScopeClassId(
-          fakeOwner,
-          ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
-          session,
-        )
+        extractScopeClassId(fakeOwner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)
     ) {
       return null
     }
@@ -400,21 +401,80 @@ public class ContributesServiceFir(session: FirSession) :
     return extractScopeArgument(fakeOwner, ClassIds.SINGLE_IN, session)
   }
 
-  private fun separateFakeServiceProviderScopeClassId(
+  private fun separateFakeServiceProviderScopeClassId(fakeOwner: FirRegularClassSymbol): ClassId? {
+    if (hasInjectAnnotation(fakeOwner)) return null
+    if (extractReplacesClassIds(fakeOwner).isEmpty()) return null
+
+    val fakeScopeClassId =
+      extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) ?: return null
+    val serviceScopeClassId =
+      extractScopeClassId(fakeOwner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)
+        ?: return null
+
+    return fakeScopeClassId.takeUnless { it == serviceScopeClassId }
+  }
+
+  private fun additionalFakeServiceProviderScopeClassId(
     fakeOwner: FirRegularClassSymbol
   ): ClassId? {
     if (hasInjectAnnotation(fakeOwner)) return null
     if (extractReplacesClassIds(fakeOwner).isEmpty()) return null
+    if (extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) != null) return null
 
-    val fakeScopeClassId = extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) ?: return null
     val serviceScopeClassId =
-      extractScopeClassId(
-        fakeOwner,
-        ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
-        session,
-      ) ?: return null
+      extractScopeClassId(fakeOwner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)
+        ?: return null
 
-    return fakeScopeClassId.takeUnless { it == serviceScopeClassId }
+    return ClassIds.APP_SCOPE.takeUnless { it == serviceScopeClassId }
+  }
+
+  private fun fakeServiceProviderContributionScopeClassId(
+    fakeOwner: FirRegularClassSymbol
+  ): ClassId? {
+    return separateFakeServiceProviderScopeClassId(fakeOwner)
+      ?: additionalFakeServiceProviderScopeClassId(fakeOwner)
+  }
+
+  private fun fakeServiceProviderContributionScopeArg(
+    fakeOwner: FirRegularClassSymbol
+  ): FirExpression? {
+    return when (fakeServiceProviderContributionScopeClassId(fakeOwner)) {
+      null -> null
+      ClassIds.APP_SCOPE -> buildAppScopeClassExpression()
+      else -> extractScopeArgument(fakeOwner, ClassIds.SINGLE_IN, session)
+    }
+  }
+
+  private fun buildAppScopeClassExpression(): FirExpression? {
+    val appScopeClassId = ClassIds.APP_SCOPE
+    val appScopeType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(appScopeClassId),
+        emptyArray(),
+        isMarkedNullable = false,
+      )
+    val kClassClassId = ClassId(FqName("kotlin.reflect"), Name.identifier("KClass"))
+    val kClassType =
+      ConeClassLikeTypeImpl(
+        ConeClassLikeLookupTagImpl(kClassClassId),
+        arrayOf(appScopeType),
+        isMarkedNullable = false,
+      )
+    val appScopeSymbol =
+      session.symbolProvider.getClassLikeSymbolByClassId(appScopeClassId) ?: return null
+
+    return buildGetClassCall {
+      coneTypeOrNull = kClassType
+      argumentList = buildArgumentList {
+        arguments += buildResolvedQualifier {
+          packageFqName = appScopeClassId.packageFqName
+          relativeClassFqName = appScopeClassId.relativeClassName
+          coneTypeOrNull = appScopeType
+          symbol = appScopeSymbol
+          resolvedToCompanionObject = false
+        }
+      }
+    }
   }
 
   /**
