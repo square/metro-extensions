@@ -248,8 +248,7 @@ internal fun extractScopeClassId(
             if (import.isAllUnder) return@firstNotNullOfOrNull null
             val importedFqName = import.importedFqName ?: return@firstNotNullOfOrNull null
             if (importedFqName.shortName() == name) {
-              val classId = ClassId.topLevel(importedFqName)
-              session.symbolProvider.getClassLikeSymbolByClassId(classId)?.classId
+              resolveImportedClassId(importedFqName, listOf(name), session)
             } else {
               null
             }
@@ -524,7 +523,7 @@ private fun resolveClassIdFromUserTypeRef(
       if (import.isAllUnder) return@firstNotNullOfOrNull null
       val importedFqName = import.importedFqName ?: return@firstNotNullOfOrNull null
       if (importedFqName.shortName() == firstName) {
-        ClassId(importedFqName.parent(), names.toFqName(), false)
+        resolveImportedClassId(importedFqName, names, session)
       } else {
         null
       }
@@ -542,7 +541,7 @@ private fun resolveClassIdFromUserTypeRef(
     file?.imports?.forEach { import ->
       if (!import.isAllUnder) return@forEach
       val importedFqName = import.importedFqName ?: return@forEach
-      add(ClassId(importedFqName, names.toFqName(), false))
+      resolveClassIdFromFqName(importedFqName.child(names), session)?.let(::add)
     }
 
     add(ClassId(FqName("kotlin"), names.toFqName(), false))
@@ -551,6 +550,34 @@ private fun resolveClassIdFromUserTypeRef(
   return candidates.firstOrNull { candidate ->
     session.symbolProvider.getClassLikeSymbolByClassId(candidate) != null
   }
+}
+
+private fun resolveImportedClassId(
+  importedFqName: FqName,
+  referencedNames: List<Name>,
+  session: FirSession,
+): ClassId? {
+  return resolveClassIdFromFqName(importedFqName.parent().child(referencedNames), session)
+}
+
+private fun resolveClassIdFromFqName(fqName: FqName, session: FirSession): ClassId? {
+  val names = fqName.pathSegments()
+  for (packageSegmentCount in names.size - 1 downTo 0) {
+    val candidate =
+      ClassId(
+        packageFqName = names.take(packageSegmentCount).toFqName(),
+        relativeClassName = names.drop(packageSegmentCount).toFqName(),
+        isLocal = false,
+      )
+    session.symbolProvider.getClassLikeSymbolByClassId(candidate)?.classId?.let {
+      return it
+    }
+  }
+  return null
+}
+
+private fun FqName.child(names: List<Name>): FqName {
+  return names.fold(this) { fqName, name -> fqName.child(name) }
 }
 
 @OptIn(DirectDeclarationsAccess::class, SymbolInternals::class)
