@@ -43,6 +43,7 @@ object MyFeatureFlag : BooleanFeatureFlag {
       }
 
       @IntoSet
+      @ComptimeOnly
       @HiddenFromObjC
       fun mirrorFunction(): FeatureFlag {
         return error(message = "Never called")
