@@ -1,3 +1,10 @@
+// FILE: comTestFakeMyServiceFakeServiceProviderContributionAppScope.kt
+package metro.hints
+
+fun AppScope(contributed: FakeServiceProviderContribution) {
+  return error(message = "Never called")
+}
+
 // FILE: comTestFakeMyServiceServiceContributionUnit.kt
 package metro.hints
 
@@ -17,6 +24,59 @@ package com.test
 
 @ContributesService(scope = Unit::class, replaces = [MyService::class])
 class FakeMyService : MyService {
+  @ContributesTo(scope = AppScope::class)
+  @BindingContainer
+  @Origin(value = FakeMyService::class)
+  object FakeServiceProviderContribution {
+    @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+    @CallableMetadata(callableName = "provideContributedServiceReplacement", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideContributedServiceReplacement")
+    object ProvideContributedServiceReplacementMetroFactory : Factory<FakeMyService> {
+      private constructor() /* primary */ {
+        super/*Any*/()
+        /* <init>() */
+
+      }
+
+      @HiddenFromObjC
+      @JvmStatic
+      @JsStatic
+      fun create(): Factory<FakeMyService> {
+        return ProvideContributedServiceReplacementMetroFactory
+      }
+
+      @HiddenFromObjC
+      @JvmStatic
+      @JsStatic
+      fun provideContributedServiceReplacement(): FakeMyService {
+        return FakeServiceProviderContribution.provideContributedServiceReplacement()
+      }
+
+      @HiddenFromObjC
+      override operator fun invoke(): FakeMyService {
+        return ProvideContributedServiceReplacementMetroFactory.provideContributedServiceReplacement()
+      }
+
+      @ComptimeOnly
+      @HiddenFromObjC
+      fun mirrorFunction(): FakeMyService {
+        return error(message = "Never called")
+      }
+
+    }
+
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
+
+    }
+
+    @Provides
+    fun provideContributedServiceReplacement(): FakeMyService {
+      return FakeMyService()
+    }
+
+  }
+
   @ContributesTo(scope = Unit::class, replaces = [MyService::class, ServiceContribution::class])
   @BindingContainer
   @Origin(value = FakeMyService::class)

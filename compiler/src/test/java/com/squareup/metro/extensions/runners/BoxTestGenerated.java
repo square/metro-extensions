@@ -253,6 +253,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("fakeServiceProviderSupportsParentScopeInjection.kt")
+    public void testFakeServiceProviderSupportsParentScopeInjection() {
+      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderSupportsParentScopeInjection.kt");
+    }
+
+    @Test
     @TestMetadata("fakeServiceWithFunctionParameter.kt")
     public void testFakeServiceWithFunctionParameter() {
       runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithFunctionParameter.kt");
