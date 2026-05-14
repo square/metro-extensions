@@ -206,6 +206,16 @@ public class ContributesRobotFir(session: FirSession) :
       }
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
+      extractScopeArgument(robotSymbol, ClassIds.SINGLE_IN, session)?.let { scopeArg ->
+        annotations +=
+          buildAnnotationCallWithScope(
+            ClassIds.SINGLE_IN,
+            ArgNames.SCOPE,
+            scopeArg,
+            functionSymbol,
+            session,
+          )
+      }
     }
   }
 
