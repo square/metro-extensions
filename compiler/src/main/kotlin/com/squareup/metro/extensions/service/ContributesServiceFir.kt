@@ -71,6 +71,8 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 
 private const val FAKE_SERVICE_PROVIDER_FUNCTION_NAME = "provideContributedServiceReplacement"
+private val FAKE_SERVICE_PROVIDER_CONTAINER_NAME =
+  Name.identifier("FakeServiceProviderContribution")
 
 /**
  * Generates a nested `ServiceContribution` binding container object for classes annotated with
@@ -159,16 +161,27 @@ public class ContributesServiceFir(session: FirSession) :
     return session.predicateBasedProvider
       .getSymbolsByPredicate(ContributesServiceIds.PREDICATE)
       .filterIsInstance<FirRegularClassSymbol>()
-      .mapNotNull { classSymbol ->
+      .flatMap { classSymbol ->
         val scopeClassId =
           extractScopeClassId(
             classSymbol,
             ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
             session,
-          ) ?: return@mapNotNull null
+          ) ?: return@flatMap emptyList()
         val nestedContainerClassId =
           classSymbol.classId.createNestedClassId(ContributesServiceIds.NESTED_CONTAINER_NAME)
-        ContributionHint(contributingClassId = nestedContainerClassId, scope = scopeClassId)
+        buildList {
+          add(ContributionHint(contributingClassId = nestedContainerClassId, scope = scopeClassId))
+          separateFakeServiceProviderScopeClassId(classSymbol)?.let { fakeScopeClassId ->
+            add(
+              ContributionHint(
+                contributingClassId =
+                  classSymbol.classId.createNestedClassId(FAKE_SERVICE_PROVIDER_CONTAINER_NAME),
+                scope = fakeScopeClassId,
+              )
+            )
+          }
+        }
       }
   }
 
@@ -177,7 +190,15 @@ public class ContributesServiceFir(session: FirSession) :
     context: NestedClassGenerationContext,
   ): Set<Name> {
     if (hasAnnotation(classSymbol, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session)) {
-      return setOf(ContributesServiceIds.NESTED_CONTAINER_NAME)
+      return buildSet {
+        add(ContributesServiceIds.NESTED_CONTAINER_NAME)
+        if (
+          classSymbol is FirRegularClassSymbol &&
+            separateFakeServiceProviderScopeClassId(classSymbol) != null
+        ) {
+          add(FAKE_SERVICE_PROVIDER_CONTAINER_NAME)
+        }
+      }
     }
     return emptySet()
   }
@@ -187,6 +208,9 @@ public class ContributesServiceFir(session: FirSession) :
     name: Name,
     context: NestedClassGenerationContext,
   ): FirClassLikeSymbol<*>? {
+    buildFakeServiceProviderContribution(owner, name)?.let {
+      return it
+    }
     if (name != ContributesServiceIds.NESTED_CONTAINER_NAME) return null
     if (!hasAnnotation(owner, ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID, session))
       return null
@@ -210,10 +234,17 @@ public class ContributesServiceFir(session: FirSession) :
           buildFakeServiceFunctions(nestedClassId, ownerSymbol, scopeArg, replacedClassId)
         }
         val fakeServiceProviderFunction =
-          if (hasInjectAnnotation(ownerSymbol)) {
+          if (
+            hasInjectAnnotation(ownerSymbol) ||
+              separateFakeServiceProviderScopeClassId(ownerSymbol) != null
+          ) {
             null
           } else {
-            buildFakeServiceProvidesFunction(nestedClassId, ownerSymbol)
+            buildFakeServiceProvidesFunction(
+              nestedClassId,
+              ownerSymbol,
+              matchingSingleInScopeArg(ownerSymbol),
+            )
           }
         serviceFunctions + listOfNotNull(fakeServiceProviderFunction)
       } else {
@@ -269,6 +300,58 @@ public class ContributesServiceFir(session: FirSession) :
     return klass.symbol
   }
 
+  private fun buildFakeServiceProviderContribution(
+    owner: FirClassSymbol<*>,
+    name: Name,
+  ): FirClassLikeSymbol<*>? {
+    if (name != FAKE_SERVICE_PROVIDER_CONTAINER_NAME) return null
+    val ownerSymbol = owner as? FirRegularClassSymbol ?: return null
+    if (separateFakeServiceProviderScopeClassId(ownerSymbol) == null) return null
+    val fakeScopeArg = extractScopeArgument(owner, ClassIds.SINGLE_IN, session) ?: return null
+    val nestedClassId = owner.classId.createNestedClassId(name)
+    val classSymbol = FirRegularClassSymbol(nestedClassId)
+    val providerFunction =
+      buildFakeServiceProvidesFunction(nestedClassId, ownerSymbol, fakeScopeArg) ?: return null
+
+    val klass = buildRegularClass {
+      resolvePhase = FirResolvePhase.BODY_RESOLVE
+      moduleData = session.moduleData
+      origin = ContributesServiceGeneratorKey.origin
+      source = owner.source
+      classKind = ClassKind.OBJECT
+      scopeProvider = session.kotlinScopeProvider
+      this.name = nestedClassId.shortClassName
+      symbol = classSymbol
+      status =
+        FirResolvedDeclarationStatusImpl(
+          Visibilities.Public,
+          Modality.FINAL,
+          Visibilities.Public.toEffectiveVisibility(owner, forClass = true),
+        )
+      superTypeRefs += session.builtinTypes.anyType
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.CONTRIBUTES_TO,
+          ArgNames.SCOPE,
+          fakeScopeArg,
+          owner,
+          session,
+        )
+      annotations += buildSimpleAnnotationCall(ClassIds.BINDING_CONTAINER, classSymbol)
+      annotations +=
+        buildAnnotationCallWithScope(
+          ClassIds.ORIGIN,
+          ArgNames.VALUE,
+          buildClassExpression(owner, session),
+          classSymbol,
+          session,
+        )
+      declarations += providerFunction
+    }
+
+    return klass.symbol
+  }
+
   override fun getCallableNamesForClass(
     classSymbol: FirClassSymbol<*>,
     context: MemberGenerationContext,
@@ -300,6 +383,38 @@ public class ContributesServiceFir(session: FirSession) :
       fallbackPackage = owner.classId.packageFqName,
       ownerSymbol = owner,
     )
+  }
+
+  private fun matchingSingleInScopeArg(fakeOwner: FirRegularClassSymbol): FirExpression? {
+    if (
+      extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) !=
+        extractScopeClassId(
+          fakeOwner,
+          ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
+          session,
+        )
+    ) {
+      return null
+    }
+
+    return extractScopeArgument(fakeOwner, ClassIds.SINGLE_IN, session)
+  }
+
+  private fun separateFakeServiceProviderScopeClassId(
+    fakeOwner: FirRegularClassSymbol
+  ): ClassId? {
+    if (hasInjectAnnotation(fakeOwner)) return null
+    if (extractReplacesClassIds(fakeOwner).isEmpty()) return null
+
+    val fakeScopeClassId = extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) ?: return null
+    val serviceScopeClassId =
+      extractScopeClassId(
+        fakeOwner,
+        ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
+        session,
+      ) ?: return null
+
+    return fakeScopeClassId.takeUnless { it == serviceScopeClassId }
   }
 
   /**
@@ -542,9 +657,8 @@ public class ContributesServiceFir(session: FirSession) :
 
   /**
    * Build the `@Provides` function that constructs a fake service when it is not already
-   * injectable. If the fake service is scoped in the same scope that it contributes to, the
-   * generated provider must keep that scope so concrete fake-service injections and fake-mode
-   * service injections share the same instance.
+   * injectable. When [singleInScopeArg] is present, the generated provider keeps that scope so
+   * concrete fake-service injections and fake-mode service injections share the same instance.
    *
    * Generates: `@Provides fun provideContributedServiceReplacement(dependency: Dependency):
    * FakeService`
@@ -553,24 +667,12 @@ public class ContributesServiceFir(session: FirSession) :
   private fun buildFakeServiceProvidesFunction(
     classId: ClassId,
     fakeOwner: FirRegularClassSymbol,
+    singleInScopeArg: FirExpression?,
   ): FirFunction? {
     val callableId = CallableId(classId, Name.identifier(FAKE_SERVICE_PROVIDER_FUNCTION_NAME))
     val constructorSymbol =
       fakeOwner.declarationSymbols.filterIsInstance<FirConstructorSymbol>().firstOrNull()
         ?: return null
-    val singleInScopeArg =
-      if (
-        extractScopeClassId(fakeOwner, ClassIds.SINGLE_IN, session) ==
-          extractScopeClassId(
-            fakeOwner,
-            ContributesServiceIds.CONTRIBUTES_SERVICE_CLASS_ID,
-            session,
-          )
-      ) {
-        extractScopeArgument(fakeOwner, ClassIds.SINGLE_IN, session)
-      } else {
-        null
-      }
 
     val fakeType = fakeOwner.defaultType()
     val dispatchType =
@@ -743,7 +845,8 @@ public class ContributesServiceFir(session: FirSession) :
 
   private fun isGeneratedContributionContainer(classSymbol: FirClassSymbol<*>): Boolean {
     return classSymbol.origin == ContributesServiceGeneratorKey.origin &&
-      classSymbol.name == ContributesServiceIds.NESTED_CONTAINER_NAME
+      classSymbol.name in
+        setOf(ContributesServiceIds.NESTED_CONTAINER_NAME, FAKE_SERVICE_PROVIDER_CONTAINER_NAME)
   }
 
   @OptIn(DirectDeclarationsAccess::class)
