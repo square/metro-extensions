@@ -207,6 +207,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("nestedGenericConstructorArgument.kt")
+    public void testNestedGenericConstructorArgument() {
+      runTest("compiler/src/test/resources/box/contributesrobot/nestedGenericConstructorArgument.kt");
+    }
+
+    @Test
     @TestMetadata("screenRobot.kt")
     public void testScreenRobot() {
       runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
