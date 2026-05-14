@@ -83,6 +83,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("defaultConstructorArgument.kt")
+    public void testDefaultConstructorArgument() {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/defaultConstructorArgument.kt");
+    }
+
+    @Test
     @TestMetadata("excludedScopedBinding.kt")
     public void testExcludedScopedBinding() {
       runTest("compiler/src/test/resources/box/contributesmultibindingscoped/excludedScopedBinding.kt");
