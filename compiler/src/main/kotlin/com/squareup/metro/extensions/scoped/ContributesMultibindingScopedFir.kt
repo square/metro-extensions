@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.declarations.builder.buildNamedFunction
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildValueParameter
@@ -34,9 +35,11 @@ import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationResolvePhase
 import org.jetbrains.kotlin.fir.expressions.FirArgumentList
 import org.jetbrains.kotlin.fir.expressions.FirExpression
+import org.jetbrains.kotlin.fir.expressions.FirLiteralExpression
 import org.jetbrains.kotlin.fir.expressions.UnresolvedExpressionTypeAccess
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.builder.buildLiteralExpression
 import org.jetbrains.kotlin.fir.extensions.ExperimentalTopLevelDeclarationsGenerationApi
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
@@ -70,6 +73,7 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.types.ConstantValueKind
 
 private const val SCOPED_PROVIDER_FUNCTION_NAME = "provideContributedMultibindingScoped"
 
@@ -480,16 +484,30 @@ public class ContributesMultibindingScopedFir(
         )
 
       for (parameter in constructorSymbol.fir.valueParameters) {
-        valueParameters += buildValueParameter {
-          resolvePhase = FirResolvePhase.BODY_RESOLVE
-          moduleData = session.moduleData
-          origin = ContributesMultibindingScopedGeneratorKey.origin
-          returnTypeRef = resolveValueParameterTypeRef(parameter, scopedSymbol, session)
-          this.name = parameter.name
-          symbol = FirValueParameterSymbol()
-          containingDeclarationSymbol = functionSymbol
-          annotations += parameter.annotations
-        }
+        valueParameters +=
+          with(compatContext) {
+            buildValueParameterCopyCompat(parameter) {
+              resolvePhase = FirResolvePhase.BODY_RESOLVE
+              moduleData = session.moduleData
+              origin = ContributesMultibindingScopedGeneratorKey.origin
+              returnTypeRef = resolveValueParameterTypeRef(parameter, scopedSymbol, session)
+              this.name = parameter.name
+              symbol = FirValueParameterSymbol()
+              containingDeclarationSymbol = functionSymbol
+              annotations.clear()
+              annotations += parameter.annotations
+              if (parameter.hasNullDefaultValue()) {
+                defaultValue =
+                  buildLiteralExpression(
+                    source = null,
+                    kind = ConstantValueKind.Null,
+                    value = null,
+                    setType = true,
+                  )
+              }
+              source = null
+            }
+          }
       }
 
       annotations += buildSimpleAnnotationCall(ClassIds.PROVIDES, functionSymbol)
@@ -505,6 +523,10 @@ public class ContributesMultibindingScopedFir(
           annotation.toAnnotationClassIdSafe(session) == ClassIds.INJECT
         }
       }
+  }
+
+  private fun FirValueParameter.hasNullDefaultValue(): Boolean {
+    return (defaultValue as? FirLiteralExpression)?.kind == ConstantValueKind.Null
   }
 
   private fun isGeneratedHolderCompanion(classSymbol: FirClassSymbol<*>): Boolean {
