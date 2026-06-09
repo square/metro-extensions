@@ -1,7 +1,11 @@
 package com.squareup.metro.extensions.scoped
 
 import com.fueledbycaffeine.autoservice.AutoService
+import com.squareup.metro.extensions.ArgNames
+import com.squareup.metro.extensions.ClassIds
+import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
 import com.squareup.metro.extensions.fir.extractScopeClassId
+import com.squareup.metro.extensions.fir.findAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
 import dev.zacsweers.metro.compiler.compat.CompatContext
@@ -36,8 +40,16 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
       .toList()
   }
 
+  private val replacingContributionClasses by lazy {
+    session.predicateBasedProvider
+      .getSymbolsByPredicate(ContributesMultibindingScopedIds.REPLACING_CONTRIBUTION_PREDICATE)
+      .filterIsInstance<FirRegularClassSymbol>()
+      .toList()
+  }
+
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(predicate)
+    register(ContributesMultibindingScopedIds.REPLACING_CONTRIBUTION_PREDICATE)
   }
 
   override fun getContributions(
@@ -57,6 +69,12 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
       val contributionInterfaceClassId =
         ContributesMultibindingScopedIds.contributionClassId(parentSymbol.classId)
       val holderClassId = ContributesMultibindingScopedIds.holderClassId(parentSymbol.classId)
+      val replaces =
+        if (isReplacedInScope(parentSymbol.classId, scopeClassId)) {
+          listOf(holderClassId, contributionInterfaceClassId)
+        } else {
+          emptyList()
+        }
 
       val contributionSymbol =
         session.symbolProvider.getClassLikeSymbolByClassId(contributionInterfaceClassId)
@@ -69,7 +87,7 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
           add(
             MetroContributionExtension.Contribution(
               supertype = holderSymbol.defaultType(),
-              replaces = emptyList(),
+              replaces = replaces,
               originClassId = holderClassId,
             )
           )
@@ -78,11 +96,32 @@ public class ContributesMultibindingScopedMetroExtension(private val session: Fi
           add(
             MetroContributionExtension.Contribution(
               supertype = contributionSymbol.defaultType(),
-              replaces = emptyList(),
+              replaces = replaces,
               originClassId = contributionInterfaceClassId,
             )
           )
         }
+      }
+    }
+  }
+
+  private fun isReplacedInScope(scopedClassId: ClassId, scopeClassId: ClassId): Boolean {
+    return replacingContributionClasses.any { replacingSymbol ->
+      ClassIds.ANNOTATIONS_WITH_REPLACES.any { annotationClassId ->
+        val annotation =
+          findAnnotation(replacingSymbol, annotationClassId, session) ?: return@any false
+        val annotationScopeClassId =
+          extractScopeClassId(replacingSymbol, annotationClassId, session)
+        if (annotationScopeClassId != scopeClassId) return@any false
+
+        extractClassIdsFromArrayArg(
+            annotation,
+            ArgNames.REPLACES,
+            session,
+            fallbackPackage = replacingSymbol.classId.packageFqName,
+            ownerSymbol = replacingSymbol,
+          )
+          .contains(scopedClassId)
       }
     }
   }

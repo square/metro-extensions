@@ -28,6 +28,14 @@ internal object ContributesMultibindingScopedIds {
   /** Predicate matching classes annotated with `@ContributesMultibindingScoped`. */
   val PREDICATE = LookupPredicate.create { annotated(CONTRIBUTES_MULTIBINDING_SCOPED_FQ_NAME) }
 
+  /** Predicate matching Metro contributions that can replace scoped contributions. */
+  val REPLACING_CONTRIBUTION_PREDICATE = LookupPredicate.create {
+    annotated(FqName("dev.zacsweers.metro.ContributesTo")) or
+      annotated(FqName("dev.zacsweers.metro.ContributesBinding")) or
+      annotated(FqName("dev.zacsweers.metro.ContributesIntoSet")) or
+      annotated(FqName("dev.zacsweers.metro.ContributesIntoMap"))
+  }
+
   fun holderClassId(contributedClassId: ClassId): ClassId {
     val contributedName =
       contributedClassId.relativeClassName.pathSegments().joinToString(separator = "") {

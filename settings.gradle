@@ -9,6 +9,12 @@ pluginManagement {
 
   repositories {
     mavenCentral()
+    maven {
+      url = uri('https://central.sonatype.com/repository/maven-snapshots/')
+      mavenContent {
+        snapshotsOnly()
+      }
+    }
     gradlePluginPortal()
   }
 }
@@ -32,6 +38,12 @@ if (settings.hasProperty('useLocalMetro')) {
 dependencyResolutionManagement {
   repositories {
     mavenCentral()
+    maven {
+      url = uri('https://central.sonatype.com/repository/maven-snapshots/')
+      mavenContent {
+        snapshotsOnly()
+      }
+    }
   }
 }
 
