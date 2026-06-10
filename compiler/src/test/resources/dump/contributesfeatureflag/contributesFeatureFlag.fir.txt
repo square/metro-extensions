@@ -1,12 +1,12 @@
 FILE: contributesFeatureFlag.kt
     package com.test
 
-    @R|com/squareup/featureflags/anvil/ContributesFeatureFlag|(description = String(My flag), removeBy = R|com/squareup/featureflags/anvil/Date.Date|(R|com/squareup/featureflags/anvil/Month.April|, Int(1), Int(2030))) public final object MyFeatureFlag : R|com/squareup/featureflags/BooleanFeatureFlag| {
+    @R|com/squareup/featureflags/anvil/ContributesFeatureFlag|(description = String(My flag) [evaluated = String(My flag)], removeBy = R|com/squareup/featureflags/anvil/Date.Date|(R|com/squareup/featureflags/anvil/Month.April|, Int(1), Int(2030)) [evaluated = R|com/squareup/featureflags/anvil/Date.Date|(R|com/squareup/featureflags/anvil/Month.April|, Int(1), Int(2030))]) public final object MyFeatureFlag : R|com/squareup/featureflags/BooleanFeatureFlag| {
         private constructor(): R|com/test/MyFeatureFlag| {
             super<R|com/squareup/featureflags/BooleanFeatureFlag|>(String(my-flag-key))
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|)) public final object FeatureFlagContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|) [evaluated = <getClass>(Q|dev/zacsweers/metro/AppScope|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyFeatureFlag|) [evaluated = <getClass>(Q|com/test/MyFeatureFlag|)]) public final object FeatureFlagContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/IntoSet|() public final fun providesMyFeatureFlag(): R|com/squareup/featureflags/FeatureFlag|
 
             private constructor(): R|com/test/MyFeatureFlag.FeatureFlagContribution| {

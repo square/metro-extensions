@@ -4,6 +4,8 @@
 
 ### Added
 
+- Support for Kotlin `2.4.0`.
+
 ### Changed
 
 ### Deprecated

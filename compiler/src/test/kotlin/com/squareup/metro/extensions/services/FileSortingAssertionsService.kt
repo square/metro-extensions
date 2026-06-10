@@ -1,6 +1,7 @@
 package com.squareup.metro.extensions.services
 
 import java.io.File
+import kotlin.time.Duration
 import org.jetbrains.kotlin.test.services.AssertionsService
 import org.jetbrains.kotlin.test.services.JUnit5Assertions
 
@@ -114,6 +115,14 @@ object FileSortingAssertionsService : AssertionsService() {
     message: (() -> String)?,
   ) {
     delegate.assertSameElements(expected, actual, message ?: { "" })
+  }
+
+  override fun assertTimeoutPreemptively(
+    timeout: Duration,
+    message: () -> String,
+    action: () -> Unit,
+  ) {
+    delegate.assertTimeoutPreemptively(timeout, message, action)
   }
 
   override fun fail(message: () -> String): Nothing = delegate.fail(message)
