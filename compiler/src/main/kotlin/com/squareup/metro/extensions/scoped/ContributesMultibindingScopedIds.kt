@@ -8,9 +8,8 @@ import org.jetbrains.kotlin.name.Name
 /**
  * Shared identifiers for the `@ContributesMultibindingScoped` compiler plugin support.
  *
- * Used by both:
- * - [ContributesMultibindingScopedFir] (FIR generator that creates the contribution interface)
- * - [ContributesMultibindingScopedMetroExtension] (Metro extension that bridges predicate gap)
+ * Used by [ContributesMultibindingScopedFir] to create scoped binding containers and contribution
+ * hints.
  */
 internal object ContributesMultibindingScopedIds {
 

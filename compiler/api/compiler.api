@@ -114,17 +114,6 @@ public final class com/squareup/metro/extensions/scoped/ContributesMultibindingS
 	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension;
 }
 
-public final class com/squareup/metro/extensions/scoped/ContributesMultibindingScopedMetroExtension : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension {
-	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
-	public fun getContributions (Lorg/jetbrains/kotlin/name/ClassId;Ldev/zacsweers/metro/compiler/fir/MetroFirTypeResolver$Factory;)Ljava/util/List;
-	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
-}
-
-public final class com/squareup/metro/extensions/scoped/ContributesMultibindingScopedMetroExtension$Factory : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension$Factory {
-	public fun <init> ()V
-	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroContributionExtension;
-}
-
 public final class com/squareup/metro/extensions/service/ContributesServiceFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateConstructors (Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/List;
