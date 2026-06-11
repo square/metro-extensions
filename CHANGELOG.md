@@ -4,8 +4,6 @@
 
 ### Added
 
-- Support for Kotlin `2.4.0`.
-
 ### Changed
 
 ### Deprecated
@@ -18,6 +16,12 @@
 
 ### Other Notes & Contributions
 
+
+## [0.0.12] - 2026-06-11
+
+### Added
+
+- Support for Kotlin `2.4.0`.
 
 ## [0.0.11] - 2026-05-14
 
@@ -114,7 +118,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.11...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.12...HEAD
+[0.0.12]: https://github.com/square/metro-extensions/compare/0.0.12
 [0.0.11]: https://github.com/square/metro-extensions/compare/0.0.11
 [0.0.10]: https://github.com/square/metro-extensions/compare/0.0.10
 [0.0.9]: https://github.com/square/metro-extensions/compare/0.0.9
