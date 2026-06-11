@@ -1,5 +1,5 @@
 [versions]
-autoservice = "0.1.4"
+autoservice = "0.1.5"
 binary-compat-validator = "0.18.1"
 buildconfig = "6.0.9"
 jdk = "21"
