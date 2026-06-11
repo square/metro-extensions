@@ -105,6 +105,14 @@ object FileSortingAssertionsService : AssertionsService() {
 
   override fun assertAll(conditions: List<() -> Unit>) = delegate.assertAll(conditions)
 
+  override fun assertTimeoutPreemptively(
+    timeout: Duration,
+    message: () -> String,
+    action: () -> Unit,
+  ) {
+    delegate.assertTimeoutPreemptively(timeout, message, action)
+  }
+
   override fun assertNotNull(value: Any?, message: (() -> String)?) {
     delegate.assertNotNull(value, message ?: { "" })
   }
