@@ -30,7 +30,7 @@ interface MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): Factory<MyService> {
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): ProvideMyServiceMetroFactory {
           return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
