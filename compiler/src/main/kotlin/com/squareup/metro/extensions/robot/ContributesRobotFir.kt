@@ -11,6 +11,8 @@ import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
 import com.squareup.metro.extensions.fir.resolveValueParameterTypeRef
 import dev.zacsweers.metro.compiler.MetroOptions
+import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
+import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension.ContributionHint
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import dev.zacsweers.metro.compiler.compat.CompatContext
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -80,7 +82,7 @@ import org.jetbrains.kotlin.name.Name
  * directly.
  */
 public class ContributesRobotFir(session: FirSession) :
-  MetroFirDeclarationGenerationExtension(session) {
+  MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(ContributesRobotIds.PREDICATE)

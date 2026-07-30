@@ -14,16 +14,15 @@ package com.test
 fun box(): String {
   // Verify that the scope hint function was generated for the @ContributesTo interface.
   // Metro uses these hints to discover cross-module contributions.
-  // The hint class name follows the pattern: metro.hints.<Package><Class><Scope>Kt
+  // The hint class name includes the fully qualified scope to avoid scope-name collisions.
   val hintClass = try {
-    Class.forName("metro.hints.ComTestAbcRobotRobotContributionUnitKt")
+    Class.forName("metro.hints.ComTestAbcRobotRobotContributionKotlin_UnitKt")
   } catch (e: ClassNotFoundException) {
     return "FAIL: Scope hint not generated for AbcRobot.RobotContribution"
   }
 
-  // The hint class should have a function named "Unit" (the scope)
-  val hintFunction = hintClass.methods.find { it.name == "Unit" }
-    ?: return "FAIL: Hint function 'Unit' not found in ${hintClass.name}"
+  val hintFunction = hintClass.methods.find { it.name == "kotlin_Unit" }
+    ?: return "FAIL: Hint function 'kotlin_Unit' not found in ${hintClass.name}"
 
   return "OK"
 }

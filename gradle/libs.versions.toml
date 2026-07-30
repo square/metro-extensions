@@ -1,12 +1,12 @@
 [versions]
-autoservice = "0.1.5"
+autoservice = "0.1.4"
 binary-compat-validator = "0.18.1"
 buildconfig = "6.0.9"
 jdk = "21"
-kotlin = "2.4.0"
+kotlin = "2.3.21"
 ktfmt = "0.26.0"
 maven-publish = "0.36.0"
-metro = "1.1.1"
+metro = "1.4.0-SNAPSHOT"
 
 [libraries]
 kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
