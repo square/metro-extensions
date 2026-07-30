@@ -14,18 +14,17 @@ class MyTestClass : Scoped
 package com.test
 
 fun box(): String {
-  // Verify that the scope hint function was generated for the @ContributesTo interface.
-  // Metro uses these hints to discover cross-module contributions.
+  // Metro fully qualifies the scope hint name to avoid scope-name collisions.
   val hintClass = try {
     Class.forName(
-      "metro.hints.ComTestMyTestClassMultibindingScopedContributionsMultibindingScopedContributionUnitKt"
+      "metro.hints.ComTestMyTestClassMultibindingScopedContributionsMultibindingScopedContributionKotlin_UnitKt"
     )
   } catch (e: ClassNotFoundException) {
     return "FAIL: Scope hint not generated for MyTestClassMultibindingScopedContributions.MultibindingScopedContribution"
   }
 
-  val hintFunction = hintClass.methods.find { it.name == "Unit" }
-    ?: return "FAIL: Hint function 'Unit' not found in ${hintClass.name}"
+  val hintFunction = hintClass.methods.find { it.name == "kotlin_Unit" }
+    ?: return "FAIL: Hint function 'kotlin_Unit' not found in ${hintClass.name}"
 
   return "OK"
 }

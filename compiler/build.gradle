@@ -51,6 +51,7 @@ dependencies {
 //noinspection UnnecessaryQualifiedReference
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
   compilerOptions {
+    freeCompilerArgs.add('-Xcontext-parameters')
     optIn.addAll([
       'org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi',
       'org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI',

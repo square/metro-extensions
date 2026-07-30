@@ -8,6 +8,8 @@ import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.hasAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
+import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
+import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension.ContributionHint
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import dev.zacsweers.metro.compiler.compat.CompatContext
 import org.jetbrains.kotlin.descriptors.ClassKind
@@ -85,7 +87,7 @@ import org.jetbrains.kotlin.name.SpecialNames
  * classes to generate (e.g., ProvidesFactory).
  */
 public class ContributesFeatureFlagFir(session: FirSession) :
-  MetroFirDeclarationGenerationExtension(session) {
+  MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(ContributesFeatureFlagIds.PREDICATE)

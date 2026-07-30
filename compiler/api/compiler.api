@@ -21,7 +21,7 @@ public final class com/squareup/metro/extensions/SquareMetroExtensionsPluginRegi
 	public fun <init> (ZZ)V
 }
 
-public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppComponentFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
+public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppComponentFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;
 	public fun getContributionHints ()Ljava/util/List;
@@ -45,7 +45,7 @@ public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppCo
 	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroContributionExtension;
 }
 
-public final class com/squareup/metro/extensions/featureflag/ContributesFeatureFlagFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
+public final class com/squareup/metro/extensions/featureflag/ContributesFeatureFlagFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateConstructors (Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/List;
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;
@@ -71,7 +71,7 @@ public final class com/squareup/metro/extensions/featureflag/ContributesFeatureF
 	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroContributionExtension;
 }
 
-public final class com/squareup/metro/extensions/robot/ContributesRobotFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
+public final class com/squareup/metro/extensions/robot/ContributesRobotFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateFunctions (Lorg/jetbrains/kotlin/name/CallableId;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/List;
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;
@@ -97,7 +97,7 @@ public final class com/squareup/metro/extensions/robot/ContributesRobotMetroExte
 	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroContributionExtension;
 }
 
-public final class com/squareup/metro/extensions/scoped/ContributesMultibindingScopedFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
+public final class com/squareup/metro/extensions/scoped/ContributesMultibindingScopedFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/compat/CompatContext;)V
 	public fun generateConstructors (Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/List;
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;
@@ -114,7 +114,7 @@ public final class com/squareup/metro/extensions/scoped/ContributesMultibindingS
 	public fun create (Lorg/jetbrains/kotlin/fir/FirSession;Ldev/zacsweers/metro/compiler/MetroOptions;Ldev/zacsweers/metro/compiler/compat/CompatContext;)Ldev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension;
 }
 
-public final class com/squareup/metro/extensions/service/ContributesServiceFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension {
+public final class com/squareup/metro/extensions/service/ContributesServiceFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateConstructors (Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/List;
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;

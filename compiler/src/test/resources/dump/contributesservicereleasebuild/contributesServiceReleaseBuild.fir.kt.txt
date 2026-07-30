@@ -29,7 +29,7 @@ interface MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): Factory<MyService> {
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): ProvideMyServiceMetroFactory {
           return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator)
         }
 

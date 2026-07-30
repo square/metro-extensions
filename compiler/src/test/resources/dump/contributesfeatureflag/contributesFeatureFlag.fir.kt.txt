@@ -26,7 +26,7 @@ object MyFeatureFlag : BooleanFeatureFlag {
       @HiddenFromObjC
       @JvmStatic
       @JsStatic
-      fun create(): Factory<FeatureFlag> {
+      fun create(): ProvidesMyFeatureFlagMetroFactory {
         return ProvidesMyFeatureFlagMetroFactory
       }
 
