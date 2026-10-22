@@ -1,7 +1,7 @@
 FILE: contributesMultibindingScoped.kt
     package com.test
 
-    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/dagger/ContributesMultibindingScoped|(scope = <getClass>(Q|kotlin/Unit|)) public final class MyTestClass : R|mortar/Scoped| {
+    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/dagger/ContributesMultibindingScoped|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public final class MyTestClass : R|mortar/Scoped| {
         public constructor(): R|com/test/MyTestClass| {
             super<R|kotlin/Any|>()
         }
@@ -17,9 +17,9 @@ FILE: contributesMultibindingScoped.kt
 FILE: com/test/MyTestClassMultibindingScopedContributions.kt
     package com.test
 
-    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyTestClass|)) public abstract interface MyTestClassMultibindingScopedContributions : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyTestClass|)) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|dev/zacsweers/metro/ForScope|(scope = <getClass>(Q|kotlin/Unit|)) public abstract fun bindsMyTestClass(myTestClass: R|com/test/MyTestClass|): R|mortar/Scoped|
+    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyTestClass|) [evaluated = <getClass>(Q|com/test/MyTestClass|)]) public abstract interface MyTestClassMultibindingScopedContributions : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyTestClass|) [evaluated = <getClass>(Q|com/test/MyTestClass|)]) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|dev/zacsweers/metro/ForScope|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public abstract fun bindsMyTestClass(myTestClass: R|com/test/MyTestClass|): R|mortar/Scoped|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public abstract class BindsMirror : R|kotlin/Any| {
                 private constructor(): R|com/test/MyTestClassMultibindingScopedContributions.MultibindingScopedContribution.BindsMirror| {
