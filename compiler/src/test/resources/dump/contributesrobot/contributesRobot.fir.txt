@@ -14,7 +14,7 @@ FILE: contributesRobot.kt
         }
 
     }
-    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/anvil/extension/ContributesRobot|(scope = <getClass>(Q|kotlin/Unit|)) public final class AbcRobot : R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>| {
+    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/anvil/extension/ContributesRobot|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public final class AbcRobot : R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>| {
         public constructor(dependency: R|com/test/Dependency|): R|com/test/AbcRobot| {
             super<R|com/squareup/instrumentation/robots/ScreenRobot<com/test/AbcRobot>|>()
         }
@@ -22,7 +22,7 @@ FILE: contributesRobot.kt
         public final val dependency: R|com/test/Dependency| = R|<local>/dependency|
             public get(): R|com/test/Dependency|
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/AbcRobot|)) public abstract interface RobotContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/AbcRobot|) [evaluated = <getClass>(Q|com/test/AbcRobot|)]) public abstract interface RobotContribution : R|kotlin/Any| {
             public abstract fun getcom_test_AbcRobotComponent(): R|com/test/AbcRobot|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) @R|dev/zacsweers/metro/internal/MetroContribution|(scope = <getClass>(Q|kotlin/Unit|)) public abstract interface MetroContributionToKotlinunity4872 : R|com/test/AbcRobot.RobotContribution| {

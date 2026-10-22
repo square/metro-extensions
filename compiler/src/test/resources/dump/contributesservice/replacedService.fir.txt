@@ -1,9 +1,9 @@
 FILE: replacedService.kt
     package com.test
 
-    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|)) public final object ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) public final fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
+    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|) [evaluated = <getClass>(Q|com/test/MyService|)]) public final object ServiceContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public final fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
             private constructor(): R|com/test/MyService.ServiceContribution| {
                 super<R|kotlin/Any|>()
@@ -22,13 +22,13 @@ FILE: replacedService.kt
         }
 
     }
-    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|), replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|))) public final class FakeMyService : R|com/test/MyService| {
+    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)], replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|)) [evaluated = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|))]) public final class FakeMyService : R|com/test/MyService| {
         public constructor(): R|com/test/FakeMyService| {
             super<R|kotlin/Any|>()
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|), replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|), <getClass>(Q|com/test/MyService.ServiceContribution|))) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/FakeMyService|)) public final object ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RealService|() public final fun provideRealMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)], replaces = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|), <getClass>(Q|com/test/MyService.ServiceContribution|)) [evaluated = <collectionLiteralCall>(<getClass>(Q|com/test/MyService|), <getClass>(Q|com/test/MyService.ServiceContribution|))]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/FakeMyService|) [evaluated = <getClass>(Q|com/test/FakeMyService|)]) public final object ServiceContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|com/squareup/api/RealService|() public final fun provideRealMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
 
             @R|dev/zacsweers/metro/Provides|() public final fun provideMyService(@R|com/squareup/api/RealService|() realService: R|dev/zacsweers/metro/Provider<com/test/MyService>|, fakeService: R|dev/zacsweers/metro/Provider<com/test/FakeMyService>|, @R|com/squareup/development/FakeMode|() isFakeMode: R|kotlin/Boolean|): R|com/test/MyService|
 
@@ -67,7 +67,7 @@ FILE: replacedService.kt
 
         }
 
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/FakeMyService|)) public final object FakeServiceProviderContribution : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|dev/zacsweers/metro/AppScope|) [evaluated = <getClass>(Q|dev/zacsweers/metro/AppScope|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/FakeMyService|) [evaluated = <getClass>(Q|com/test/FakeMyService|)]) public final object FakeServiceProviderContribution : R|kotlin/Any| {
             @R|dev/zacsweers/metro/Provides|() public final fun provideContributedServiceReplacement(): R|com/test/FakeMyService|
 
             private constructor(): R|com/test/FakeMyService.FakeServiceProviderContribution| {
