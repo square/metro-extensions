@@ -4,12 +4,7 @@
 
 ### Added
 
-- Support for Metro 1.4 contribution hints: the FIR generators implement `MetroContributionHintExtension`, so graphs discover `@ContributesRobot`, `@ContributesService`, `@ContributesMultibindingScoped`, `@ContributesFeatureFlag` and `@DevelopmentAppComponent` contributions again.
-
 ### Changed
-
-- Upgraded Metro to `1.4.5`.
-- Built against Kotlin `2.3.21` (was `2.4.0` in `0.0.12`). The Kotlin compiler plugin API is not binary compatible across these versions: a build made with Kotlin `2.4.0` fails on Kotlin `2.3.21` with `NoSuchFieldError: CompilerConfigurationKey.Companion`. This release therefore targets Kotlin `2.3.x` consumers; Kotlin `2.4.x` consumers need a release built on Kotlin `2.4.x`.
 
 ### Deprecated
 
@@ -21,6 +16,17 @@
 
 ### Other Notes & Contributions
 
+
+## [0.0.13] - 2026-10-22
+
+### Added
+
+- Support for Metro 1.4 contribution hints: the FIR generators implement `MetroContributionHintExtension`, so graphs discover `@ContributesRobot`, `@ContributesService`, `@ContributesMultibindingScoped`, `@ContributesFeatureFlag` and `@DevelopmentAppComponent` contributions again.
+
+### Changed
+
+- Upgraded Metro to `1.4.5`.
+- Built against Kotlin `2.3.21` (was `2.4.0` in `0.0.12`). The Kotlin compiler plugin API is not binary compatible across these versions: a build made with Kotlin `2.4.0` fails on Kotlin `2.3.21` with `NoSuchFieldError: CompilerConfigurationKey.Companion`. This release therefore targets Kotlin `2.3.x` consumers; Kotlin `2.4.x` consumers need a release built on Kotlin `2.4.x`.
 
 ## [0.0.12] - 2026-06-11
 
@@ -123,7 +129,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.12...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.13...HEAD
+[0.0.13]: https://github.com/square/metro-extensions/compare/0.0.13
 [0.0.12]: https://github.com/square/metro-extensions/compare/0.0.12
 [0.0.11]: https://github.com/square/metro-extensions/compare/0.0.11
 [0.0.10]: https://github.com/square/metro-extensions/compare/0.0.10
