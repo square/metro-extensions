@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'tomm/metro-1-4-contribution-hints'
-      - 'zachklipp/clf-575/metro-1.4.5-hints'
     paths-ignore:
       - '**/*.md'
 
