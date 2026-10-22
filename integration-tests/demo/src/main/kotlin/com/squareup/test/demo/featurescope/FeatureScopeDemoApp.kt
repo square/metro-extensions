@@ -4,6 +4,7 @@ import com.squareup.dagger.ActivityScope
 import com.squareup.development.shell.DevelopmentAppComponent
 import com.squareup.development.shell.DevelopmentApplication
 import com.squareup.development.shell.login.screen.FeatureProvider
+import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.GraphExtension
 import dev.zacsweers.metro.Provides
@@ -26,8 +27,9 @@ interface DemoFeatureComponent {
 }
 
 /** Provides [FeatureProvider] at the feature scope. */
+@BindingContainer
 @ContributesTo(DemoFeatureScope::class)
-interface DemoFeatureProviderModule {
+object DemoFeatureProviderModule {
   @Provides fun provideFeatureProvider(): FeatureProvider = DemoFeatureProviderImpl()
 }
 

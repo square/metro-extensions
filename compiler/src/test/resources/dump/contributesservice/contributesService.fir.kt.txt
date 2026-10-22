@@ -1,7 +1,8 @@
-// FILE: comTestMyServiceServiceContributionUnit.kt
+// FILE: comTestMyServiceServiceContributionKotlin_Unit.kt
 package metro.hints
 
-fun Unit(contributed: ServiceContribution) {
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
   return error(message = "Never called")
 }
 
@@ -50,16 +51,16 @@ interface MyService {
 
       }
 
-      @HiddenFromObjC
-      override operator fun invoke(): MyService {
-        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
-      }
-
       @SingleIn(scope = Unit::class)
       @ComptimeOnly
       @HiddenFromObjC
-      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+      fun declarationMirror(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
+      }
+
+      @HiddenFromObjC
+      override operator fun invoke(): MyService {
+        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
     }

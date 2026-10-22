@@ -3,7 +3,7 @@ FILE: scopedInSuperTypes.kt
 
     public abstract interface BaseInterface : R|mortar/Scoped| {
     }
-    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/dagger/ContributesMultibindingScoped|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public final class Service : R|com/test/BaseInterface| {
+    @R|dev/zacsweers/metro/Inject|() @R|com/squareup/dagger/ContributesMultibindingScoped|(scope = <getClass>(Q|kotlin/Unit|)) public final class Service : R|com/test/BaseInterface| {
         public constructor(): R|com/test/Service| {
             super<R|kotlin/Any|>()
         }
@@ -19,15 +19,11 @@ FILE: scopedInSuperTypes.kt
 FILE: com/test/ServiceMultibindingScopedContributions.kt
     package com.test
 
-    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/Service|) [evaluated = <getClass>(Q|com/test/Service|)]) public abstract interface ServiceMultibindingScopedContributions : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/Service|) [evaluated = <getClass>(Q|com/test/Service|)]) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|dev/zacsweers/metro/ForScope|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public abstract fun bindsService(service: R|com/test/Service|): R|mortar/Scoped|
+    @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/Service|)) public abstract interface ServiceMultibindingScopedContributions : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/Service|)) public abstract interface MultibindingScopedContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Binds|() @R|dev/zacsweers/metro/IntoSet|() @R|dev/zacsweers/metro/ForScope|(scope = <getClass>(Q|kotlin/Unit|)) public abstract fun bindsService(service: R|com/test/Service|): R|mortar/Scoped|
 
             @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public abstract class BindsMirror : R|kotlin/Any| {
-                private constructor(): R|com/test/ServiceMultibindingScopedContributions.MultibindingScopedContribution.BindsMirror| {
-                    super<R|kotlin/Any|>()
-                }
-
                 private constructor(): R|com/test/ServiceMultibindingScopedContributions.MultibindingScopedContribution.BindsMirror| {
                     super<R|kotlin/Any|>()
                 }
@@ -37,3 +33,11 @@ FILE: com/test/ServiceMultibindingScopedContributions.kt
         }
 
     }
+FILE: metro/hints/comTestServiceMultibindingScopedContributionsKotlin_Unit.kt
+    package metro.hints
+
+    @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final fun kotlin_Unit(contributed: R|com/test/ServiceMultibindingScopedContributions|): R|kotlin/Unit|
+FILE: metro/hints/comTestServiceMultibindingScopedContributionsMultibindingScopedContributionKotlin_Unit.kt
+    package metro.hints
+
+    @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final fun kotlin_Unit(contributed: R|com/test/ServiceMultibindingScopedContributions.MultibindingScopedContribution|): R|kotlin/Unit|

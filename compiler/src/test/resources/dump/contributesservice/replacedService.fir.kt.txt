@@ -1,21 +1,24 @@
-// FILE: comTestFakeMyServiceFakeServiceProviderContributionAppScope.kt
+// FILE: comTestFakeMyServiceFakeServiceProviderContributionDev_zacsweers_metro_AppScope.kt
 package metro.hints
 
-fun AppScope(contributed: FakeServiceProviderContribution) {
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun dev_zacsweers_metro_AppScope(contributed: FakeServiceProviderContribution) {
   return error(message = "Never called")
 }
 
-// FILE: comTestFakeMyServiceServiceContributionUnit.kt
+// FILE: comTestFakeMyServiceServiceContributionKotlin_Unit.kt
 package metro.hints
 
-fun Unit(contributed: ServiceContribution) {
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
   return error(message = "Never called")
 }
 
-// FILE: comTestMyServiceServiceContributionUnit.kt
+// FILE: comTestMyServiceServiceContributionKotlin_Unit.kt
 package metro.hints
 
-fun Unit(contributed: ServiceContribution) {
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
   return error(message = "Never called")
 }
 
@@ -51,15 +54,15 @@ class FakeMyService : MyService {
         return FakeServiceProviderContribution.provideContributedServiceReplacement()
       }
 
+      @ComptimeOnly
+      @HiddenFromObjC
+      fun declarationMirror(): FakeMyService {
+        return error(message = "Never called")
+      }
+
       @HiddenFromObjC
       override operator fun invoke(): FakeMyService {
         return ProvideContributedServiceReplacementMetroFactory.provideContributedServiceReplacement()
-      }
-
-      @ComptimeOnly
-      @HiddenFromObjC
-      fun mirrorFunction(): FakeMyService {
-        return error(message = "Never called")
       }
 
     }
@@ -117,15 +120,15 @@ class FakeMyService : MyService {
 
       }
 
+      @ComptimeOnly
+      @HiddenFromObjC
+      fun declarationMirror(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
+        return error(message = "Never called")
+      }
+
       @HiddenFromObjC
       override operator fun invoke(): MyService {
         return Companion.provideMyService(realService = <this>.#realService, fakeService = <this>.#fakeService, isFakeMode = <this>.#isFakeMode.invoke())
-      }
-
-      @ComptimeOnly
-      @HiddenFromObjC
-      fun mirrorFunction(@RealService realService: Provider<MyService>, fakeService: Provider<FakeMyService>, @FakeMode isFakeMode: Boolean): MyService {
-        return error(message = "Never called")
       }
 
     }
@@ -164,17 +167,17 @@ class FakeMyService : MyService {
 
       }
 
-      @HiddenFromObjC
-      override operator fun invoke(): MyService {
-        return Companion.provideRealMyService(serviceCreator = <this>.#serviceCreator.invoke())
-      }
-
       @SingleIn(scope = Unit::class)
       @RealService
       @ComptimeOnly
       @HiddenFromObjC
-      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+      fun declarationMirror(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
         return error(message = "Never called")
+      }
+
+      @HiddenFromObjC
+      override operator fun invoke(): MyService {
+        return Companion.provideRealMyService(serviceCreator = <this>.#serviceCreator.invoke())
       }
 
     }
@@ -202,15 +205,15 @@ class FakeMyService : MyService {
         return ServiceContribution.provideContributedServiceReplacement()
       }
 
+      @ComptimeOnly
+      @HiddenFromObjC
+      fun declarationMirror(): FakeMyService {
+        return error(message = "Never called")
+      }
+
       @HiddenFromObjC
       override operator fun invoke(): FakeMyService {
         return ProvideContributedServiceReplacementMetroFactory.provideContributedServiceReplacement()
-      }
-
-      @ComptimeOnly
-      @HiddenFromObjC
-      fun mirrorFunction(): FakeMyService {
-        return error(message = "Never called")
       }
 
     }
@@ -293,16 +296,16 @@ interface MyService {
 
       }
 
-      @HiddenFromObjC
-      override operator fun invoke(): MyService {
-        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
-      }
-
       @SingleIn(scope = Unit::class)
       @ComptimeOnly
       @HiddenFromObjC
-      fun mirrorFunction(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+      fun declarationMirror(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
+      }
+
+      @HiddenFromObjC
+      override operator fun invoke(): MyService {
+        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
     }
