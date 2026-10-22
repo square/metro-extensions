@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Built against Kotlin `2.4.10` (was `2.3.21` in `0.0.13`), for consumers on Kotlin `2.4.x`. Kotlin `2.3.x` consumers should stay on `0.0.13`. The AutoService compiler plugin returns to `0.1.5`, which is built for Kotlin `2.4.x`.
+
 ### Deprecated
 
 ### Removed
