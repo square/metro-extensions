@@ -1,9 +1,9 @@
 FILE: contributesServiceReleaseBuild.kt
     package com.test
 
-    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
-        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|) [evaluated = <getClass>(Q|com/test/MyService|)]) public final object ServiceContribution : R|kotlin/Any| {
-            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|) [evaluated = <getClass>(Q|kotlin/Unit|)]) public final fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
+    @R|com/squareup/services/anvil/ContributesService|(scope = <getClass>(Q|kotlin/Unit|)) @R|com/squareup/api/RetrofitAuthenticated|() public abstract interface MyService : R|kotlin/Any| {
+        @R|dev/zacsweers/metro/ContributesTo|(scope = <getClass>(Q|kotlin/Unit|)) @R|dev/zacsweers/metro/BindingContainer|() @R|dev/zacsweers/metro/Origin|(value = <getClass>(Q|com/test/MyService|)) public final object ServiceContribution : R|kotlin/Any| {
+            @R|dev/zacsweers/metro/Provides|() @R|dev/zacsweers/metro/SingleIn|(scope = <getClass>(Q|kotlin/Unit|)) public final fun provideMyService(@R|com/squareup/api/RetrofitAuthenticated|() serviceCreator: R|com/squareup/api/ServiceCreator|): R|com/test/MyService|
 
             private constructor(): R|com/test/MyService.ServiceContribution| {
                 super<R|kotlin/Any|>()
@@ -22,3 +22,7 @@ FILE: contributesServiceReleaseBuild.kt
         }
 
     }
+FILE: metro/hints/comTestMyServiceServiceContributionKotlin_Unit.kt
+    package metro.hints
+
+    @R|kotlin/Deprecated|(message = String(This synthesized declaration should not be used directly), level = Q|kotlin/DeprecationLevel|.R|kotlin/DeprecationLevel.HIDDEN|) public final fun kotlin_Unit(contributed: R|com/test/MyService.ServiceContribution|): R|kotlin/Unit|
