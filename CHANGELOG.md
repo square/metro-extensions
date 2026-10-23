@@ -6,8 +6,6 @@
 
 ### Changed
 
-- Built against Kotlin `2.4.10` (was `2.3.21` in `0.0.13`), for consumers on Kotlin `2.4.x`. Kotlin `2.3.x` consumers should stay on `0.0.13`. The AutoService compiler plugin returns to `0.1.5`, which is built for Kotlin `2.4.x`.
-
 ### Deprecated
 
 ### Removed
@@ -18,6 +16,12 @@
 
 ### Other Notes & Contributions
 
+
+## [0.0.14] - 2026-10-23
+
+### Changed
+
+- Built against Kotlin `2.4.10` (was `2.3.21` in `0.0.13`), for consumers on Kotlin `2.4.x`. Kotlin `2.3.x` consumers should stay on `0.0.13`. The AutoService compiler plugin returns to `0.1.5`, which is built for Kotlin `2.4.x`.
 
 ## [0.0.13] - 2026-10-22
 
@@ -131,7 +135,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.13...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.14...HEAD
+[0.0.14]: https://github.com/square/metro-extensions/compare/0.0.14
 [0.0.13]: https://github.com/square/metro-extensions/compare/0.0.13
 [0.0.12]: https://github.com/square/metro-extensions/compare/0.0.12
 [0.0.11]: https://github.com/square/metro-extensions/compare/0.0.11
