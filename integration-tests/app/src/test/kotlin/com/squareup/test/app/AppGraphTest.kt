@@ -3,8 +3,11 @@ package com.squareup.test.app
 import com.squareup.test.app.data.FakeLibService
 import com.squareup.test.app.data.TestFeatureFlag
 import com.squareup.test.app.data.TestRobot
+import com.squareup.test.app.data.TestScoped
+import com.squareup.test.lib.LibDynamicFlag
 import com.squareup.test.lib.LibFeatureFlag
 import com.squareup.test.lib.LibRobot
+import com.squareup.test.lib.LibScoped
 import com.squareup.test.lib.LibService
 import dev.zacsweers.metro.createGraphFactory
 import kotlin.test.Test
@@ -19,6 +22,14 @@ class AppGraphTest {
   fun `scoped set contains both lib and app contributions`() {
     val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
     assertEquals(3, graph.scoped.size)
+    assertEquals(
+      setOf(
+        LibScoped::class.qualifiedName,
+        AppScoped::class.qualifiedName,
+        TestScoped::class.qualifiedName,
+      ),
+      graph.scoped.map { it::class.qualifiedName }.toSet(),
+    )
   }
 
   @Test
@@ -41,8 +52,9 @@ class AppGraphTest {
   fun `feature flags set contains lib, app, and test contributions`() {
     val graph = createGraphFactory<AppGraph.Factory>().create(fakeMode = false)
     val flags = graph.featureFlags
-    assertEquals(3, flags.size)
+    assertEquals(4, flags.size)
     assertTrue(flags.contains(LibFeatureFlag))
+    assertTrue(flags.contains(LibDynamicFlag))
     assertTrue(flags.contains(AppFeatureFlag))
     assertTrue(flags.contains(TestFeatureFlag))
   }

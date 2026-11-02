@@ -1,11 +1,3 @@
-// FILE: comTestMyServiceServiceContributionKotlin_Unit.kt
-package metro.hints
-
-@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-fun kotlin_Unit(contributed: ServiceContribution) {
-  return error(message = "Never called")
-}
-
 // FILE: contributesService.kt
 package com.test
 
@@ -82,4 +74,13 @@ interface MyService {
 
   }
 
+}
+
+// FILE: contributesService.kt
+@file:JvmName(name = "ComTestMyServiceServiceContributionKotlin_UnitKt")
+package metro.hints
+
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
 }

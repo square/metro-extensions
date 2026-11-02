@@ -9,6 +9,7 @@ import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import com.squareup.metro.extensions.fir.resolveValueParameterTypeRef
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
@@ -225,6 +226,8 @@ public class ContributesRobotFir(session: FirSession) :
     classSymbol: FirClassSymbol<*>,
     context: MemberGenerationContext,
   ): Set<Name> {
+    session.registerPredeclaredFunctionMetadata(classSymbol, ContributesRobotGeneratorKey)
+
     if (!isGeneratedContributionInterface(classSymbol)) return emptySet()
 
     // The outer class is the @ContributesRobot-annotated class that owns this nested interface.

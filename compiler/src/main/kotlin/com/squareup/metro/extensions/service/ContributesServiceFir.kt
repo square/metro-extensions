@@ -11,6 +11,7 @@ import com.squareup.metro.extensions.fir.extractScopeArgument
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import com.squareup.metro.extensions.fir.resolveValueParameterTypeRef
 import com.squareup.metro.extensions.squareMetroExtensionsConfig
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -363,6 +364,8 @@ public class ContributesServiceFir(session: FirSession) :
     classSymbol: FirClassSymbol<*>,
     context: MemberGenerationContext,
   ): Set<Name> {
+    session.registerPredeclaredFunctionMetadata(classSymbol, ContributesServiceGeneratorKey)
+
     return if (isGeneratedContributionContainer(classSymbol)) {
       setOf(SpecialNames.INIT)
     } else {

@@ -16,6 +16,10 @@ import java.util.regex.Pattern;
 @TestMetadata("compiler/src/test/resources/dump")
 @TestDataPath("$PROJECT_ROOT")
 public class FirDumpTestGenerated extends AbstractFirDumpTest {
+  private void run(String fileName) {
+    runTest("compiler/src/test/resources/dump/" + fileName);
+  }
+
   @Test
   public void testAllFilesPresentInDump() {
     KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -25,6 +29,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/contributesfeatureflag")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesfeatureflag {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/contributesfeatureflag/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesfeatureflag() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -33,7 +41,7 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("contributesFeatureFlag.kt")
     public void testContributesFeatureFlag() {
-      runTest("compiler/src/test/resources/dump/contributesfeatureflag/contributesFeatureFlag.kt");
+      run("contributesFeatureFlag.kt");
     }
   }
 
@@ -41,6 +49,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/contributesmultibindingscoped/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesmultibindingscoped() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesmultibindingscoped"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -49,13 +61,13 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("contributesMultibindingScoped.kt")
     public void testContributesMultibindingScoped() {
-      runTest("compiler/src/test/resources/dump/contributesmultibindingscoped/contributesMultibindingScoped.kt");
+      run("contributesMultibindingScoped.kt");
     }
 
     @Test
     @TestMetadata("scopedInSuperTypes.kt")
     public void testScopedInSuperTypes() {
-      runTest("compiler/src/test/resources/dump/contributesmultibindingscoped/scopedInSuperTypes.kt");
+      run("scopedInSuperTypes.kt");
     }
   }
 
@@ -63,6 +75,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/contributesrobot")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesrobot {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/contributesrobot/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesrobot() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -71,7 +87,7 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("contributesRobot.kt")
     public void testContributesRobot() {
-      runTest("compiler/src/test/resources/dump/contributesrobot/contributesRobot.kt");
+      run("contributesRobot.kt");
     }
   }
 
@@ -79,6 +95,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/contributesservice")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesservice {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/contributesservice/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesservice() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -87,13 +107,13 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("contributesService.kt")
     public void testContributesService() {
-      runTest("compiler/src/test/resources/dump/contributesservice/contributesService.kt");
+      run("contributesService.kt");
     }
 
     @Test
     @TestMetadata("replacedService.kt")
     public void testReplacedService() {
-      runTest("compiler/src/test/resources/dump/contributesservice/replacedService.kt");
+      run("replacedService.kt");
     }
   }
 
@@ -101,6 +121,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/contributesservicereleasebuild")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesservicereleasebuild {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/contributesservicereleasebuild/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesservicereleasebuild() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/contributesservicereleasebuild"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -109,7 +133,7 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("contributesServiceReleaseBuild.kt")
     public void testContributesServiceReleaseBuild() {
-      runTest("compiler/src/test/resources/dump/contributesservicereleasebuild/contributesServiceReleaseBuild.kt");
+      run("contributesServiceReleaseBuild.kt");
     }
   }
 
@@ -117,6 +141,10 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
   @TestMetadata("compiler/src/test/resources/dump/developmentappcomponent")
   @TestDataPath("$PROJECT_ROOT")
   public class Developmentappcomponent {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/dump/developmentappcomponent/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInDevelopmentappcomponent() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/dump/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -125,19 +153,19 @@ public class FirDumpTestGenerated extends AbstractFirDumpTest {
     @Test
     @TestMetadata("developmentAppComponent.kt")
     public void testDevelopmentAppComponent() {
-      runTest("compiler/src/test/resources/dump/developmentappcomponent/developmentAppComponent.kt");
+      run("developmentAppComponent.kt");
     }
 
     @Test
     @TestMetadata("excludeLoggedInComponent.kt")
     public void testExcludeLoggedInComponent() {
-      runTest("compiler/src/test/resources/dump/developmentappcomponent/excludeLoggedInComponent.kt");
+      run("excludeLoggedInComponent.kt");
     }
 
     @Test
     @TestMetadata("featureScopeComponent.kt")
     public void testFeatureScopeComponent() {
-      runTest("compiler/src/test/resources/dump/developmentappcomponent/featureScopeComponent.kt");
+      run("featureScopeComponent.kt");
     }
   }
 }
