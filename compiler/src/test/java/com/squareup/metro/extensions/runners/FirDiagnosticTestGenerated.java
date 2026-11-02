@@ -16,6 +16,10 @@ import java.util.regex.Pattern;
 @TestMetadata("compiler/src/test/resources/diagnostics")
 @TestDataPath("$PROJECT_ROOT")
 public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
+  private void run(String fileName) {
+    runTest("compiler/src/test/resources/diagnostics/" + fileName);
+  }
+
   @Test
   public void testAllFilesPresentInDiagnostics() {
     KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -25,6 +29,10 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   @TestMetadata("compiler/src/test/resources/diagnostics/contributesfeatureflag")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesfeatureflag {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesfeatureflag() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -33,25 +41,25 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     @Test
     @TestMetadata("dynamicConfigFlagMustBeObject.kt")
     public void testDynamicConfigFlagMustBeObject() {
-      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/dynamicConfigFlagMustBeObject.kt");
+      run("dynamicConfigFlagMustBeObject.kt");
     }
 
     @Test
     @TestMetadata("mustBeObject.kt")
     public void testMustBeObject() {
-      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustBeObject.kt");
+      run("mustBeObject.kt");
     }
 
     @Test
     @TestMetadata("mustBePublic.kt")
     public void testMustBePublic() {
-      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustBePublic.kt");
+      run("mustBePublic.kt");
     }
 
     @Test
     @TestMetadata("mustImplementFeatureFlag.kt")
     public void testMustImplementFeatureFlag() {
-      runTest("compiler/src/test/resources/diagnostics/contributesfeatureflag/mustImplementFeatureFlag.kt");
+      run("mustImplementFeatureFlag.kt");
     }
   }
 
@@ -59,6 +67,10 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   @TestMetadata("compiler/src/test/resources/diagnostics/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesmultibindingscoped() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesmultibindingscoped"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -67,19 +79,19 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     @Test
     @TestMetadata("classMustImplementScoped.kt")
     public void testClassMustImplementScoped() {
-      runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/classMustImplementScoped.kt");
+      run("classMustImplementScoped.kt");
     }
 
     @Test
     @TestMetadata("multipleConstructorsRequireInject.kt")
     public void testMultipleConstructorsRequireInject() {
-      runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/multipleConstructorsRequireInject.kt");
+      run("multipleConstructorsRequireInject.kt");
     }
 
     @Test
     @TestMetadata("replacedScopeMismatch.kt")
     public void testReplacedScopeMismatch() {
-      runTest("compiler/src/test/resources/diagnostics/contributesmultibindingscoped/replacedScopeMismatch.kt");
+      run("replacedScopeMismatch.kt");
     }
   }
 
@@ -87,6 +99,10 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   @TestMetadata("compiler/src/test/resources/diagnostics/contributesrobot")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesrobot {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/diagnostics/contributesrobot/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesrobot() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -95,13 +111,13 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     @Test
     @TestMetadata("classMustExtendScreenRobot.kt")
     public void testClassMustExtendScreenRobot() {
-      runTest("compiler/src/test/resources/diagnostics/contributesrobot/classMustExtendScreenRobot.kt");
+      run("classMustExtendScreenRobot.kt");
     }
 
     @Test
     @TestMetadata("multipleConstructorsRequireInject.kt")
     public void testMultipleConstructorsRequireInject() {
-      runTest("compiler/src/test/resources/diagnostics/contributesrobot/multipleConstructorsRequireInject.kt");
+      run("multipleConstructorsRequireInject.kt");
     }
   }
 
@@ -109,6 +125,10 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   @TestMetadata("compiler/src/test/resources/diagnostics/contributesservice")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesservice {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/diagnostics/contributesservice/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesservice() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -117,25 +137,25 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     @Test
     @TestMetadata("classMustBeInterface.kt")
     public void testClassMustBeInterface() {
-      runTest("compiler/src/test/resources/diagnostics/contributesservice/classMustBeInterface.kt");
+      run("classMustBeInterface.kt");
     }
 
     @Test
     @TestMetadata("multipleConstructorsRequireInject.kt")
     public void testMultipleConstructorsRequireInject() {
-      runTest("compiler/src/test/resources/diagnostics/contributesservice/multipleConstructorsRequireInject.kt");
+      run("multipleConstructorsRequireInject.kt");
     }
 
     @Test
     @TestMetadata("qualifierRequired.kt")
     public void testQualifierRequired() {
-      runTest("compiler/src/test/resources/diagnostics/contributesservice/qualifierRequired.kt");
+      run("qualifierRequired.kt");
     }
 
     @Test
     @TestMetadata("tooManyQualifiers.kt")
     public void testTooManyQualifiers() {
-      runTest("compiler/src/test/resources/diagnostics/contributesservice/tooManyQualifiers.kt");
+      run("tooManyQualifiers.kt");
     }
   }
 
@@ -143,6 +163,10 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
   @TestMetadata("compiler/src/test/resources/diagnostics/developmentappcomponent")
   @TestDataPath("$PROJECT_ROOT")
   public class Developmentappcomponent {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInDevelopmentappcomponent() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/diagnostics/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -151,19 +175,19 @@ public class FirDiagnosticTestGenerated extends AbstractFirDiagnosticTest {
     @Test
     @TestMetadata("featureComponentWithoutScope.kt")
     public void testFeatureComponentWithoutScope() {
-      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/featureComponentWithoutScope.kt");
+      run("featureComponentWithoutScope.kt");
     }
 
     @Test
     @TestMetadata("featureScopeWithoutComponent.kt")
     public void testFeatureScopeWithoutComponent() {
-      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/featureScopeWithoutComponent.kt");
+      run("featureScopeWithoutComponent.kt");
     }
 
     @Test
     @TestMetadata("mustExtendDevelopmentApplication.kt")
     public void testMustExtendDevelopmentApplication() {
-      runTest("compiler/src/test/resources/diagnostics/developmentappcomponent/mustExtendDevelopmentApplication.kt");
+      run("mustExtendDevelopmentApplication.kt");
     }
   }
 }

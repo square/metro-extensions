@@ -24,6 +24,7 @@ public final class com/squareup/metro/extensions/SquareMetroExtensionsPluginRegi
 public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppComponentFir : dev/zacsweers/metro/compiler/api/fir/MetroFirDeclarationGenerationExtension, dev/zacsweers/metro/compiler/api/fir/MetroContributionHintExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun generateNestedClassLikeDeclaration (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/name/Name;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassLikeSymbol;
+	public fun getCallableNamesForClass (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Member;)Ljava/util/Set;
 	public fun getContributionHints ()Ljava/util/List;
 	public fun getNestedClassifiersNames (Lorg/jetbrains/kotlin/fir/symbols/impl/FirClassSymbol;Lorg/jetbrains/kotlin/fir/extensions/DeclarationGenerationContext$Nested;)Ljava/util/Set;
 	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
@@ -37,6 +38,7 @@ public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppCo
 public final class com/squareup/metro/extensions/developmentapp/DevelopmentAppComponentMetroExtension : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun getContributions (Lorg/jetbrains/kotlin/name/ClassId;Ldev/zacsweers/metro/compiler/fir/MetroFirTypeResolver$Factory;)Ljava/util/List;
+	public fun lookupFqNames (Lorg/jetbrains/kotlin/name/ClassId;)Ljava/util/Collection;
 	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
 }
 
@@ -63,6 +65,7 @@ public final class com/squareup/metro/extensions/featureflag/ContributesFeatureF
 public final class com/squareup/metro/extensions/featureflag/ContributesFeatureFlagMetroExtension : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun getContributions (Lorg/jetbrains/kotlin/name/ClassId;Ldev/zacsweers/metro/compiler/fir/MetroFirTypeResolver$Factory;)Ljava/util/List;
+	public fun lookupFqNames (Lorg/jetbrains/kotlin/name/ClassId;)Ljava/util/Collection;
 	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
 }
 
@@ -89,6 +92,7 @@ public final class com/squareup/metro/extensions/robot/ContributesRobotFir$Facto
 public final class com/squareup/metro/extensions/robot/ContributesRobotMetroExtension : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun getContributions (Lorg/jetbrains/kotlin/name/ClassId;Ldev/zacsweers/metro/compiler/fir/MetroFirTypeResolver$Factory;)Ljava/util/List;
+	public fun lookupFqNames (Lorg/jetbrains/kotlin/name/ClassId;)Ljava/util/Collection;
 	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
 }
 
@@ -132,6 +136,7 @@ public final class com/squareup/metro/extensions/service/ContributesServiceFir$F
 public final class com/squareup/metro/extensions/service/ContributesServiceMetroExtension : dev/zacsweers/metro/compiler/api/fir/MetroContributionExtension {
 	public fun <init> (Lorg/jetbrains/kotlin/fir/FirSession;)V
 	public fun getContributions (Lorg/jetbrains/kotlin/name/ClassId;Ldev/zacsweers/metro/compiler/fir/MetroFirTypeResolver$Factory;)Ljava/util/List;
+	public fun lookupFqNames (Lorg/jetbrains/kotlin/name/ClassId;)Ljava/util/Collection;
 	public fun registerPredicates (Lorg/jetbrains/kotlin/fir/extensions/FirDeclarationPredicateRegistrar;)V
 }
 

@@ -6,11 +6,15 @@
 
 ### Changed
 
+- Built against Metro `1.5.0`, retaining Kotlin `2.4.10`.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Generated scoped bindings, constructor and service providers, feature flag providers, and development graph factory methods are now serialized into Kotlin metadata. Downstream modules can discover these declarations with Metro's `omit-redundant-mirrors` optimization enabled.
 
 ### Security
 

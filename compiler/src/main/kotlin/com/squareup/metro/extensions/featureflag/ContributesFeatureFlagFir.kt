@@ -7,6 +7,7 @@ import com.squareup.metro.extensions.Keys.ContributesFeatureFlagGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension.ContributionHint
@@ -173,6 +174,8 @@ public class ContributesFeatureFlagFir(session: FirSession) :
     classSymbol: FirClassSymbol<*>,
     context: MemberGenerationContext,
   ): Set<Name> {
+    session.registerPredeclaredFunctionMetadata(classSymbol, ContributesFeatureFlagGeneratorKey)
+
     return if (isGeneratedContributionContainer(classSymbol)) {
       setOf(SpecialNames.INIT)
     } else {

@@ -7,6 +7,7 @@ import com.squareup.metro.extensions.Keys.DevelopmentAppComponentGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import com.squareup.metro.extensions.squareMetroExtensionsConfig
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
@@ -36,6 +37,7 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
+import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
@@ -91,6 +93,14 @@ import org.jetbrains.kotlin.name.Name
  */
 public class DevelopmentAppComponentFir(session: FirSession) :
   MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
+
+  override fun getCallableNamesForClass(
+    classSymbol: FirClassSymbol<*>,
+    context: MemberGenerationContext,
+  ): Set<Name> {
+    session.registerPredeclaredFunctionMetadata(classSymbol, DevelopmentAppComponentGeneratorKey)
+    return emptySet()
+  }
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     if (session.squareMetroExtensionsConfig.enableDevelopmentAppComponent) {

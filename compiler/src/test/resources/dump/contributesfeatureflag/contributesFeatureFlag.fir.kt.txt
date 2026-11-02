@@ -1,11 +1,3 @@
-// FILE: comTestMyFeatureFlagFeatureFlagContributionDev_zacsweers_metro_AppScope.kt
-package metro.hints
-
-@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-fun dev_zacsweers_metro_AppScope(contributed: FeatureFlagContribution) {
-  return error(message = "Never called")
-}
-
 // FILE: contributesFeatureFlag.kt
 package com.test
 
@@ -72,4 +64,13 @@ object MyFeatureFlag : BooleanFeatureFlag {
 
   }
 
+}
+
+// FILE: contributesFeatureFlag.kt
+@file:JvmName(name = "ComTestMyFeatureFlagFeatureFlagContributionDev_zacsweers_metro_AppScopeKt")
+package metro.hints
+
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun dev_zacsweers_metro_AppScope(contributed: FeatureFlagContribution) {
+  return error(message = "Never called")
 }

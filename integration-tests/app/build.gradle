@@ -8,4 +8,5 @@ dependencies {
   implementation project(':integration-tests:lib')
   implementation project(':stubs')
   testImplementation libs.kotlin.test
+  testImplementation libs.kotlin.metadata.jvm
 }

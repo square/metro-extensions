@@ -8,6 +8,7 @@ import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
 import com.squareup.metro.extensions.fir.extractScopeClassId
 import com.squareup.metro.extensions.fir.hasAnnotation
+import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import com.squareup.metro.extensions.fir.resolveValueParameterTypeRef
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
@@ -118,7 +119,8 @@ private const val SCOPED_PROVIDER_FUNCTION_NAME = "provideContributedMultibindin
  *
  * The function is added directly to the class's declarations list (rather than through
  * `getCallableNamesForClass`/`generateFunctions`) so Metro can see it when deciding what nested
- * classes to generate.
+ * classes to generate. [registerPredeclaredFunctionMetadata] also exposes these functions in Kotlin
+ * metadata without generating them a second time through the member scope.
  */
 public class ContributesMultibindingScopedFir(
   session: FirSession,
@@ -326,6 +328,11 @@ public class ContributesMultibindingScopedFir(
     classSymbol: FirClassSymbol<*>,
     context: MemberGenerationContext,
   ): Set<Name> {
+    session.registerPredeclaredFunctionMetadata(
+      classSymbol,
+      ContributesMultibindingScopedGeneratorKey,
+    )
+
     return if (isGeneratedHolderCompanion(classSymbol)) {
       setOf(SpecialNames.INIT)
     } else {

@@ -16,6 +16,10 @@ import java.util.regex.Pattern;
 @TestMetadata("compiler/src/test/resources/box")
 @TestDataPath("$PROJECT_ROOT")
 public class BoxTestGenerated extends AbstractBoxTest {
+  private void run(String fileName) {
+    runTest("compiler/src/test/resources/box/" + fileName);
+  }
+
   @Test
   public void testAllFilesPresentInBox() {
     KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -25,6 +29,10 @@ public class BoxTestGenerated extends AbstractBoxTest {
   @TestMetadata("compiler/src/test/resources/box/contributesfeatureflag")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesfeatureflag {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/box/contributesfeatureflag/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesfeatureflag() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesfeatureflag"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -33,25 +41,25 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @Test
     @TestMetadata("dynamicConfigurationFlag.kt")
     public void testDynamicConfigurationFlag() {
-      runTest("compiler/src/test/resources/box/contributesfeatureflag/dynamicConfigurationFlag.kt");
+      run("dynamicConfigurationFlag.kt");
     }
 
     @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesfeatureflag/multiCompilation.kt");
+      run("multiCompilation.kt");
     }
 
     @Test
     @TestMetadata("multipleFlags.kt")
     public void testMultipleFlags() {
-      runTest("compiler/src/test/resources/box/contributesfeatureflag/multipleFlags.kt");
+      run("multipleFlags.kt");
     }
 
     @Test
     @TestMetadata("singleCompilation.kt")
     public void testSingleCompilation() {
-      runTest("compiler/src/test/resources/box/contributesfeatureflag/singleCompilation.kt");
+      run("singleCompilation.kt");
     }
   }
 
@@ -59,6 +67,10 @@ public class BoxTestGenerated extends AbstractBoxTest {
   @TestMetadata("compiler/src/test/resources/box/contributesmultibindingscoped")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesmultibindingscoped {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesmultibindingscoped() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesmultibindingscoped"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -67,85 +79,85 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @Test
     @TestMetadata("constructorProvider.kt")
     public void testConstructorProvider() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/constructorProvider.kt");
+      run("constructorProvider.kt");
     }
 
     @Test
     @TestMetadata("contributesBindingOnSameClass.kt")
     public void testContributesBindingOnSameClass() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/contributesBindingOnSameClass.kt");
+      run("contributesBindingOnSameClass.kt");
     }
 
     @Test
     @TestMetadata("contributesBindingScopedMultiCompilation.kt")
     public void testContributesBindingScopedMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/contributesBindingScopedMultiCompilation.kt");
+      run("contributesBindingScopedMultiCompilation.kt");
     }
 
     @Test
     @TestMetadata("defaultConstructorArgument.kt")
     public void testDefaultConstructorArgument() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/defaultConstructorArgument.kt");
+      run("defaultConstructorArgument.kt");
     }
 
     @Test
     @TestMetadata("excludedScopedBinding.kt")
     public void testExcludedScopedBinding() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/excludedScopedBinding.kt");
+      run("excludedScopedBinding.kt");
     }
 
     @Test
     @TestMetadata("hintGeneratedFir.kt")
     public void testHintGeneratedFir() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/hintGeneratedFir.kt");
+      run("hintGeneratedFir.kt");
     }
 
     @Test
     @TestMetadata("hintGeneratedIr.kt")
     public void testHintGeneratedIr() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/hintGeneratedIr.kt");
+      run("hintGeneratedIr.kt");
     }
 
     @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/multiCompilation.kt");
+      run("multiCompilation.kt");
     }
 
     @Test
     @TestMetadata("replacedScopedBinding.kt")
     public void testReplacedScopedBinding() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/replacedScopedBinding.kt");
+      run("replacedScopedBinding.kt");
     }
 
     @Test
     @TestMetadata("replacedScopedBindingMultiCompilation.kt")
     public void testReplacedScopedBindingMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/replacedScopedBindingMultiCompilation.kt");
+      run("replacedScopedBindingMultiCompilation.kt");
     }
 
     @Test
     @TestMetadata("replacedScopedBindingMultiCompilationWithExtension.kt")
     public void testReplacedScopedBindingMultiCompilationWithExtension() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/replacedScopedBindingMultiCompilationWithExtension.kt");
+      run("replacedScopedBindingMultiCompilationWithExtension.kt");
     }
 
     @Test
     @TestMetadata("scopedInSuperTypes.kt")
     public void testScopedInSuperTypes() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/scopedInSuperTypes.kt");
+      run("scopedInSuperTypes.kt");
     }
 
     @Test
     @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
     public void testSecondaryInjectConstructorSkipsProvider() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/secondaryInjectConstructorSkipsProvider.kt");
+      run("secondaryInjectConstructorSkipsProvider.kt");
     }
 
     @Test
     @TestMetadata("singleCompilation.kt")
     public void testSingleCompilation() {
-      runTest("compiler/src/test/resources/box/contributesmultibindingscoped/singleCompilation.kt");
+      run("singleCompilation.kt");
     }
   }
 
@@ -153,6 +165,10 @@ public class BoxTestGenerated extends AbstractBoxTest {
   @TestMetadata("compiler/src/test/resources/box/contributesrobot")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesrobot {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/box/contributesrobot/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesrobot() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesrobot"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -161,79 +177,79 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @Test
     @TestMetadata("componentAddedToGraph.kt")
     public void testComponentAddedToGraph() {
-      runTest("compiler/src/test/resources/box/contributesrobot/componentAddedToGraph.kt");
+      run("componentAddedToGraph.kt");
     }
 
     @Test
     @TestMetadata("composeScreenRobot.kt")
     public void testComposeScreenRobot() {
-      runTest("compiler/src/test/resources/box/contributesrobot/composeScreenRobot.kt");
+      run("composeScreenRobot.kt");
     }
 
     @Test
     @TestMetadata("constructorArguments.kt")
     public void testConstructorArguments() {
-      runTest("compiler/src/test/resources/box/contributesrobot/constructorArguments.kt");
+      run("constructorArguments.kt");
     }
 
     @Test
     @TestMetadata("hintGeneratedFir.kt")
     public void testHintGeneratedFir() {
-      runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedFir.kt");
+      run("hintGeneratedFir.kt");
     }
 
     @Test
     @TestMetadata("hintGeneratedIr.kt")
     public void testHintGeneratedIr() {
-      runTest("compiler/src/test/resources/box/contributesrobot/hintGeneratedIr.kt");
+      run("hintGeneratedIr.kt");
     }
 
     @Test
     @TestMetadata("injectAnnotationSkipsProvider.kt")
     public void testInjectAnnotationSkipsProvider() {
-      runTest("compiler/src/test/resources/box/contributesrobot/injectAnnotationSkipsProvider.kt");
+      run("injectAnnotationSkipsProvider.kt");
     }
 
     @Test
     @TestMetadata("innerClassRobot.kt")
     public void testInnerClassRobot() {
-      runTest("compiler/src/test/resources/box/contributesrobot/innerClassRobot.kt");
+      run("innerClassRobot.kt");
     }
 
     @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesrobot/multiCompilation.kt");
+      run("multiCompilation.kt");
     }
 
     @Test
     @TestMetadata("namedScopeArgument.kt")
     public void testNamedScopeArgument() {
-      runTest("compiler/src/test/resources/box/contributesrobot/namedScopeArgument.kt");
+      run("namedScopeArgument.kt");
     }
 
     @Test
     @TestMetadata("nestedGenericConstructorArgument.kt")
     public void testNestedGenericConstructorArgument() {
-      runTest("compiler/src/test/resources/box/contributesrobot/nestedGenericConstructorArgument.kt");
+      run("nestedGenericConstructorArgument.kt");
     }
 
     @Test
     @TestMetadata("screenRobot.kt")
     public void testScreenRobot() {
-      runTest("compiler/src/test/resources/box/contributesrobot/screenRobot.kt");
+      run("screenRobot.kt");
     }
 
     @Test
     @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
     public void testSecondaryInjectConstructorSkipsProvider() {
-      runTest("compiler/src/test/resources/box/contributesrobot/secondaryInjectConstructorSkipsProvider.kt");
+      run("secondaryInjectConstructorSkipsProvider.kt");
     }
 
     @Test
     @TestMetadata("singleInAnnotationScopesProvider.kt")
     public void testSingleInAnnotationScopesProvider() {
-      runTest("compiler/src/test/resources/box/contributesrobot/singleInAnnotationScopesProvider.kt");
+      run("singleInAnnotationScopesProvider.kt");
     }
   }
 
@@ -241,6 +257,10 @@ public class BoxTestGenerated extends AbstractBoxTest {
   @TestMetadata("compiler/src/test/resources/box/contributesservice")
   @TestDataPath("$PROJECT_ROOT")
   public class Contributesservice {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/box/contributesservice/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInContributesservice() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/contributesservice"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -249,91 +269,91 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @Test
     @TestMetadata("fakeServiceProviderIgnoresMismatchedScope.kt")
     public void testFakeServiceProviderIgnoresMismatchedScope() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderIgnoresMismatchedScope.kt");
+      run("fakeServiceProviderIgnoresMismatchedScope.kt");
     }
 
     @Test
     @TestMetadata("fakeServiceProviderPreservesScope.kt")
     public void testFakeServiceProviderPreservesScope() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderPreservesScope.kt");
+      run("fakeServiceProviderPreservesScope.kt");
     }
 
     @Test
     @TestMetadata("fakeServiceProviderSupportsParentScopeInjection.kt")
     public void testFakeServiceProviderSupportsParentScopeInjection() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceProviderSupportsParentScopeInjection.kt");
+      run("fakeServiceProviderSupportsParentScopeInjection.kt");
     }
 
     @Test
     @TestMetadata("fakeServiceWithFunctionParameter.kt")
     public void testFakeServiceWithFunctionParameter() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithFunctionParameter.kt");
+      run("fakeServiceWithFunctionParameter.kt");
     }
 
     @Test
     @TestMetadata("fakeServiceWithNestedParameter.kt")
     public void testFakeServiceWithNestedParameter() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithNestedParameter.kt");
+      run("fakeServiceWithNestedParameter.kt");
     }
 
     @Test
     @TestMetadata("fakeServiceWithoutInject.kt")
     public void testFakeServiceWithoutInject() {
-      runTest("compiler/src/test/resources/box/contributesservice/fakeServiceWithoutInject.kt");
+      run("fakeServiceWithoutInject.kt");
     }
 
     @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
-      runTest("compiler/src/test/resources/box/contributesservice/multiCompilation.kt");
+      run("multiCompilation.kt");
     }
 
     @Test
     @TestMetadata("replacedMultipleServices.kt")
     public void testReplacedMultipleServices() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedMultipleServices.kt");
+      run("replacedMultipleServices.kt");
     }
 
     @Test
     @TestMetadata("replacedServiceDoesNotInstantiateFakeInRealMode.kt")
     public void testReplacedServiceDoesNotInstantiateFakeInRealMode() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceDoesNotInstantiateFakeInRealMode.kt");
+      run("replacedServiceDoesNotInstantiateFakeInRealMode.kt");
     }
 
     @Test
     @TestMetadata("replacedServiceOneCompilation.kt")
     public void testReplacedServiceOneCompilation() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceOneCompilation.kt");
+      run("replacedServiceOneCompilation.kt");
     }
 
     @Test
     @TestMetadata("replacedServiceSameLibSeparateGraph.kt")
     public void testReplacedServiceSameLibSeparateGraph() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceSameLibSeparateGraph.kt");
+      run("replacedServiceSameLibSeparateGraph.kt");
     }
 
     @Test
     @TestMetadata("replacedServiceThreeCompilations.kt")
     public void testReplacedServiceThreeCompilations() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceThreeCompilations.kt");
+      run("replacedServiceThreeCompilations.kt");
     }
 
     @Test
     @TestMetadata("replacedServiceTwoCompilations.kt")
     public void testReplacedServiceTwoCompilations() {
-      runTest("compiler/src/test/resources/box/contributesservice/replacedServiceTwoCompilations.kt");
+      run("replacedServiceTwoCompilations.kt");
     }
 
     @Test
     @TestMetadata("secondaryInjectConstructorSkipsProvider.kt")
     public void testSecondaryInjectConstructorSkipsProvider() {
-      runTest("compiler/src/test/resources/box/contributesservice/secondaryInjectConstructorSkipsProvider.kt");
+      run("secondaryInjectConstructorSkipsProvider.kt");
     }
 
     @Test
     @TestMetadata("singleCompilation.kt")
     public void testSingleCompilation() {
-      runTest("compiler/src/test/resources/box/contributesservice/singleCompilation.kt");
+      run("singleCompilation.kt");
     }
   }
 
@@ -341,6 +361,10 @@ public class BoxTestGenerated extends AbstractBoxTest {
   @TestMetadata("compiler/src/test/resources/box/developmentappcomponent")
   @TestDataPath("$PROJECT_ROOT")
   public class Developmentappcomponent {
+    private void run(String fileName) {
+      runTest("compiler/src/test/resources/box/developmentappcomponent/" + fileName);
+    }
+
     @Test
     public void testAllFilesPresentInDevelopmentappcomponent() {
       KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/src/test/resources/box/developmentappcomponent"), Pattern.compile("^(.+)\\.kt$"), null, true);
@@ -349,25 +373,31 @@ public class BoxTestGenerated extends AbstractBoxTest {
     @Test
     @TestMetadata("excludeLoggedInComponent.kt")
     public void testExcludeLoggedInComponent() {
-      runTest("compiler/src/test/resources/box/developmentappcomponent/excludeLoggedInComponent.kt");
+      run("excludeLoggedInComponent.kt");
     }
 
     @Test
     @TestMetadata("featureScopeComponent.kt")
     public void testFeatureScopeComponent() {
-      runTest("compiler/src/test/resources/box/developmentappcomponent/featureScopeComponent.kt");
+      run("featureScopeComponent.kt");
+    }
+
+    @Test
+    @TestMetadata("generatedFactoryMultiCompilation.kt")
+    public void testGeneratedFactoryMultiCompilation() {
+      run("generatedFactoryMultiCompilation.kt");
     }
 
     @Test
     @TestMetadata("multiCompilation.kt")
     public void testMultiCompilation() {
-      runTest("compiler/src/test/resources/box/developmentappcomponent/multiCompilation.kt");
+      run("multiCompilation.kt");
     }
 
     @Test
     @TestMetadata("singleCompilation.kt")
     public void testSingleCompilation() {
-      runTest("compiler/src/test/resources/box/developmentappcomponent/singleCompilation.kt");
+      run("singleCompilation.kt");
     }
   }
 }

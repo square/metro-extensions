@@ -1,27 +1,3 @@
-// FILE: comTestFakeMyServiceFakeServiceProviderContributionDev_zacsweers_metro_AppScope.kt
-package metro.hints
-
-@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-fun dev_zacsweers_metro_AppScope(contributed: FakeServiceProviderContribution) {
-  return error(message = "Never called")
-}
-
-// FILE: comTestFakeMyServiceServiceContributionKotlin_Unit.kt
-package metro.hints
-
-@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-fun kotlin_Unit(contributed: ServiceContribution) {
-  return error(message = "Never called")
-}
-
-// FILE: comTestMyServiceServiceContributionKotlin_Unit.kt
-package metro.hints
-
-@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
-fun kotlin_Unit(contributed: ServiceContribution) {
-  return error(message = "Never called")
-}
-
 // FILE: replacedService.kt
 package com.test
 
@@ -327,4 +303,31 @@ interface MyService {
 
   }
 
+}
+
+// FILE: replacedService.kt
+@file:JvmName(name = "ComTestFakeMyServiceServiceContributionKotlin_UnitKt")
+package metro.hints
+
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: replacedService.kt
+@file:JvmName(name = "ComTestMyServiceServiceContributionKotlin_UnitKt")
+package metro.hints
+
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun kotlin_Unit(contributed: ServiceContribution) {
+  return error(message = "Never called")
+}
+
+// FILE: replacedService.kt
+@file:JvmName(name = "ComTestFakeMyServiceFakeServiceProviderContributionDev_zacsweers_metro_AppScopeKt")
+package metro.hints
+
+@Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+fun dev_zacsweers_metro_AppScope(contributed: FakeServiceProviderContribution) {
+  return error(message = "Never called")
 }
