@@ -6,20 +6,26 @@
 
 ### Changed
 
-- Built against Metro `1.5.0`, retaining Kotlin `2.4.10`.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Generated scoped bindings, constructor and service providers, feature flag providers, and development graph factory methods are now serialized into Kotlin metadata. Downstream modules can discover these declarations with Metro's `omit-redundant-mirrors` optimization enabled.
-
 ### Security
 
 ### Other Notes & Contributions
 
+
+## [0.0.15] - 2026-11-03
+
+### Changed
+
+- Built against Metro `1.5.0`, retaining Kotlin `2.4.10`.
+
+### Fixed
+
+- Generated scoped bindings, constructor and service providers, feature flag providers, and development graph factory methods are now serialized into Kotlin metadata. Downstream modules can discover these declarations with Metro's `omit-redundant-mirrors` optimization enabled.
 
 ## [0.0.14] - 2026-10-23
 
@@ -139,7 +145,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.14...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.15...HEAD
+[0.0.15]: https://github.com/square/metro-extensions/compare/0.0.15
 [0.0.14]: https://github.com/square/metro-extensions/compare/0.0.14
 [0.0.13]: https://github.com/square/metro-extensions/compare/0.0.13
 [0.0.12]: https://github.com/square/metro-extensions/compare/0.0.12
