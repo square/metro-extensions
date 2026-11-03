@@ -18,7 +18,7 @@ interface BootstrapService
 @SingleIn(BootstrapScope::class)
 class ConstructorScoped(val dependency: ScopedDependency) : Scoped, BootstrapService
 
-class ScopedDependency @Inject constructor()
+@Inject class ScopedDependency
 
 @Inject
 @SingleIn(BootstrapScope::class)
@@ -31,6 +31,7 @@ abstract class ReplacementScope private constructor()
 
 interface ReplacementService
 
+@Inject
 @ContributesBinding(ReplacementScope::class, binding = binding<ReplacementService>())
 @ContributesMultibindingScoped(ReplacementScope::class)
-class OriginalScoped @Inject constructor() : ReplacementService, Scoped
+class OriginalScoped : ReplacementService, Scoped
