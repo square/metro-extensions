@@ -20,6 +20,7 @@ import kotlin.test.assertIs
 import kotlin.test.assertSame
 import mortar.Scoped
 
+@Inject
 @ContributesBinding(
   ReplacementScope::class,
   binding = binding<ReplacementService>(),
@@ -27,7 +28,7 @@ import mortar.Scoped
 )
 @ContributesMultibindingScoped(ReplacementScope::class)
 @SingleIn(ReplacementScope::class)
-class ReplacementScoped @Inject constructor() : ReplacementService, Scoped
+class ReplacementScoped : ReplacementService, Scoped
 
 @DependencyGraph(ReplacementScope::class)
 @SingleIn(ReplacementScope::class)
