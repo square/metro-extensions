@@ -64,13 +64,16 @@ class GeneratedMetadataTest {
     val robot = metadata("com.squareup.test.lib.ConstructorRobot\$RobotContribution")
     assertEquals(
       setOf(
-        "provideConstructorRobotComponent",
+        "providecom_ssquareup_stest_slib_sConstructorRobotComponent",
         "getcom_squareup_test_lib_ConstructorRobotComponent",
       ),
       robot.functions.map { it.name }.toSet(),
     )
     assertEquals(2, robot.functions.size)
-    val provider = robot.functions.single { it.name == "provideConstructorRobotComponent" }
+    val provider =
+      robot.functions.single {
+        it.name == "providecom_ssquareup_stest_slib_sConstructorRobotComponent"
+      }
     assertTrue(provider.annotations.has("dev/zacsweers/metro/Provides"))
     assertEquals(
       KClassValue("com/squareup/test/lib/BootstrapScope"),
@@ -83,6 +86,29 @@ class GeneratedMetadataTest {
       listOf("getcom_squareup_test_lib_LibRobotComponent"),
       injected.functions.map { it.name },
     )
+  }
+
+  @Test
+  fun `same named robots serialize distinct constructor providers`() {
+    val providerNames = mutableSetOf<String>()
+    for (feature in listOf("featurea", "featureb")) {
+      val robot = metadata("com.example.$feature.SettingsRobot\$RobotContribution")
+      val provider = robot.functions.single { it.name.startsWith("provide") }
+      assertTrue(providerNames.add(provider.name))
+      assertTrue(provider.annotations.has("dev/zacsweers/metro/Provides"))
+      assertEquals(
+        KmClassifier.Class("com/example/$feature/SettingsRobot"),
+        provider.returnType.classifier,
+      )
+      assertEquals(
+        KmClassifier.Class("kotlin/String"),
+        provider.valueParameters.single().type.classifier,
+      )
+      assertEquals(
+        listOf("getcom_example_${feature}_SettingsRobotComponent"),
+        robot.functions.filterNot { it.name.startsWith("provide") }.map { it.name },
+      )
+    }
   }
 
   @Test
