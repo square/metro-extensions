@@ -229,9 +229,21 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("nestedAndUnderscoreProviderNames.kt")
+    public void testNestedAndUnderscoreProviderNames() {
+      run("nestedAndUnderscoreProviderNames.kt");
+    }
+
+    @Test
     @TestMetadata("nestedGenericConstructorArgument.kt")
     public void testNestedGenericConstructorArgument() {
       run("nestedGenericConstructorArgument.kt");
+    }
+
+    @Test
+    @TestMetadata("sameNameConstructorRobotsMultiCompilation.kt")
+    public void testSameNameConstructorRobotsMultiCompilation() {
+      run("sameNameConstructorRobotsMultiCompilation.kt");
     }
 
     @Test

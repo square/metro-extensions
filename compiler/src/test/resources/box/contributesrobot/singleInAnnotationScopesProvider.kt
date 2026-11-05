@@ -22,7 +22,7 @@ fun box(): String {
   val contributionClass =
     AbcRobot::class.java.declaredClasses.first { it.simpleName == "RobotContribution" }
   val providerMethod =
-    contributionClass.declaredMethods.first { it.name == "provideAbcRobotComponent" }
+    contributionClass.declaredMethods.first { it.name == "providecom_stest_sAbcRobotComponent" }
   assertNotNull(providerMethod.getAnnotation(SingleIn::class.java))
 
   val graph = createGraph<MyGraph>()

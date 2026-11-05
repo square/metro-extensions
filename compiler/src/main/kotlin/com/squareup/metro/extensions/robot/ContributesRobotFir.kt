@@ -74,7 +74,7 @@ import org.jetbrains.kotlin.name.Name
  *   fun getcom_test_AbcRobotComponent(): AbcRobot
  *
  *   @Provides
- *   fun provideAbcRobotComponent(dependency: Dependency): AbcRobot
+ *   fun providecom_stest_sAbcRobotComponent(dependency: Dependency): AbcRobot
  * }
  * ```
  *
@@ -313,8 +313,11 @@ public class ContributesRobotFir(session: FirSession) :
   }
 
   private fun robotProviderFunctionName(contributorClassId: ClassId): Name {
-    val fileName = contributorClassId.relativeClassName.asString().replace('.', '_') + "Component"
-    return Name.identifier("provide$fileName")
+    // ClassId uses '/' for package separators and '.' for nested classes. Escape underscores
+    // first so literal names cannot alias either separator (e.g. Outer_dRobot vs Outer.Robot).
+    val encodedClassId =
+      contributorClassId.asString().replace("_", "_u").replace("/", "_s").replace(".", "_d")
+    return Name.identifier("provide${encodedClassId}Component")
   }
 
   private fun fqcnBasedAccessorName(contributorClassId: ClassId): String {
