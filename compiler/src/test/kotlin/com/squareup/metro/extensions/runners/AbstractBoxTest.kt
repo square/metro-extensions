@@ -4,16 +4,15 @@ import com.squareup.metro.extensions.services.configureKotlinTestImports
 import com.squareup.metro.extensions.services.configureMetroImports
 import com.squareup.metro.extensions.services.configurePlugin
 import org.jetbrains.kotlin.config.JvmTarget
-import org.jetbrains.kotlin.test.FirParser
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.CodegenTestDirectives
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives
 import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives
-import org.jetbrains.kotlin.test.runners.codegen.AbstractFirBlackBoxCodegenTestBase
+import org.jetbrains.kotlin.test.runners.codegen.AbstractFirLightTreeBlackBoxCodegenTest
 import org.jetbrains.kotlin.test.services.EnvironmentBasedStandardLibrariesPathProvider
 import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
 
-open class AbstractBoxTest : AbstractFirBlackBoxCodegenTestBase(FirParser.LightTree) {
+open class AbstractBoxTest : AbstractFirLightTreeBlackBoxCodegenTest() {
   override fun createKotlinStandardLibrariesPathProvider(): KotlinStandardLibrariesPathProvider {
     return EnvironmentBasedStandardLibrariesPathProvider
   }

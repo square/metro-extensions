@@ -18,6 +18,7 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrClassReference
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrDelegatingConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.classOrNull
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.name.ClassId
 
 /**
  * IR extension that generates method bodies for constructor `@Provides` functions created by
@@ -123,7 +125,7 @@ private class ContributesMultibindingScopedIrTransformer(
     while (parent is IrClass) {
       val originAnnotation =
         parent.annotations.firstOrNull { annotation ->
-          annotation.symbol.owner.parentAsClass.classId == ClassIds.ORIGIN
+          annotation.annotationClassId == ClassIds.ORIGIN
         }
       val originClass =
         originAnnotation
@@ -163,3 +165,11 @@ private class ContributesMultibindingScopedIrTransformer(
       }
   }
 }
+
+/**
+ * The class an annotation call instantiates. Declared on [IrConstructorCall] because Kotlin 2.4.20
+ * deprecated `IrAnnotation.symbol` in favor of `classSymbol`, which older supported compilers do
+ * not have.
+ */
+private val IrConstructorCall.annotationClassId: ClassId?
+  get() = symbol.owner.parentAsClass.classId

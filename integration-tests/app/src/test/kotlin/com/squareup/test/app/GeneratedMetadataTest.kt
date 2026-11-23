@@ -1,6 +1,5 @@
 package com.squareup.test.app
 
-import kotlin.metadata.ExperimentalAnnotationsInMetadata
 import kotlin.metadata.KmAnnotation
 import kotlin.metadata.KmAnnotationArgument.KClassValue
 import kotlin.metadata.KmClass
@@ -15,7 +14,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /** Reads the metadata of the separately compiled library, rather than JVM method annotations. */
-@OptIn(ExperimentalAnnotationsInMetadata::class)
 class GeneratedMetadataTest {
   @Test
   fun `binds methods and scope arguments are serialized without redundant mirrors`() {

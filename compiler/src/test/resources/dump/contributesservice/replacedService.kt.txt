@@ -217,7 +217,7 @@ class FakeMyService : MyService {
     @SingleIn(scope = Unit::class)
     @RealService
     fun provideRealMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
-      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+      return serviceCreator.create<MyService>(service = <get-java><MyService>(/* <this> = MyService::class */))
     }
 
   }
@@ -298,7 +298,7 @@ interface MyService {
       when {
         isFakeMode -> error(message = "No fake service provided for MyService.")
       }
-      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+      return serviceCreator.create<MyService>(service = <get-java><MyService>(/* <this> = MyService::class */))
     }
 
   }

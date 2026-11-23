@@ -1,4 +1,4 @@
-// FILE: contributesServiceReleaseBuild.kt
+// FILE: contributesService.kt
 package com.test
 
 @ContributesService(scope = Unit::class)
@@ -12,6 +12,7 @@ interface MyService {
     @CallableMetadata(callableName = "provideMyService", propertyName = "", startOffset = -1, endOffset = -1, newInstanceName = "provideMyService")
     class ProvideMyServiceMetroFactory : Factory<MyService> {
       private /* final field */ val serviceCreator: Provider<ServiceCreator> = serviceCreator
+      private /* final field */ val isFakeMode: Provider<Boolean> = isFakeMode
       companion object Companion {
         private constructor() /* primary */ {
           super/*Any*/()
@@ -22,21 +23,21 @@ interface MyService {
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>): ProvideMyServiceMetroFactory {
-          return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator)
+        fun create(@RetrofitAuthenticated serviceCreator: Provider<ServiceCreator>, @FakeMode isFakeMode: Provider<Boolean>): ProvideMyServiceMetroFactory {
+          return ProvideMyServiceMetroFactory(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
         @HiddenFromObjC
         @JvmStatic
         @JsStatic
-        fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
-          return ServiceContribution.provideMyService(serviceCreator = serviceCreator)
+        fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+          return ServiceContribution.provideMyService(serviceCreator = serviceCreator, isFakeMode = isFakeMode)
         }
 
       }
 
       @HiddenFromObjC
-      private constructor(serviceCreator: Provider<ServiceCreator>) /* primary */ {
+      private constructor(serviceCreator: Provider<ServiceCreator>, isFakeMode: Provider<Boolean>) /* primary */ {
         super/*Any*/()
         /* <init>() */
 
@@ -45,13 +46,13 @@ interface MyService {
       @SingleIn(scope = Unit::class)
       @ComptimeOnly
       @HiddenFromObjC
-      fun declarationMirror(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
+      fun declarationMirror(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
         return error(message = "Never called")
       }
 
       @HiddenFromObjC
       override operator fun invoke(): MyService {
-        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke())
+        return Companion.provideMyService(serviceCreator = <this>.#serviceCreator.invoke(), isFakeMode = <this>.#isFakeMode.invoke())
       }
 
     }
@@ -64,15 +65,18 @@ interface MyService {
 
     @Provides
     @SingleIn(scope = Unit::class)
-    fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator): MyService {
-      return serviceCreator.create<MyService>(service = <get-java></* null */>(/* <this> = MyService::class */))
+    fun provideMyService(@RetrofitAuthenticated serviceCreator: ServiceCreator, @FakeMode isFakeMode: Boolean): MyService {
+      when {
+        isFakeMode -> error(message = "No fake service provided for MyService.")
+      }
+      return serviceCreator.create<MyService>(service = <get-java><MyService>(/* <this> = MyService::class */))
     }
 
   }
 
 }
 
-// FILE: contributesServiceReleaseBuild.kt
+// FILE: contributesService.kt
 @file:JvmName(name = "ComTestMyServiceServiceContributionKotlin_UnitKt")
 package metro.hints
 

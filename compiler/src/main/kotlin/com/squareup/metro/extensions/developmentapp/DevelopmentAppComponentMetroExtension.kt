@@ -2,6 +2,7 @@ package com.squareup.metro.extensions.developmentapp
 
 import com.fueledbycaffeine.autoservice.AutoService
 import com.squareup.metro.extensions.ClassIds
+import com.squareup.metro.extensions.fir.classIdCompat
 import com.squareup.metro.extensions.fir.findAnnotation
 import dev.zacsweers.metro.compiler.MetroOptions
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionExtension
@@ -115,7 +116,7 @@ public class DevelopmentAppComponentMetroExtension(private val session: FirSessi
     val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
     val classId =
       when (innerArg) {
-        is FirResolvedQualifier -> innerArg.classId
+        is FirResolvedQualifier -> innerArg.classIdCompat
         is org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression -> {
           val ref = innerArg.calleeReference
           if (

@@ -2,6 +2,7 @@ package com.squareup.metro.extensions.developmentapp
 
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.SquareMetroExtensionsDiagnostics
+import com.squareup.metro.extensions.fir.classIdCompat
 import com.squareup.metro.extensions.fir.hasTransitiveSupertype
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -117,7 +118,7 @@ internal object DevelopmentAppComponentChecker : FirClassChecker(MppCheckerKind.
     val inner = getClassCall.argumentList.arguments.firstOrNull() ?: return null
     val classId =
       when (inner) {
-        is FirResolvedQualifier -> inner.classId
+        is FirResolvedQualifier -> inner.classIdCompat
         else -> null
       } ?: return null
     // Treat Unit::class as "not specified"

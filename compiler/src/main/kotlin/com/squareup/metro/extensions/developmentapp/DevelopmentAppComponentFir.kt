@@ -5,6 +5,8 @@ import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.DevelopmentAppComponentGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
+import com.squareup.metro.extensions.fir.buildClassQualifier
+import com.squareup.metro.extensions.fir.classIdCompat
 import com.squareup.metro.extensions.fir.findAnnotation
 import com.squareup.metro.extensions.fir.hasAnnotation
 import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
@@ -35,7 +37,6 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildCollectionLiteral
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
-import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
@@ -91,8 +92,10 @@ import org.jetbrains.kotlin.name.Name
  * When `generateLoggedInComponent = false`, the `@DependencyGraph` annotation includes an
  * `excludes` parameter to exclude `LoginScreenModule` and `DevelopmentLoggedInComponent`.
  */
-public class DevelopmentAppComponentFir(session: FirSession) :
-  MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
+public class DevelopmentAppComponentFir(
+  session: FirSession,
+  private val compatContext: CompatContext,
+) : MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
 
   override fun getCallableNamesForClass(
     classSymbol: FirClassSymbol<*>,
@@ -378,7 +381,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     // try FirResolvedQualifier first, then FirPropertyAccessExpression with import scanning.
     val classId =
       when (innerArg) {
-        is org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier -> innerArg.classId
+        is org.jetbrains.kotlin.fir.expressions.FirResolvedQualifier -> innerArg.classIdCompat
         is org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression -> {
           val ref = innerArg.calleeReference
           if (
@@ -528,13 +531,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     return buildGetClassCall {
       coneTypeOrNull = kClassType
       argumentList = buildArgumentList {
-        arguments += buildResolvedQualifier {
-          packageFqName = scopeClassId.packageFqName
-          relativeClassFqName = scopeClassId.relativeClassName
-          coneTypeOrNull = scopeType
-          symbol = scopeSymbol
-          resolvedToCompanionObject = false
-        }
+        arguments += compatContext.buildClassQualifier(scopeClassId, scopeSymbol, scopeType)
       }
     }
   }
@@ -728,13 +725,7 @@ public class DevelopmentAppComponentFir(session: FirSession) :
       buildGetClassCall {
         coneTypeOrNull = kClassType
         argumentList = buildArgumentList {
-          arguments += buildResolvedQualifier {
-            packageFqName = classId.packageFqName
-            relativeClassFqName = classId.relativeClassName
-            coneTypeOrNull = classType
-            symbol = resolvedSymbol
-            resolvedToCompanionObject = false
-          }
+          arguments += compatContext.buildClassQualifier(classId, resolvedSymbol, classType)
         }
       }
     }
@@ -771,13 +762,8 @@ public class DevelopmentAppComponentFir(session: FirSession) :
     return buildGetClassCall {
       coneTypeOrNull = kClassType
       argumentList = buildArgumentList {
-        arguments += buildResolvedQualifier {
-          packageFqName = appScopeClassId.packageFqName
-          relativeClassFqName = appScopeClassId.relativeClassName
-          coneTypeOrNull = appScopeType
-          symbol = appScopeSymbol
-          resolvedToCompanionObject = false
-        }
+        arguments +=
+          compatContext.buildClassQualifier(appScopeClassId, appScopeSymbol, appScopeType)
       }
     }
   }
@@ -821,6 +807,6 @@ public class DevelopmentAppComponentFir(session: FirSession) :
       session: FirSession,
       options: MetroOptions,
       compatContext: CompatContext,
-    ): MetroFirDeclarationGenerationExtension = DevelopmentAppComponentFir(session)
+    ): MetroFirDeclarationGenerationExtension = DevelopmentAppComponentFir(session, compatContext)
   }
 }

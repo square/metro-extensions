@@ -1,0 +1,1 @@
+/classMustBeInterface.kt:8:1: error: com.test.Service must be an interface in order to use @ContributesService.
