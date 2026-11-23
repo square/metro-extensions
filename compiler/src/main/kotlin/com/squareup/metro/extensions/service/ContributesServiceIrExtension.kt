@@ -258,10 +258,16 @@ private class ContributesServiceIrTransformer(private val pluginContext: IrPlugi
       )
 
     // ServiceType::class.java
-    val javaClassExpr = irBuilder.irCall(javaGetter).apply { arguments[0] = classRef }
+    val javaClassType =
+      javaGetter.owner.returnType.classOrNull?.typeWith(serviceType) ?: return null
+    val javaClassExpr =
+      irBuilder.irCall(javaGetter, type = javaClassType).apply {
+        typeArguments[0] = serviceType
+        arguments[0] = classRef
+      }
 
     // serviceCreator.create(ServiceType::class.java)
-    return irBuilder.irCall(createFun.symbol).apply {
+    return irBuilder.irCall(createFun.symbol, type = serviceType).apply {
       arguments[0] = irBuilder.irGet(serviceCreatorParam)
       typeArguments[0] = serviceType
       arguments[1] = javaClassExpr

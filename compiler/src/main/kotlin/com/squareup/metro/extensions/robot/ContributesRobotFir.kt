@@ -82,7 +82,7 @@ import org.jetbrains.kotlin.name.Name
  * parameters as the constructor and the IR phase fills in a body that calls the constructor
  * directly.
  */
-public class ContributesRobotFir(session: FirSession) :
+public class ContributesRobotFir(session: FirSession, private val compatContext: CompatContext) :
   MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
@@ -148,7 +148,7 @@ public class ContributesRobotFir(session: FirSession) :
         buildAnnotationCallWithScope(
           ClassIds.ORIGIN,
           ArgNames.VALUE,
-          buildClassExpression(owner, session),
+          buildClassExpression(owner, session, compatContext),
           classSymbol,
           session,
         )
@@ -371,6 +371,6 @@ public class ContributesRobotFir(session: FirSession) :
       session: FirSession,
       options: MetroOptions,
       compatContext: CompatContext,
-    ): MetroFirDeclarationGenerationExtension = ContributesRobotFir(session)
+    ): MetroFirDeclarationGenerationExtension = ContributesRobotFir(session, compatContext)
   }
 }

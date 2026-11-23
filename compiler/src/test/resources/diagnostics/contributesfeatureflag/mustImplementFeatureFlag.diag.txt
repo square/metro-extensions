@@ -1,0 +1,1 @@
+/mustImplementFeatureFlag.kt:7:1: error: com.test.NotAFeatureFlag contributes a feature flag to the dependency graph, but doesn't implement com.squareup.featureflags.FeatureFlag.

@@ -15,7 +15,6 @@ import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension
 import dev.zacsweers.metro.compiler.api.fir.MetroContributionHintExtension.ContributionHint
 import dev.zacsweers.metro.compiler.api.fir.MetroFirDeclarationGenerationExtension
 import dev.zacsweers.metro.compiler.compat.CompatContext
-import org.jetbrains.kotlin.KtFakeSourceElementKind
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Modality
@@ -161,7 +160,7 @@ public class ContributesMultibindingScopedFir(
     val scopeSymbol =
       session.symbolProvider.getClassLikeSymbolByClassId(scopeClassId) as? FirClassSymbol<*>
         ?: return null
-    val scopeArg = buildClassExpression(scopeSymbol, session)
+    val scopeArg = buildClassExpression(scopeSymbol, session, compatContext)
     val classSymbol = FirRegularClassSymbol(classId)
 
     return buildRegularClass {
@@ -198,7 +197,7 @@ public class ContributesMultibindingScopedFir(
             buildAnnotationCallWithScope(
               ClassIds.ORIGIN,
               ArgNames.VALUE,
-              buildClassExpression(scopedSymbol, session),
+              buildClassExpression(scopedSymbol, session, compatContext),
               classSymbol,
               session,
             ),
@@ -247,7 +246,7 @@ public class ContributesMultibindingScopedFir(
     val scopeSymbol =
       session.symbolProvider.getClassLikeSymbolByClassId(scopeClassId) as? FirClassSymbol<*>
         ?: return null
-    val scopeArg = buildClassExpression(scopeSymbol, session)
+    val scopeArg = buildClassExpression(scopeSymbol, session, compatContext)
     val shouldGenerateBinds = !hasLegacyScopedProviders(scopedSymbol)
 
     val nestedClassId = owner.classId.createNestedClassId(name)
@@ -286,7 +285,7 @@ public class ContributesMultibindingScopedFir(
           buildAnnotationCallWithScope(
             ClassIds.ORIGIN,
             ArgNames.VALUE,
-            buildClassExpression(scopedSymbol, session),
+            buildClassExpression(scopedSymbol, session, compatContext),
             classSymbol,
             session,
           )
@@ -629,8 +628,7 @@ private class NonAcceptingAnnotationCall(
   override val containingDeclarationSymbol: FirBasedSymbol<*>,
 ) : FirAnnotationCall() {
   override val source: KtSourceElement?
-    get() =
-      with(compatContext) { delegate.source?.fakeElement(KtFakeSourceElementKind.PluginGenerated) }
+    get() = with(compatContext) { delegate.source?.fakeElement(pluginGeneratedSourceElementKind) }
 
   @UnresolvedExpressionTypeAccess
   override val coneTypeOrNull: ConeKotlinType?

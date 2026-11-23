@@ -6,6 +6,7 @@ import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.Keys.ContributesFeatureFlagGeneratorKey
 import com.squareup.metro.extensions.fir.buildAnnotationCallWithScope
 import com.squareup.metro.extensions.fir.buildClassExpression
+import com.squareup.metro.extensions.fir.buildClassQualifier
 import com.squareup.metro.extensions.fir.hasAnnotation
 import com.squareup.metro.extensions.fir.registerPredeclaredFunctionMetadata
 import dev.zacsweers.metro.compiler.MetroOptions
@@ -31,7 +32,6 @@ import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationArgumentMappi
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotationCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.buildGetClassCall
-import org.jetbrains.kotlin.fir.expressions.builder.buildResolvedQualifier
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.extensions.NestedClassGenerationContext
@@ -87,8 +87,10 @@ import org.jetbrains.kotlin.name.SpecialNames
  * `getCallableNamesForClass`/`generateFunctions`) so Metro can see them when deciding what nested
  * classes to generate (e.g., ProvidesFactory).
  */
-public class ContributesFeatureFlagFir(session: FirSession) :
-  MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
+public class ContributesFeatureFlagFir(
+  session: FirSession,
+  private val compatContext: CompatContext,
+) : MetroFirDeclarationGenerationExtension(session), MetroContributionHintExtension {
 
   override fun FirDeclarationPredicateRegistrar.registerPredicates() {
     register(ContributesFeatureFlagIds.PREDICATE)
@@ -160,7 +162,7 @@ public class ContributesFeatureFlagFir(session: FirSession) :
         buildAnnotationCallWithScope(
           ClassIds.ORIGIN,
           ArgNames.VALUE,
-          buildClassExpression(owner, session),
+          buildClassExpression(owner, session, compatContext),
           classSymbol,
           session,
         )
@@ -215,13 +217,8 @@ public class ContributesFeatureFlagFir(session: FirSession) :
     return buildGetClassCall {
       coneTypeOrNull = kClassType
       argumentList = buildArgumentList {
-        arguments += buildResolvedQualifier {
-          packageFqName = appScopeClassId.packageFqName
-          relativeClassFqName = appScopeClassId.relativeClassName
-          coneTypeOrNull = appScopeType
-          symbol = appScopeSymbol
-          resolvedToCompanionObject = false
-        }
+        arguments +=
+          compatContext.buildClassQualifier(appScopeClassId, appScopeSymbol, appScopeType)
       }
     }
   }
@@ -328,6 +325,6 @@ public class ContributesFeatureFlagFir(session: FirSession) :
       session: FirSession,
       options: MetroOptions,
       compatContext: CompatContext,
-    ): MetroFirDeclarationGenerationExtension = ContributesFeatureFlagFir(session)
+    ): MetroFirDeclarationGenerationExtension = ContributesFeatureFlagFir(session, compatContext)
   }
 }

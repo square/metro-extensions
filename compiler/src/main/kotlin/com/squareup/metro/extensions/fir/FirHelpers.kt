@@ -1,6 +1,7 @@
 package com.squareup.metro.extensions.fir
 
 import com.squareup.metro.extensions.ArgNames
+import dev.zacsweers.metro.compiler.compat.CompatContext
 import org.jetbrains.kotlin.fir.FirFunctionTypeParameter
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.builder.buildFunctionTypeParameter
@@ -232,7 +233,7 @@ internal fun extractScopeClassId(
   val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
 
   return when (innerArg) {
-    is FirResolvedQualifier -> innerArg.classId
+    is FirResolvedQualifier -> innerArg.classIdCompat
     is FirPropertyAccessExpression -> {
       val ref = innerArg.calleeReference
       if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {
@@ -693,7 +694,7 @@ private fun resolveClassIdFromGetClassCall(
 ): ClassId? {
   val innerArg = getClassCall.argumentList.arguments.firstOrNull() ?: return null
   return when (innerArg) {
-    is FirResolvedQualifier -> innerArg.classId
+    is FirResolvedQualifier -> innerArg.classIdCompat
     is FirPropertyAccessExpression -> {
       val ref = innerArg.calleeReference
       if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {
@@ -806,6 +807,7 @@ private fun resolveClassIdViaTypeResolver(
 internal fun buildClassExpression(
   classSymbol: FirClassSymbol<*>,
   session: FirSession,
+  compatContext: CompatContext,
 ): FirExpression {
   val classId = classSymbol.classId
   val classType =
@@ -825,13 +827,12 @@ internal fun buildClassExpression(
   return buildGetClassCall {
     coneTypeOrNull = kClassType
     argumentList = buildArgumentList {
-      arguments += buildResolvedQualifier {
-        packageFqName = classId.packageFqName
-        relativeClassFqName = classId.relativeClassName
-        coneTypeOrNull = classType
-        symbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
-        resolvedToCompanionObject = false
-      }
+      arguments +=
+        compatContext.buildClassQualifier(
+          classId,
+          session.symbolProvider.getClassLikeSymbolByClassId(classId)!!,
+          classType,
+        )
     }
   }
 }
@@ -857,3 +858,31 @@ internal fun hasTransitiveSupertype(
     hasTransitiveSupertype(superConeType, session, targetIds, visited)
   }
 }
+
+/**
+ * The [ClassId] a resolved class qualifier refers to. Kotlin 2.4.20 removed
+ * `FirResolvedQualifier.classId` (KT-84522), while `packageFqName` and `relativeClassFqName` exist
+ * on every supported compiler.
+ */
+internal val FirResolvedQualifier.classIdCompat: ClassId?
+  get() = relativeClassFqName?.let { ClassId(packageFqName, it, isLocal = false) }
+
+/**
+ * Builds a resolved qualifier for [classId]. Kotlin 2.4.20 renamed `FirResolvedQualifier.symbol` to
+ * `qualifierSymbol` (KT-84522), so resolved symbols go through Metro's [CompatContext].
+ */
+internal fun CompatContext.buildClassQualifier(
+  classId: ClassId,
+  symbol: FirClassLikeSymbol<*>?,
+  classType: ConeKotlinType,
+): FirResolvedQualifier =
+  if (symbol != null) {
+    buildResolvedQualifierCompat(classId, symbol, classType)
+  } else {
+    buildResolvedQualifier {
+      packageFqName = classId.packageFqName
+      relativeClassFqName = classId.relativeClassName
+      coneTypeOrNull = classType
+      resolvedToCompanionObject = false
+    }
+  }

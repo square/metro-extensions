@@ -1,0 +1,1 @@
+/multipleConstructorsRequireInject.kt:12:1: error: com.test.FakeMyService contributes a service replacement to the Metro graph and has multiple constructors. Annotate the service class or the constructor Metro should use with @Inject.

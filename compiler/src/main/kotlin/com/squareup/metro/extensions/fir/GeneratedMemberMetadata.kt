@@ -3,10 +3,13 @@ package com.squareup.metro.extensions.fir
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.DirectDeclarationsAccess
+import org.jetbrains.kotlin.fir.declarations.FirCallableDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationDataKey
 import org.jetbrains.kotlin.fir.declarations.FirDeclarationDataRegistry
 import org.jetbrains.kotlin.fir.declarations.FirNamedFunction
 import org.jetbrains.kotlin.fir.declarations.origin
+import org.jetbrains.kotlin.fir.serialization.FirProvidedDeclarationsForMetadataService
 import org.jetbrains.kotlin.fir.serialization.providedDeclarationsForMetadataService
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
@@ -34,7 +37,7 @@ internal fun FirSession.registerPredeclaredFunctionMetadata(
   for (symbol in owner.declarationSymbols.filterIsInstance<FirNamedFunctionSymbol>()) {
     val function = symbol.fir
     if (function.origin != key.origin || function.isRegisteredForMetadata == true) continue
-    providedDeclarationsForMetadataService.registerDeclaration(function)
+    providedDeclarationsForMetadataService.registerDeclarationCompat(function, owner.fir)
     function.isRegisteredForMetadata = true
   }
 }
@@ -43,3 +46,22 @@ private object RegisteredForMetadata : FirDeclarationDataKey()
 
 private var FirNamedFunction.isRegisteredForMetadata: Boolean? by
   FirDeclarationDataRegistry.data(RegisteredForMetadata)
+
+/**
+ * Kotlin 2.4.20 added a containing-declaration parameter to
+ * [FirProvidedDeclarationsForMetadataService.registerDeclaration]. Older compilers only expose the
+ * single-argument overload, which is called reflectively so one build supports both.
+ */
+private fun FirProvidedDeclarationsForMetadataService.registerDeclarationCompat(
+  declaration: FirCallableDeclaration,
+  containingDeclaration: FirDeclaration,
+) {
+  try {
+    registerDeclaration(declaration, containingDeclaration)
+  } catch (_: NoSuchMethodError) {
+    FirProvidedDeclarationsForMetadataService::class
+      .java
+      .getMethod("registerDeclaration", FirCallableDeclaration::class.java)
+      .invoke(this, declaration)
+  }
+}

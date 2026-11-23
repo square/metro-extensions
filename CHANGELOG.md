@@ -6,11 +6,17 @@
 
 ### Changed
 
+- Built against Kotlin `2.4.21`. The compiler plugin supports Kotlin `2.4.10` and `2.4.2x` compilers.
+- `ContributesServiceFir`, `ContributesFeatureFlagFir`, `ContributesRobotFir`, and `DevelopmentAppComponentFir` take Metro's `CompatContext` as a constructor parameter.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Fix `NoSuchMethodError` crashes on Kotlin `2.4.20` and newer caused by FIR API changes to `FirResolvedQualifier`, `FirProvidedDeclarationsForMetadataService`, and `KtFakeSourceElementKind.PluginGenerated`.
+- `@ContributesService` no longer generates IR whose `ServiceCreator.create` and `KClass.java` calls keep an unsubstituted type parameter as their type, which Kotlin `2.4.20` and newer reject during IR validation.
 
 ### Security
 

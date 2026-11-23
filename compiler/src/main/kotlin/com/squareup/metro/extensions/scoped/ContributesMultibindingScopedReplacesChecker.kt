@@ -3,6 +3,7 @@ package com.squareup.metro.extensions.scoped
 import com.squareup.metro.extensions.ArgNames
 import com.squareup.metro.extensions.ClassIds
 import com.squareup.metro.extensions.fir.SquareMetroExtensionsDiagnostics
+import com.squareup.metro.extensions.fir.classIdCompat
 import com.squareup.metro.extensions.fir.extractClassIdsFromArrayArg
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
@@ -129,7 +130,7 @@ internal object ContributesMultibindingScopedReplacesChecker :
       is FirGetClassCall -> {
         val innerArg = expr.argumentList.arguments.firstOrNull() ?: return null
         when (innerArg) {
-          is FirResolvedQualifier -> innerArg.classId
+          is FirResolvedQualifier -> innerArg.classIdCompat
           is FirPropertyAccessExpression -> {
             val ref = innerArg.calleeReference
             if (ref is FirResolvedNamedReference && ref.resolvedSymbol is FirClassLikeSymbol<*>) {

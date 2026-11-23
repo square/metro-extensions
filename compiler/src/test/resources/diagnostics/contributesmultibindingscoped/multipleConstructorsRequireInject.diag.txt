@@ -1,0 +1,1 @@
+/multipleConstructorsRequireInject.kt:8:1: error: com.test.MyScoped contributes a multibinding for mortar.Scoped to the Metro graph and has multiple constructors. Annotate the scoped class or the constructor Metro should use with @Inject.
