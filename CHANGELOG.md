@@ -6,22 +6,29 @@
 
 ### Changed
 
-- Built against Kotlin `2.4.21`. The compiler plugin supports Kotlin `2.4.10` and `2.4.2x` compilers.
-- `ContributesServiceFir`, `ContributesFeatureFlagFir`, `ContributesRobotFir`, and `DevelopmentAppComponentFir` take Metro's `CompatContext` as a constructor parameter.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Fix `NoSuchMethodError` crashes on Kotlin `2.4.20` and newer caused by FIR API changes to `FirResolvedQualifier`, `FirProvidedDeclarationsForMetadataService`, and `KtFakeSourceElementKind.PluginGenerated`.
-- `@ContributesService` no longer generates IR whose `ServiceCreator.create` and `KClass.java` calls keep an unsubstituted type parameter as their type, which Kotlin `2.4.20` and newer reject during IR validation.
-
 ### Security
 
 ### Other Notes & Contributions
 
+
+## [0.0.16] - 2026-11-24
+
+### Changed
+
+- Built against Kotlin `2.4.21`. The compiler plugin supports Kotlin `2.4.10` and `2.4.2x` compilers.
+- `ContributesServiceFir`, `ContributesFeatureFlagFir`, `ContributesRobotFir`, and `DevelopmentAppComponentFir` take Metro's `CompatContext` as a constructor parameter.
+
+### Fixed
+
+- Fix `NoSuchMethodError` crashes on Kotlin `2.4.20` and newer caused by FIR API changes to `FirResolvedQualifier`, `FirProvidedDeclarationsForMetadataService`, and `KtFakeSourceElementKind.PluginGenerated`.
+- Generated `@ContributesRobot` provider names now include the robot's qualified class identity, so robots with the same simple name in different packages no longer collide.
+- `@ContributesService` no longer generates IR whose `ServiceCreator.create` and `KClass.java` calls keep an unsubstituted type parameter as their type, which Kotlin `2.4.20` and newer reject during IR validation.
 
 ## [0.0.15] - 2026-11-03
 
@@ -151,7 +158,8 @@
 - Support for `@ContributesRobot`.
 
 
-[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.15...HEAD
+[Unreleased]: https://github.com/square/metro-extensions/compare/0.0.16...HEAD
+[0.0.16]: https://github.com/square/metro-extensions/compare/0.0.16
 [0.0.15]: https://github.com/square/metro-extensions/compare/0.0.15
 [0.0.14]: https://github.com/square/metro-extensions/compare/0.0.14
 [0.0.13]: https://github.com/square/metro-extensions/compare/0.0.13
